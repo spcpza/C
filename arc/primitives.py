@@ -517,6 +517,124 @@ def shift_down_1(g: Grid) -> Grid:
     return [[bg] * len(g[0])] + [list(r) for r in g[:-1]]
 
 
+def row_majority(g: Grid) -> Grid:
+    """Each row becomes a solid row of its most common color."""
+    if not g:
+        return []
+    out = []
+    for row in g:
+        c = max(set(row), key=row.count)
+        out.append([c] * len(row))
+    return out
+
+
+def col_majority(g: Grid) -> Grid:
+    if not g:
+        return []
+    return transpose(row_majority(transpose(g)))
+
+
+def erase_singletons(g: Grid) -> Grid:
+    """Remove cells with no same-color 4-neighbor."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [list(r) for r in g]
+    for r in range(rows):
+        for c in range(cols):
+            v = g[r][c]
+            if v == bg:
+                continue
+            has_friend = False
+            for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+                nr, nc = r+dr, c+dc
+                if 0 <= nr < rows and 0 <= nc < cols and g[nr][nc] == v:
+                    has_friend = True; break
+            if not has_friend:
+                out[r][c] = bg
+    return out
+
+
+def fill_largest_to_rect(g: Grid) -> Grid:
+    """Fill the bbox of the largest non-bg component, preserving color."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    # find components
+    seen = [[False]*cols for _ in range(rows)]
+    comps = []
+    for r in range(rows):
+        for c in range(cols):
+            if seen[r][c] or g[r][c] == bg:
+                continue
+            color = g[r][c]
+            stack = [(r,c)]; comp = []
+            while stack:
+                rr,cc = stack.pop()
+                if rr<0 or rr>=rows or cc<0 or cc>=cols: continue
+                if seen[rr][cc] or g[rr][cc] != color: continue
+                seen[rr][cc] = True; comp.append((rr,cc))
+                stack += [(rr+1,cc),(rr-1,cc),(rr,cc+1),(rr,cc-1)]
+            if comp:
+                comps.append((color, comp))
+    if not comps:
+        return [list(r) for r in g]
+    color, biggest = max(comps, key=lambda kv: len(kv[1]))
+    r0 = min(r for r,_ in biggest); r1 = max(r for r,_ in biggest)
+    c0 = min(c for _,c in biggest); c1 = max(c for _,c in biggest)
+    out = [list(r) for r in g]
+    for r in range(r0, r1+1):
+        for c in range(c0, c1+1):
+            out[r][c] = color
+    return out
+
+
+def thicken_1(g: Grid) -> Grid:
+    """Grow every non-bg cell to its 4-neighbors (bg → adjacent color)."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [list(r) for r in g]
+    for r in range(rows):
+        for c in range(cols):
+            if g[r][c] != bg:
+                continue
+            for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+                nr, nc = r+dr, c+dc
+                if 0 <= nr < rows and 0 <= nc < cols and g[nr][nc] != bg:
+                    out[r][c] = g[nr][nc]
+                    break
+    return out
+
+
+def first_nonbg_per_col(g: Grid) -> Grid:
+    if not g:
+        return []
+    return transpose(first_nonbg_per_row(transpose(g)))
+
+
+def collapse_to_palette(g: Grid) -> Grid:
+    """Output: a 1xN row containing each distinct color from input, in order of first appearance."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    seen: list[int] = []
+    for row in g:
+        for v in row:
+            if v != bg and v not in seen:
+                seen.append(v)
+    if not seen:
+        return [[bg]]
+    return [seen]
+
+
 def complete_symmetry_h(g: Grid) -> Grid:
     out = [list(r) for r in g]
     rows = len(out); cols = len(out[0]) if rows else 0
@@ -745,6 +863,13 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "shift_left_1":         shift_left_1,
     "shift_up_1":           shift_up_1,
     "shift_down_1":         shift_down_1,
+    "row_majority":         row_majority,
+    "col_majority":         col_majority,
+    "erase_singletons":     erase_singletons,
+    "fill_largest_to_rect": fill_largest_to_rect,
+    "thicken_1":            thicken_1,
+    "first_nonbg_per_col":  first_nonbg_per_col,
+    "collapse_to_palette":  collapse_to_palette,
 }
 
 
@@ -807,4 +932,11 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "shift_left_1":            "passage",
     "shift_up_1":              "rising",
     "shift_down_1":            "low_places",
+    "row_majority":            "majority",
+    "col_majority":            "majority",
+    "erase_singletons":        "winnow",
+    "fill_largest_to_rect":    "filling",
+    "thicken_1":               "increase",
+    "first_nonbg_per_col":     "gathering",
+    "collapse_to_palette":     "distinguishing",
 }

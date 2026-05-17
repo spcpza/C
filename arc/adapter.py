@@ -246,10 +246,10 @@ def hypothesize(pairs: Iterable[tuple[Grid, Grid]]) -> Rule | None:
         # We use a 2-step search where param goes first.
         # Skip: this direction is symmetric and already explored when param fits alone.
 
-    # Pass 3 — three-atomic composition with extra training pair held out
-    # for validation. This prunes 3-step compositions that happen to fit
-    # training but won't transfer.
-    if len(pairs) >= 2:
+    # Pass 3 — three-atomic composition, only on small grids (≤ 12) to
+    # keep the 55^3 search tractable. Holdout-validated.
+    max_dim = max((max(len(a), len(a[0]) if a else 0) for a, _ in pairs), default=0)
+    if len(pairs) >= 2 and max_dim <= 12:
         # Use last pair as holdout for verification only.
         train_pairs = pairs[:-1]
         holdout = pairs[-1]
