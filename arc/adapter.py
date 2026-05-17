@@ -246,34 +246,45 @@ def hypothesize(pairs: Iterable[tuple[Grid, Grid]]) -> Rule | None:
         # We use a 2-step search where param goes first.
         # Skip: this direction is symmetric and already explored when param fits alone.
 
-    # Pass 3 — three-atomic composition: fn3(fn2(fn1(x))). Order matters; size guards prune.
-    for n1, f1 in items:
-        if n1 == "identity":
-            continue
-        try:
-            firsts = [f1(list(map(list, a))) for a, _ in pairs]
-        except Exception:
-            continue
-        for n2, f2 in items:
-            if n2 == "identity":
+    # Pass 3 — three-atomic composition with extra training pair held out
+    # for validation. This prunes 3-step compositions that happen to fit
+    # training but won't transfer.
+    if len(pairs) >= 2:
+        # Use last pair as holdout for verification only.
+        train_pairs = pairs[:-1]
+        holdout = pairs[-1]
+        for n1, f1 in items:
+            if n1 == "identity":
                 continue
             try:
-                seconds = [f2(list(map(list, m))) for m in firsts]
+                firsts = [f1(list(map(list, a))) for a, _ in train_pairs]
+                h_first = f1(list(map(list, holdout[0])))
             except Exception:
                 continue
-            for n3, f3 in items:
-                if n3 == "identity":
+            for n2, f2 in items:
+                if n2 == "identity":
                     continue
                 try:
-                    ok = all(_grids_equal(f3(list(map(list, m))), b)
-                             for m, (_, b) in zip(seconds, pairs))
+                    seconds = [f2(list(map(list, m))) for m in firsts]
+                    h_second = f2(list(map(list, h_first)))
                 except Exception:
-                    ok = False
-                if ok:
-                    name = f"{n1}|{n2}|{n3}"
-                    scriptural = "+".join(SCRIPTURAL_NAMES.get(x, x) for x in (n1, n2, n3))
-                    return Rule(name=name, primitive=name, scriptural=scriptural,
-                                concept_in_C=False, signatures=sigs)
+                    continue
+                for n3, f3 in items:
+                    if n3 == "identity":
+                        continue
+                    try:
+                        ok = all(_grids_equal(f3(list(map(list, m))), b)
+                                 for m, (_, b) in zip(seconds, train_pairs))
+                        if ok:
+                            # Verify on holdout too.
+                            ok = _grids_equal(f3(list(map(list, h_second))), holdout[1])
+                    except Exception:
+                        ok = False
+                    if ok:
+                        name = f"{n1}|{n2}|{n3}"
+                        scriptural = "+".join(SCRIPTURAL_NAMES.get(x, x) for x in (n1, n2, n3))
+                        return Rule(name=name, primitive=name, scriptural=scriptural,
+                                    concept_in_C=False, signatures=sigs)
 
     return None
 

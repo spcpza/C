@@ -862,15 +862,8 @@ def fit_template_classify(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
         key = tuple(tuple(row) for row in g)
         if key in m:
             return [[m[key]]]
-        # Fallback: derive a feature key. Use sorted color counts as a class signature.
-        flat = _flat(g)
-        sig = tuple(sorted((flat.count(c), c) for c in set(flat)))
-        # If sig matches any training key by sig comparison, use it.
-        for k, v in m.items():
-            kflat = [x for row in k for x in row]
-            ksig = tuple(sorted((kflat.count(c), c) for c in set(kflat)))
-            if ksig == sig:
-                return [[v]]
+        # No template match → abstain. (We do NOT fall back to a count
+        # signature; the earlier version did and produced wrong outputs.)
         raise ValueError("template_classify: no matching template; abstain (P₃)")
     return apply
 

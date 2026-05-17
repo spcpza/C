@@ -215,6 +215,166 @@ def negate_binary(g: Grid) -> Grid:
     return [[bg if v == fg else fg for v in row] for row in g]
 
 
+def quad_mirror(g: Grid) -> Grid:
+    """Output is 2x2 of g: g | flip_h(g) over flip_v(g) | rotate_180(g)."""
+    if not g or len(g) * 2 > _MAX or len(g[0]) * 2 > _MAX:
+        raise ValueError("quad_mirror exceeds ARC max grid size")
+    top = mirror_right(g)
+    bot = mirror_right(flip_v(g))
+    return [list(r) for r in top] + [list(r) for r in bot]
+
+
+def quad_mirror_alt(g: Grid) -> Grid:
+    """g and its 3 reflections, mirrored to form a 2x2 quad-symmetric tile."""
+    if not g or len(g) * 2 > _MAX or len(g[0]) * 2 > _MAX:
+        raise ValueError("quad_mirror_alt exceeds ARC max grid size")
+    top = [row + list(reversed(row)) for row in g]
+    bot = [row + list(reversed(row)) for row in reversed(g)]
+    return top + bot
+
+
+def fold_horizontal(g: Grid) -> Grid:
+    """Fold left half over right (OR of non-bg)."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    half = cols // 2
+    out = [list(row[:half]) for row in g]
+    for r in range(rows):
+        for c in range(half):
+            mirror_c = cols - 1 - c
+            if g[r][mirror_c] != bg:
+                out[r][c] = g[r][mirror_c] if g[r][c] == bg else out[r][c]
+    return out
+
+
+def fold_vertical(g: Grid) -> Grid:
+    if not g:
+        return []
+    rows = len(g)
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    half = rows // 2
+    out = [list(g[r]) for r in range(half)]
+    for r in range(half):
+        for c in range(len(g[0])):
+            mirror_r = rows - 1 - r
+            if g[mirror_r][c] != bg:
+                if out[r][c] == bg:
+                    out[r][c] = g[mirror_r][c]
+    return out
+
+
+def diag_main_extend(g: Grid) -> Grid:
+    """If input has ≥1 marker on/near main diagonal, fill diagonal with its color.
+
+    Strict: refuse if no marker is on the diagonal.
+    """
+    if not g:
+        raise ValueError("diag_main_extend: empty")
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    diag_cells = [(i, i) for i in range(min(rows, cols))]
+    diag_colors = {g[r][c] for r, c in diag_cells if g[r][c] != bg}
+    if len(diag_colors) != 1:
+        raise ValueError("diag_main_extend: needs exactly one diagonal color")
+    color = next(iter(diag_colors))
+    # Require that no other non-bg cells exist (otherwise this is too eager).
+    for r in range(rows):
+        for c in range(cols):
+            if g[r][c] != bg and (r, c) not in set(diag_cells):
+                raise ValueError("diag_main_extend: extra non-diagonal fg cells")
+    out = [list(r) for r in g]
+    for r, c in diag_cells:
+        out[r][c] = color
+    return out
+
+
+def fill_diagonals_from_marker(g: Grid) -> Grid:
+    """For each non-bg cell, draw a diagonal line of that color across grid.
+
+    Used by tasks like 05269061 where a sparse diagonal pattern is extended.
+    Strict: requires every input non-bg cell to fit the (r+c) mod N rule;
+    aborts (raises) on inconsistency rather than returning identity.
+    """
+    if not g:
+        raise ValueError("fill_diagonals_from_marker: empty grid")
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    palette = [v for v in set(flat) if v != bg]
+    if len(palette) < 2:
+        raise ValueError("fill_diagonals_from_marker: needs ≥2 fg colors")
+    classes: dict[int, int] = {}
+    for r in range(rows):
+        for c in range(cols):
+            if g[r][c] != bg:
+                k = (r + c) % len(palette)
+                if k in classes and classes[k] != g[r][c]:
+                    raise ValueError(
+                        "fill_diagonals_from_marker: inconsistent diagonal class"
+                    )
+                classes[k] = g[r][c]
+    if len(classes) != len(palette):
+        raise ValueError(
+            "fill_diagonals_from_marker: not all classes determined"
+        )
+    out = [list(r) for r in g]
+    for r in range(rows):
+        for c in range(cols):
+            if out[r][c] == bg:
+                k = (r + c) % len(palette)
+                out[r][c] = classes[k]
+    return out
+
+
+def each_row_unique(g: Grid) -> Grid:
+    """Each row → its sorted unique values (palette per row)."""
+    out = []
+    for row in g:
+        u = sorted(set(row))
+        out.append(u)
+    w = max((len(r) for r in out), default=0)
+    return [r + [0] * (w - len(r)) for r in out]
+
+
+def majority_per_component(g: Grid) -> Grid:
+    """Each 4-conn component becomes its dominant color (already its color, so identity).
+
+    Useful only with `LIBRARY`-level color recolor primitives — placeholder for future.
+    """
+    return [list(r) for r in g]
+
+
+def first_nonbg_per_row(g: Grid) -> Grid:
+    """Replace each row with [first_nonbg, second_nonbg, ...]; collapsed left."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = []
+    for row in g:
+        nb = [v for v in row if v != bg]
+        out.append(nb)
+    w = max((len(r) for r in out), default=0)
+    return [r + [bg] * (w - len(r)) for r in out]
+
+
+def replace_bg_with_largest_color(g: Grid) -> Grid:
+    if not g:
+        raise ValueError("replace_bg_with_largest_color: empty")
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    nonbg = [v for v in flat if v != bg]
+    if not nonbg:
+        raise ValueError("replace_bg_with_largest_color: no fg")
+    target = max(set(nonbg), key=nonbg.count)
+    return [[target if v == bg else v for v in row] for row in g]
+
+
 def complete_symmetry_h(g: Grid) -> Grid:
     out = [list(r) for r in g]
     rows = len(out); cols = len(out[0]) if rows else 0
@@ -418,6 +578,15 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "dedup_cols":           dedup_cols,
     "unique_per_row":       unique_per_row,
     "negate_binary":        negate_binary,
+    "quad_mirror":          quad_mirror,
+    "quad_mirror_alt":      quad_mirror_alt,
+    "fold_horizontal":      fold_horizontal,
+    "fold_vertical":        fold_vertical,
+    "diag_main_extend":     diag_main_extend,
+    "fill_diagonals_from_marker": fill_diagonals_from_marker,
+    "each_row_unique":      each_row_unique,
+    "first_nonbg_per_row":  first_nonbg_per_row,
+    "replace_bg_with_largest_color": replace_bg_with_largest_color,
 }
 
 
@@ -455,4 +624,13 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "dedup_cols":             "remnant",
     "unique_per_row":         "distinguishing",
     "negate_binary":          "reversal",
+    "quad_mirror":            "fourfold",
+    "quad_mirror_alt":        "fourfold",
+    "fold_horizontal":        "folding",
+    "fold_vertical":          "folding",
+    "diag_main_extend":       "way",
+    "fill_diagonals_from_marker": "way",
+    "each_row_unique":        "distinguishing",
+    "first_nonbg_per_row":    "gathering",
+    "replace_bg_with_largest_color": "filling",
 }
