@@ -127,6 +127,63 @@ def hypothesize(pairs: Iterable[tuple[Grid, Grid]]) -> Rule | None:
                         concept_in_C=_concept_known(scriptural),
                         signatures=sigs)
 
+    # Pass 1c — meta: atomic_op then inferred color_map.
+    # For each atomic op f, check if there's a consistent color mapping
+    # m such that m(f(x)) == y for every training pair.
+    from .parametric import _infer_color_map
+    for name, fn in LIBRARY.items():
+        if name == "identity":
+            continue
+        try:
+            firsts = [fn(list(map(list, a))) for a, _ in pairs]
+        except Exception:
+            continue
+        # Build a combined mapping across all pairs.
+        combined: dict[int, int] = {}
+        consistent = True
+        for first, (_, b) in zip(firsts, pairs):
+            m = _infer_color_map(first, list(map(list, b)))
+            if m is None:
+                consistent = False; break
+            for k, v in m.items():
+                if k in combined and combined[k] != v:
+                    consistent = False; break
+                combined[k] = v
+            if not consistent:
+                break
+        if not consistent or not combined:
+            continue
+        # Reject identity mapping (would mean fn already solves alone).
+        if all(k == v for k, v in combined.items()):
+            continue
+        # Reject if any pair's first→target was identity (= color-map-only suffices).
+        # That belongs to the color_permutation fitter, not this meta.
+        m_fixed = dict(combined); domain = set(m_fixed.keys())
+
+        def make_apply(_fn=fn, _m=m_fixed, _dom=domain):
+            def apply(g: Grid) -> Grid:
+                stepped = _fn([list(r) for r in g])
+                for row in stepped:
+                    for v in row:
+                        if v not in _dom:
+                            raise ValueError(
+                                f"meta atomic+recolor: color {v} not in trained mapping; abstain"
+                            )
+                return [[_m[v] for v in row] for row in stepped]
+            return apply
+
+        apply = make_apply()
+        try:
+            ok = all(_grids_equal(apply(list(map(list, a))), b) for a, b in pairs)
+        except Exception:
+            ok = False
+        if ok:
+            full_name = f"meta:{name}+recolor"
+            scriptural = SCRIPTURAL_NAMES.get(name, name) + "+renaming"
+            return Rule(name=full_name, primitive=full_name,
+                        scriptural=scriptural,
+                        concept_in_C=False, signatures=sigs)
+
     # Pass 2 — two-primitive compositions: fn2(fn1(x)).
     items = list(LIBRARY.items())
     seconds_cache: dict[str, list] = {}
@@ -250,6 +307,35 @@ def apply_rule(rule: Rule, x: Grid, pairs: Iterable[tuple[Grid, Grid]] | None = 
                 raise NotImplementedError(f"parametric refit failed for {kind!r}")
             return fn([list(r) for r in x])
         raise NotImplementedError(f"unknown parametric {kind!r}")
+
+    if name.startswith("meta:") and name.endswith("+recolor"):
+        # name is meta:<atomic>+recolor
+        if pairs is None:
+            raise ValueError("meta rule requires training pairs to re-fit")
+        atomic_name = name[len("meta:"):-len("+recolor")]
+        fn = LIBRARY.get(atomic_name)
+        if fn is None:
+            raise NotImplementedError(f"meta atomic {atomic_name!r} missing")
+        # Re-infer the color mapping
+        from .parametric import _infer_color_map
+        combined: dict[int, int] = {}
+        for a, b in pairs:
+            first = fn(list(map(list, a)))
+            m = _infer_color_map(first, list(map(list, b)))
+            if m is None:
+                raise NotImplementedError("meta refit: inconsistent mapping")
+            for k, v in m.items():
+                if k in combined and combined[k] != v:
+                    raise NotImplementedError("meta refit: mapping conflict")
+                combined[k] = v
+        stepped = fn([list(r) for r in x])
+        for row in stepped:
+            for v in row:
+                if v not in combined:
+                    raise ValueError(
+                        f"meta atomic+recolor: color {v} not in trained mapping"
+                    )
+        return [[combined[v] for v in row] for row in stepped]
 
     if "|" in name:
         parts = name.split("|")

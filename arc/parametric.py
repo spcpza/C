@@ -18,6 +18,28 @@ from typing import Callable
 Grid = list[list[int]]
 
 
+# ---------------------------------------------------------------
+#  Meta-fitter helpers: infer color mapping between two grids.
+# ---------------------------------------------------------------
+
+def _infer_color_map(a: Grid, b: Grid) -> dict[int, int] | None:
+    """Return cell-wise color mapping a → b, or None if inconsistent."""
+    if not a or not b:
+        return None
+    if len(a) != len(b) or len(a[0]) != len(b[0]):
+        return None
+    m: dict[int, int] = {}
+    for r in range(len(a)):
+        for c in range(len(a[0])):
+            v, w = a[r][c], b[r][c]
+            if v in m:
+                if m[v] != w:
+                    return None
+            else:
+                m[v] = w
+    return m
+
+
 def _flat(g: Grid) -> list[int]:
     return [v for row in g for v in row]
 
