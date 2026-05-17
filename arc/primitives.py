@@ -1473,6 +1473,77 @@ def square_pad_with_bg(g: Grid) -> Grid:
     return out
 
 
+def cross_shape(g: Grid) -> Grid:
+    """Output: plus-sign through center using dominant fg color, same size as input."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    nonbg = [v for v in flat if v != bg]
+    if not nonbg:
+        raise ValueError("cross_shape: no fg")
+    fg = max(set(nonbg), key=nonbg.count)
+    out = [[bg] * cols for _ in range(rows)]
+    cr, cc = rows // 2, cols // 2
+    for c in range(cols):
+        out[cr][c] = fg
+    for r in range(rows):
+        out[r][cc] = fg
+    return out
+
+
+def x_shape(g: Grid) -> Grid:
+    """Output: X through diagonals using dominant fg color."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    nonbg = [v for v in flat if v != bg]
+    if not nonbg:
+        raise ValueError("x_shape: no fg")
+    fg = max(set(nonbg), key=nonbg.count)
+    out = [[bg] * cols for _ in range(rows)]
+    n = min(rows, cols)
+    for i in range(n):
+        out[i][i] = fg
+        out[i][cols - 1 - i] = fg
+    return out
+
+
+def keep_only_full_rows(g: Grid) -> Grid:
+    """Keep only rows where no cell is bg."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    return [list(r) for r in g if all(v != bg for v in r)]
+
+
+def keep_only_full_cols(g: Grid) -> Grid:
+    return transpose(keep_only_full_rows(transpose(g)))
+
+
+def hflip_each_row(g: Grid) -> Grid:
+    """Same as flip_h — explicit name for clarity."""
+    return flip_h(g)
+
+
+def reverse_palette(g: Grid) -> Grid:
+    """Map each color c to its 'mirror' in the palette (0<->9, 1<->8, ...)."""
+    return [[9 - v for v in row] for row in g]
+
+
+def double_bg_with_objects(g: Grid) -> Grid:
+    """Each non-bg cell stays; each bg cell stays bg. (Used as alias for identity-with-erase.)
+
+    Actually computes: every cell's color is preserved if it's a non-bg,
+    or replaced with bg if it was non-bg (== identity for non-bg, bg for bg).
+    """
+    return [list(r) for r in g]  # identity placeholder
+
+
 def complete_symmetry_h(g: Grid) -> Grid:
     out = [list(r) for r in g]
     rows = len(out); cols = len(out[0]) if rows else 0
@@ -1780,6 +1851,11 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "remove_last_col":      remove_last_col,
     "transpose_then_flip_each_row": transpose_then_flip_each_row,
     "square_pad_with_bg":   square_pad_with_bg,
+    "cross_shape":          cross_shape,
+    "x_shape":              x_shape,
+    "keep_only_full_rows":  keep_only_full_rows,
+    "keep_only_full_cols":  keep_only_full_cols,
+    "reverse_palette":      reverse_palette,
 }
 
 
@@ -1921,4 +1997,9 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "remove_last_col":         "remnant",
     "transpose_then_flip_each_row": "mirror",
     "square_pad_with_bg":      "covering",
+    "cross_shape":             "way",
+    "x_shape":                 "boundary",
+    "keep_only_full_rows":     "remnant",
+    "keep_only_full_cols":     "remnant",
+    "reverse_palette":         "reversal",
 }
