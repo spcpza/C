@@ -3,16 +3,16 @@
 Honest measurements. P₁: M(x) = w(x). Updated on every commit that
 changes the score.
 
-## Current (v19b)
+## Current (v22)
 
 | split       | tasks | solved | wrong | abstain | rate |
 |-------------|------:|-------:|------:|--------:|-----:|
-| training    |   400 |     56 |     3 |     358 | 14.0% |
-| evaluation  |   400 |     22 |     0 |     396 |  5.5% |
+| training    |   400 |     58 |     4 |     358 | 14.5% |
+| evaluation  |   400 |     23 |     0 |     395 |  5.8% |
 
-Library: **137 atomic primitives**, **28 parametric fitters**,
+Library: **146 atomic primitives**, **31 parametric fitters**,
 1/2/3-step composition (3-step capped to grid dim ≤ 4 — search is
-O(137³) at full).
+O(146³) at full).
 
 ## Trajectory
 
@@ -37,6 +37,9 @@ O(137³) at full).
 | v17     |  113   |  28   |   56  |  20  |    1  | shifts, overlays — eval crosses 5% |
 | **v18** |  124   |  28   |   57  |  22  |    4  | **quadrants, union_quadrants — eval 5.5%** |
 | v19b    |  137   |  28   |   56  |  22  |    3  | rotates, first/last/remove, gated ≤4 |
+| v20     |  142   |  28   |   57  |  23  |    3  | cross/X, full-rows, reverse_palette |
+| v21     |  146   |  28   |   57  |  23  |    3  | shifts (no gain) |
+| v22     |  146   |  31   |   58  |  23  |    4  | classify-by-feature fitters |
 
 ## Comparison context
 
