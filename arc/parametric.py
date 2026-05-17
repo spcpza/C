@@ -758,6 +758,338 @@ def fit_each_cell_repeated_input(pairs: list[tuple[Grid, Grid]]) -> Callable | N
 #  Registry of parametric fitters.
 # ---------------------------------------------------------------
 
+# ---------------------------------------------------------------
+#  shift — shift the grid by (dr, dc), with bg fill.
+# ---------------------------------------------------------------
+
+def fit_shift(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    deltas: set[tuple[int, int]] = set()
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        rows, cols = _shape(inp)
+        bg = _background(inp)
+        valid: set[tuple[int, int]] = set()
+        for dr in range(-rows + 1, rows):
+            for dc in range(-cols + 1, cols):
+                if dr == 0 and dc == 0:
+                    continue
+                ok = True
+                for r in range(rows):
+                    for c in range(cols):
+                        sr, sc = r - dr, c - dc
+                        if 0 <= sr < rows and 0 <= sc < cols:
+                            expected = inp[sr][sc]
+                        else:
+                            expected = bg
+                        if out[r][c] != expected:
+                            ok = False
+                            break
+                    if not ok:
+                        break
+                if ok:
+                    valid.add((dr, dc))
+        if not deltas:
+            deltas = valid
+        else:
+            deltas &= valid
+        if not deltas:
+            return None
+    if not deltas:
+        return None
+    # Choose the shift with smallest |dr|+|dc|, then lex.
+    dr, dc = min(deltas, key=lambda d: (abs(d[0]) + abs(d[1]), d))
+
+    def apply(g: Grid) -> Grid:
+        rows, cols = _shape(g)
+        bg = _background(g)
+        out = [[bg] * cols for _ in range(rows)]
+        for r in range(rows):
+            for c in range(cols):
+                sr, sc = r - dr, c - dc
+                if 0 <= sr < rows and 0 <= sc < cols:
+                    out[r][c] = g[sr][sc]
+        return out
+    return apply
+
+
+# ---------------------------------------------------------------
+#  template_classify — output is a fixed single-cell color whose
+#  value depends on which input template matches.
+# ---------------------------------------------------------------
+
+def fit_template_classify(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    # Output is 1x1 in every training pair, and matches input -> color map.
+    mapping: dict[tuple[tuple[int, ...], ...], int] = {}
+    for inp, out in pairs:
+        if _shape(out) != (1, 1):
+            return None
+        key = tuple(tuple(row) for row in inp)
+        c = out[0][0]
+        if key in mapping and mapping[key] != c:
+            return None
+        mapping[key] = c
+    if not mapping:
+        return None
+    m = dict(mapping)
+
+    def apply(g: Grid) -> Grid:
+        key = tuple(tuple(row) for row in g)
+        if key in m:
+            return [[m[key]]]
+        # Fallback: derive a feature key. Use sorted color counts as a class signature.
+        flat = _flat(g)
+        sig = tuple(sorted((flat.count(c), c) for c in set(flat)))
+        # If sig matches any training key by sig comparison, use it.
+        for k, v in m.items():
+            kflat = [x for row in k for x in row]
+            ksig = tuple(sorted((kflat.count(c), c) for c in set(kflat)))
+            if ksig == sig:
+                return [[v]]
+        raise ValueError("template_classify: no matching template; abstain (P₃)")
+    return apply
+
+
+# ---------------------------------------------------------------
+#  overlay_halves — input is split by a constant-color divider;
+#  output is the cell-wise AND/OR/XOR of the two halves at a recolor.
+# ---------------------------------------------------------------
+
+def fit_overlay_halves(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    div_color: int | None = None
+    output_color: int | None = None
+    mode: str | None = None  # "and" | "or" | "xor"
+    horizontal: bool | None = None
+    for inp, out in pairs:
+        rows, cols = _shape(inp)
+        bg = _background(inp)
+        # Find a row or column that is constant of a single non-bg color, splitting in half.
+        h_div_row = None
+        for r in range(rows):
+            if len(set(inp[r])) == 1 and inp[r][0] != bg:
+                h_div_row = r; break
+        v_div_col = None
+        for c in range(cols):
+            col = [inp[r][c] for r in range(rows)]
+            if len(set(col)) == 1 and col[0] != bg:
+                v_div_col = c; break
+        if h_div_row is None and v_div_col is None:
+            return None
+        # Prefer the orientation that splits evenly.
+        if v_div_col is not None and (v_div_col, cols - 1 - v_div_col)[0] == cols - 1 - v_div_col:
+            this_horiz = False
+            div_c = inp[0][v_div_col]
+            left = [row[:v_div_col] for row in inp]
+            right = [row[v_div_col + 1:] for row in inp]
+            if _shape(left) != _shape(right):
+                return None
+            halves = (left, right)
+        elif h_div_row is not None and h_div_row == rows - 1 - h_div_row:
+            this_horiz = True
+            div_c = inp[h_div_row][0]
+            top = inp[:h_div_row]
+            bot = inp[h_div_row + 1:]
+            if _shape(top) != _shape(bot):
+                return None
+            halves = (top, bot)
+        else:
+            return None
+        if horizontal is None:
+            horizontal = this_horiz
+        elif horizontal != this_horiz:
+            return None
+        if div_color is None:
+            div_color = div_c
+        elif div_color != div_c:
+            return None
+        if _shape(out) != _shape(halves[0]):
+            return None
+        # Try each mode (and: both non-bg; or: either non-bg; xor: exactly one non-bg).
+        for try_mode in ("and", "or", "xor"):
+            possible_color: int | None = None
+            ok = True
+            for r in range(len(out)):
+                for c in range(len(out[0])):
+                    a = halves[0][r][c]
+                    b = halves[1][r][c]
+                    if try_mode == "and":
+                        active = (a != bg) and (b != bg)
+                    elif try_mode == "or":
+                        active = (a != bg) or (b != bg)
+                    else:
+                        active = (a != bg) != (b != bg)
+                    if active:
+                        if possible_color is None:
+                            possible_color = out[r][c]
+                        elif possible_color != out[r][c]:
+                            ok = False; break
+                    else:
+                        if out[r][c] != bg:
+                            ok = False; break
+                if not ok:
+                    break
+            if ok and possible_color is not None:
+                if mode is None:
+                    mode = try_mode
+                    output_color = possible_color
+                    break
+                elif mode == try_mode and output_color == possible_color:
+                    break
+        else:
+            return None
+    if mode is None or div_color is None or output_color is None or horizontal is None:
+        return None
+    div_c, out_c, m_mode, horiz = div_color, output_color, mode, horizontal
+
+    def apply(g: Grid) -> Grid:
+        rows, cols = _shape(g)
+        bg = _background(g)
+        if horiz:
+            # find divider row of constant div_c
+            row = next((r for r in range(rows) if all(g[r][c] == div_c for c in range(cols))), None)
+            if row is None:
+                raise ValueError("overlay_halves: divider not found in test")
+            top = g[:row]; bot = g[row + 1:]
+            halves = (top, bot)
+        else:
+            col = next((c for c in range(cols) if all(g[r][c] == div_c for r in range(rows))), None)
+            if col is None:
+                raise ValueError("overlay_halves: divider not found in test")
+            left = [r[:col] for r in g]; right = [r[col + 1:] for r in g]
+            halves = (left, right)
+        if _shape(halves[0]) != _shape(halves[1]):
+            raise ValueError("overlay_halves: halves not equal")
+        out_rows, out_cols = _shape(halves[0])
+        out = [[bg] * out_cols for _ in range(out_rows)]
+        for r in range(out_rows):
+            for c in range(out_cols):
+                a = halves[0][r][c]; b = halves[1][r][c]
+                if m_mode == "and":
+                    active = (a != bg) and (b != bg)
+                elif m_mode == "or":
+                    active = (a != bg) or (b != bg)
+                else:
+                    active = (a != bg) != (b != bg)
+                if active:
+                    out[r][c] = out_c
+        return out
+    return apply
+
+
+# ---------------------------------------------------------------
+#  grid_tile — output = input tiled in an NxM arrangement; N,M inferred.
+# ---------------------------------------------------------------
+
+def fit_grid_tile(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    tile_n: int | None = None
+    tile_m: int | None = None
+    for inp, out in pairs:
+        ri, ci = _shape(inp)
+        ro, co = _shape(out)
+        if ro % ri or co % ci:
+            return None
+        n = ro // ri; m = co // ci
+        if (n, m) == (1, 1):
+            return None
+        # Verify out is input tiled n x m
+        ok = True
+        for R in range(n):
+            for C in range(m):
+                for r in range(ri):
+                    for c in range(ci):
+                        if out[R * ri + r][C * ci + c] != inp[r][c]:
+                            ok = False; break
+                    if not ok: break
+                if not ok: break
+            if not ok: break
+        if not ok:
+            return None
+        if tile_n is None:
+            tile_n, tile_m = n, m
+        elif (tile_n, tile_m) != (n, m):
+            return None
+    if tile_n is None or tile_m is None:
+        return None
+    n_fixed, m_fixed = tile_n, tile_m
+
+    def apply(g: Grid) -> Grid:
+        ri, ci = _shape(g)
+        if ri * n_fixed > 30 or ci * m_fixed > 30:
+            raise ValueError("grid_tile: exceeds ARC max grid")
+        out = [[0] * (ci * m_fixed) for _ in range(ri * n_fixed)]
+        for R in range(n_fixed):
+            for C in range(m_fixed):
+                for r in range(ri):
+                    for c in range(ci):
+                        out[R * ri + r][C * ci + c] = g[r][c]
+        return out
+    return apply
+
+
+# ---------------------------------------------------------------
+#  remove_isolated_or_keep_isolated — keep only cells whose 4-neighbours are bg (isolated).
+# ---------------------------------------------------------------
+
+def fit_keep_isolated(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    def op(g: Grid) -> Grid:
+        bg = _background(g)
+        rows, cols = _shape(g)
+        out = [[bg] * cols for _ in range(rows)]
+        for r in range(rows):
+            for c in range(cols):
+                if g[r][c] == bg:
+                    continue
+                isolated = True
+                for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+                    nr, nc = r+dr, c+dc
+                    if 0 <= nr < rows and 0 <= nc < cols and g[nr][nc] != bg:
+                        isolated = False; break
+                if isolated:
+                    out[r][c] = g[r][c]
+        return out
+    any_change = False
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        if op([list(r) for r in inp]) != [list(r) for r in out]:
+            return None
+        if inp != out:
+            any_change = True
+    if not any_change:
+        return None
+    return op
+
+
+def fit_remove_isolated(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    def op(g: Grid) -> Grid:
+        bg = _background(g)
+        rows, cols = _shape(g)
+        out = [list(r) for r in g]
+        for r in range(rows):
+            for c in range(cols):
+                if g[r][c] == bg:
+                    continue
+                isolated = True
+                for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+                    nr, nc = r+dr, c+dc
+                    if 0 <= nr < rows and 0 <= nc < cols and g[nr][nc] != bg:
+                        isolated = False; break
+                if isolated:
+                    out[r][c] = bg
+        return out
+    any_change = False
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        if op([list(r) for r in inp]) != [list(r) for r in out]:
+            return None
+        if inp != out:
+            any_change = True
+    if not any_change:
+        return None
+    return op
+
+
 FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] = [
     ("color_permutation",         fit_color_permutation),
     ("swap_two_colors",           fit_swap_two_colors),
@@ -768,11 +1100,17 @@ FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] 
     ("outline_objects",           fit_outline_objects),
     ("fill_components_to_bbox",   fit_fill_components_to_bbox),
     ("grow_components_by_1",      fit_grow_components_by_1),
+    ("keep_isolated",             fit_keep_isolated),
+    ("remove_isolated",           fit_remove_isolated),
+    ("shift",                     fit_shift),
     ("bbox_of_nonbg",             fit_bbox_of_nonbg),
     ("pad_with_color",            fit_pad_with_color),
     ("extract_neighborhood",      fit_extract_neighborhood),
     ("periodic_complete",         fit_periodic_complete),
     ("each_cell_repeated_input",  fit_each_cell_repeated_input),
+    ("grid_tile",                 fit_grid_tile),
+    ("overlay_halves",            fit_overlay_halves),
+    ("template_classify",         fit_template_classify),
     ("fixed_output",              fit_fixed_output),
 ]
 
@@ -787,10 +1125,16 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "outline_objects":           "boundary",
     "fill_components_to_bbox":   "filling",
     "grow_components_by_1":      "increase",
+    "keep_isolated":             "remnant",
+    "remove_isolated":           "winnow",
+    "shift":                     "passage",
     "bbox_of_nonbg":             "remnant",
     "pad_with_color":            "covering",
     "extract_neighborhood":      "set_apart",
     "periodic_complete":         "restoration",
     "each_cell_repeated_input":  "image_in_image",
+    "grid_tile":                 "multiply",
+    "overlay_halves":            "witness",
+    "template_classify":         "judge",
     "fixed_output":              "decree",
 }
