@@ -246,10 +246,11 @@ def hypothesize(pairs: Iterable[tuple[Grid, Grid]]) -> Rule | None:
         # We use a 2-step search where param goes first.
         # Skip: this direction is symmetric and already explored when param fits alone.
 
-    # Pass 3 — three-atomic composition over full library, gated on small
-    # grids (max dim ≤ 6) to keep search tractable. Holdout-validated.
+    # Pass 3 — three-atomic composition over full library, gated on
+    # very small grids (max dim ≤ 4) since the library is now ~140
+    # primitives (140^3 = ~2.7M ops per task). Holdout-validated.
     max_dim = max((max(len(a), len(a[0]) if a else 0) for a, _ in pairs), default=0)
-    items_for_3step = items if (len(pairs) >= 2 and max_dim <= 6) else []
+    items_for_3step = items if (len(pairs) >= 2 and max_dim <= 4) else []
     if items_for_3step:
         train_pairs = pairs[:-1]
         holdout = pairs[-1]
