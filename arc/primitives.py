@@ -1014,6 +1014,131 @@ def colors_by_count_strip(g: Grid) -> Grid:
     return [ranked]
 
 
+def shrink_to_centroid(g: Grid) -> Grid:
+    """Each non-bg 4-conn component → single cell at component centroid (rounded)."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    seen = [[False]*cols for _ in range(rows)]
+    out = [[bg] * cols for _ in range(rows)]
+    for r in range(rows):
+        for c in range(cols):
+            if seen[r][c] or g[r][c] == bg:
+                continue
+            color = g[r][c]
+            stack = [(r,c)]; comp = []
+            while stack:
+                rr, cc = stack.pop()
+                if rr<0 or rr>=rows or cc<0 or cc>=cols: continue
+                if seen[rr][cc] or g[rr][cc] != color: continue
+                seen[rr][cc] = True; comp.append((rr, cc))
+                stack += [(rr+1,cc),(rr-1,cc),(rr,cc+1),(rr,cc-1)]
+            cr = sum(rr for rr,_ in comp) // len(comp)
+            cc_ = sum(cc for _,cc in comp) // len(comp)
+            out[cr][cc_] = color
+    return out
+
+
+def each_object_to_bbox_color(g: Grid) -> Grid:
+    """Each component → solid filled rectangle in its color (its bounding box)."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [list(r) for r in g]
+    seen = [[False]*cols for _ in range(rows)]
+    for r in range(rows):
+        for c in range(cols):
+            if seen[r][c] or g[r][c] == bg:
+                continue
+            color = g[r][c]
+            stack = [(r,c)]; comp = []
+            while stack:
+                rr, cc = stack.pop()
+                if rr<0 or rr>=rows or cc<0 or cc>=cols: continue
+                if seen[rr][cc] or g[rr][cc] != color: continue
+                seen[rr][cc] = True; comp.append((rr, cc))
+                stack += [(rr+1,cc),(rr-1,cc),(rr,cc+1),(rr,cc-1)]
+            r0 = min(rr for rr,_ in comp); r1 = max(rr for rr,_ in comp)
+            c0 = min(cc for _,cc in comp); c1 = max(cc for _,cc in comp)
+            for rr in range(r0, r1+1):
+                for cc in range(c0, c1+1):
+                    out[rr][cc] = color
+    return out
+
+
+def add_to_each_corner(g: Grid) -> Grid:
+    """Place the most common fg color at each of the 4 corners."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    nonbg = [v for v in flat if v != bg]
+    if not nonbg:
+        raise ValueError("add_to_each_corner: no fg")
+    fg = max(set(nonbg), key=nonbg.count)
+    out = [list(r) for r in g]
+    out[0][0] = fg; out[0][cols-1] = fg
+    out[rows-1][0] = fg; out[rows-1][cols-1] = fg
+    return out
+
+
+def gravity_centroid(g: Grid) -> Grid:
+    """Pull all non-bg cells toward grid centroid until they collide."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [[bg] * cols for _ in range(rows)]
+    cr, cc = rows // 2, cols // 2
+    cells = sorted(
+        [(r, c, g[r][c]) for r in range(rows) for c in range(cols) if g[r][c] != bg],
+        key=lambda x: abs(x[0] - cr) + abs(x[1] - cc),
+    )
+    occupied = set()
+    for r, c, v in cells:
+        # Walk toward center; stop when next step is occupied or out of bounds.
+        nr, nc = r, c
+        while (nr, nc) not in occupied:
+            dr = (cr > nr) - (cr < nr)
+            dc = (cc > nc) - (cc < nc)
+            if dr == 0 and dc == 0:
+                break
+            new_r, new_c = nr + dr, nc + dc
+            if (new_r, new_c) in occupied:
+                break
+            nr, nc = new_r, new_c
+            if (nr, nc) == (cr, cc):
+                break
+        occupied.add((nr, nc))
+        out[nr][nc] = v
+    return out
+
+
+def grid_within_grid(g: Grid) -> Grid:
+    """Replace each cell with a 3x3 block where center=cell, corners=cell if cell != bg."""
+    if not g or len(g) * 3 > _MAX or len(g[0]) * 3 > _MAX:
+        raise ValueError("grid_within_grid: exceeds ARC max")
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [[bg] * (cols * 3) for _ in range(rows * 3)]
+    for r in range(rows):
+        for c in range(cols):
+            v = g[r][c]
+            if v == bg:
+                continue
+            for dr in range(3):
+                for dc in range(3):
+                    out[r * 3 + dr][c * 3 + dc] = v
+    return out
+
+
 def complete_symmetry_h(g: Grid) -> Grid:
     out = [list(r) for r in g]
     rows = len(out); cols = len(out[0]) if rows else 0
@@ -1281,6 +1406,11 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "even_rows_only":       even_rows_only,
     "even_cols_only":       even_cols_only,
     "colors_by_count_strip": colors_by_count_strip,
+    "shrink_to_centroid":   shrink_to_centroid,
+    "each_object_to_bbox_color": each_object_to_bbox_color,
+    "add_to_each_corner":   add_to_each_corner,
+    "gravity_centroid":     gravity_centroid,
+    "grid_within_grid":     grid_within_grid,
 }
 
 
@@ -1382,4 +1512,9 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "even_rows_only":          "set_apart",
     "even_cols_only":          "set_apart",
     "colors_by_count_strip":   "ordering",
+    "shrink_to_centroid":      "remnant",
+    "each_object_to_bbox_color": "filling",
+    "add_to_each_corner":      "covering",
+    "gravity_centroid":        "gathering",
+    "grid_within_grid":        "image_in_image",
 }
