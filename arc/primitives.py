@@ -1250,6 +1250,132 @@ def union_overlay_v(g: Grid) -> Grid:
     return out
 
 
+def quadrant_top_left(g: Grid) -> Grid:
+    if not g:
+        return []
+    h = len(g) // 2; w = len(g[0]) // 2
+    if h < 1 or w < 1:
+        raise ValueError("quadrant: too small")
+    return [list(r[:w]) for r in g[:h]]
+
+
+def quadrant_top_right(g: Grid) -> Grid:
+    if not g:
+        return []
+    h = len(g) // 2; w = len(g[0]) // 2
+    if h < 1 or w < 1:
+        raise ValueError("quadrant: too small")
+    return [list(r[-w:]) for r in g[:h]]
+
+
+def quadrant_bot_left(g: Grid) -> Grid:
+    if not g:
+        return []
+    h = len(g) // 2; w = len(g[0]) // 2
+    if h < 1 or w < 1:
+        raise ValueError("quadrant: too small")
+    return [list(r[:w]) for r in g[-h:]]
+
+
+def quadrant_bot_right(g: Grid) -> Grid:
+    if not g:
+        return []
+    h = len(g) // 2; w = len(g[0]) // 2
+    if h < 1 or w < 1:
+        raise ValueError("quadrant: too small")
+    return [list(r[-w:]) for r in g[-h:]]
+
+
+def union_quadrants(g: Grid) -> Grid:
+    """OR of all 4 quadrants (top-left wins where multiple non-bg)."""
+    if not g:
+        return []
+    h = len(g) // 2; w = len(g[0]) // 2
+    if h < 1 or w < 1:
+        raise ValueError("union_quadrants: too small")
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    tl = [list(r[:w]) for r in g[:h]]
+    tr = [list(reversed(r[-w:])) for r in g[:h]]
+    bl = [list(r[:w]) for r in g[-h:][::-1]]
+    br = [list(reversed(r[-w:])) for r in g[-h:][::-1]]
+    out = [[bg] * w for _ in range(h)]
+    for r in range(h):
+        for c in range(w):
+            for q in (tl, tr, bl, br):
+                if q[r][c] != bg:
+                    out[r][c] = q[r][c]
+                    break
+    return out
+
+
+def center_cell_only(g: Grid) -> Grid:
+    """Output: 1x1 grid containing the center cell of input."""
+    if not g:
+        return []
+    return [[g[len(g)//2][len(g[0])//2]]]
+
+
+def colors_count_to_grid(g: Grid) -> Grid:
+    """Output: NxN where N = count of distinct non-bg colors. Fill with bg."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    palette = set(flat) - {bg}
+    n = len(palette)
+    if n == 0:
+        raise ValueError("colors_count_to_grid: no fg")
+    if n > _MAX:
+        raise ValueError("colors_count_to_grid: exceeds ARC max")
+    return [[bg] * n for _ in range(n)]
+
+
+def all_same_color(g: Grid) -> Grid:
+    """All non-bg cells get the same first non-bg color."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    nonbg = [v for v in flat if v != bg]
+    if not nonbg:
+        raise ValueError("all_same_color: no fg")
+    target = nonbg[0]
+    return [[target if v != bg else bg for v in row] for row in g]
+
+
+def each_object_to_color_of_neighbor(g: Grid) -> Grid:
+    """Each non-bg cell takes color of its first non-self non-bg 4-neighbor.
+
+    If no such neighbor, stays.
+    """
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [list(r) for r in g]
+    for r in range(rows):
+        for c in range(cols):
+            v = g[r][c]
+            if v == bg:
+                continue
+            for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+                nr, nc = r+dr, c+dc
+                if 0 <= nr < rows and 0 <= nc < cols and g[nr][nc] != bg and g[nr][nc] != v:
+                    out[r][c] = g[nr][nc]
+                    break
+    return out
+
+
+def diag_flip_then_h_flip(g: Grid) -> Grid:
+    return flip_h(transpose(g))
+
+
+def diag_flip_then_v_flip(g: Grid) -> Grid:
+    return flip_v(transpose(g))
+
+
 def complete_symmetry_h(g: Grid) -> Grid:
     out = [list(r) for r in g]
     rows = len(out); cols = len(out[0]) if rows else 0
@@ -1533,6 +1659,17 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "remove_zero_cols":     remove_zero_cols,
     "union_overlay_h":      union_overlay_h,
     "union_overlay_v":      union_overlay_v,
+    "quadrant_top_left":    quadrant_top_left,
+    "quadrant_top_right":   quadrant_top_right,
+    "quadrant_bot_left":    quadrant_bot_left,
+    "quadrant_bot_right":   quadrant_bot_right,
+    "union_quadrants":      union_quadrants,
+    "center_cell_only":     center_cell_only,
+    "colors_count_to_grid": colors_count_to_grid,
+    "all_same_color":       all_same_color,
+    "each_object_to_color_of_neighbor": each_object_to_color_of_neighbor,
+    "diag_flip_then_h_flip": diag_flip_then_h_flip,
+    "diag_flip_then_v_flip": diag_flip_then_v_flip,
 }
 
 
@@ -1650,4 +1787,15 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "remove_zero_cols":        "remnant",
     "union_overlay_h":         "witness",
     "union_overlay_v":         "witness",
+    "quadrant_top_left":       "remnant",
+    "quadrant_top_right":      "remnant",
+    "quadrant_bot_left":       "remnant",
+    "quadrant_bot_right":      "remnant",
+    "union_quadrants":         "witness",
+    "center_cell_only":        "set_apart",
+    "colors_count_to_grid":    "counting",
+    "all_same_color":          "name",
+    "each_object_to_color_of_neighbor": "renaming",
+    "diag_flip_then_h_flip":   "mirror",
+    "diag_flip_then_v_flip":   "mirror",
 }
