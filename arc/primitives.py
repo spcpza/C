@@ -375,6 +375,148 @@ def replace_bg_with_largest_color(g: Grid) -> Grid:
     return [[target if v == bg else v for v in row] for row in g]
 
 
+def hollow_rect_border(g: Grid) -> Grid:
+    """Convert g to a hollow rectangle outline of size and color preserved."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    fg_set = set(flat) - {bg}
+    if len(fg_set) != 1:
+        raise ValueError("hollow_rect_border: needs single fg")
+    fg = next(iter(fg_set))
+    out = [[bg] * cols for _ in range(rows)]
+    for c in range(cols):
+        out[0][c] = fg; out[rows - 1][c] = fg
+    for r in range(rows):
+        out[r][0] = fg; out[r][cols - 1] = fg
+    return out
+
+
+def draw_grid_border(g: Grid) -> Grid:
+    """Draw an outer border of the dominant fg color around bg-only grid."""
+    return hollow_rect_border(g)
+
+
+def half_height_top(g: Grid) -> Grid:
+    if not g:
+        return []
+    h = len(g) // 2
+    if h < 1:
+        raise ValueError("half_height_top: too small")
+    return [list(r) for r in g[:h]]
+
+
+def half_height_bot(g: Grid) -> Grid:
+    if not g:
+        return []
+    h = len(g) // 2
+    if h < 1:
+        raise ValueError("half_height_bot: too small")
+    return [list(r) for r in g[-h:]]
+
+
+def half_width_left(g: Grid) -> Grid:
+    if not g or not g[0]:
+        return []
+    w = len(g[0]) // 2
+    if w < 1:
+        raise ValueError("half_width_left: too small")
+    return [list(r[:w]) for r in g]
+
+
+def half_width_right(g: Grid) -> Grid:
+    if not g or not g[0]:
+        return []
+    w = len(g[0]) // 2
+    if w < 1:
+        raise ValueError("half_width_right: too small")
+    return [list(r[-w:]) for r in g]
+
+
+def top_third(g: Grid) -> Grid:
+    if not g:
+        return []
+    h = len(g) // 3
+    if h < 1:
+        raise ValueError("top_third: too small")
+    return [list(r) for r in g[:h]]
+
+
+def bottom_third(g: Grid) -> Grid:
+    if not g:
+        return []
+    h = len(g) // 3
+    if h < 1:
+        raise ValueError("bottom_third: too small")
+    return [list(r) for r in g[-h:]]
+
+
+def diagonal_quad(g: Grid) -> Grid:
+    """Output: 2x2 of g with each quadrant flipped to create 8-way symmetry."""
+    if not g or len(g) * 2 > _MAX or len(g[0]) * 2 > _MAX:
+        raise ValueError("diagonal_quad: too large")
+    return [row + list(reversed(row)) for row in g] + \
+           [row + list(reversed(row)) for row in reversed(g)]
+
+
+def top_row_extract(g: Grid) -> Grid:
+    if not g:
+        return []
+    return [list(g[0])]
+
+
+def bottom_row_extract(g: Grid) -> Grid:
+    if not g:
+        return []
+    return [list(g[-1])]
+
+
+def left_col_extract(g: Grid) -> Grid:
+    if not g:
+        return []
+    return [[r[0]] for r in g]
+
+
+def right_col_extract(g: Grid) -> Grid:
+    if not g:
+        return []
+    return [[r[-1]] for r in g]
+
+
+def shift_right_1(g: Grid) -> Grid:
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    return [[bg] + list(r[:-1]) for r in g]
+
+
+def shift_left_1(g: Grid) -> Grid:
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    return [list(r[1:]) + [bg] for r in g]
+
+
+def shift_up_1(g: Grid) -> Grid:
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    return [list(r) for r in g[1:]] + [[bg] * len(g[0])]
+
+
+def shift_down_1(g: Grid) -> Grid:
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    return [[bg] * len(g[0])] + [list(r) for r in g[:-1]]
+
+
 def complete_symmetry_h(g: Grid) -> Grid:
     out = [list(r) for r in g]
     rows = len(out); cols = len(out[0]) if rows else 0
@@ -587,6 +729,22 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "each_row_unique":      each_row_unique,
     "first_nonbg_per_row":  first_nonbg_per_row,
     "replace_bg_with_largest_color": replace_bg_with_largest_color,
+    "hollow_rect_border":   hollow_rect_border,
+    "half_height_top":      half_height_top,
+    "half_height_bot":      half_height_bot,
+    "half_width_left":      half_width_left,
+    "half_width_right":     half_width_right,
+    "top_third":            top_third,
+    "bottom_third":         bottom_third,
+    "diagonal_quad":        diagonal_quad,
+    "top_row_extract":      top_row_extract,
+    "bottom_row_extract":   bottom_row_extract,
+    "left_col_extract":     left_col_extract,
+    "right_col_extract":    right_col_extract,
+    "shift_right_1":        shift_right_1,
+    "shift_left_1":         shift_left_1,
+    "shift_up_1":           shift_up_1,
+    "shift_down_1":         shift_down_1,
 }
 
 
@@ -633,4 +791,20 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "each_row_unique":        "distinguishing",
     "first_nonbg_per_row":    "gathering",
     "replace_bg_with_largest_color": "filling",
+    "hollow_rect_border":      "boundary",
+    "half_height_top":         "remnant",
+    "half_height_bot":         "remnant",
+    "half_width_left":         "remnant",
+    "half_width_right":        "remnant",
+    "top_third":               "remnant",
+    "bottom_third":            "remnant",
+    "diagonal_quad":           "fourfold",
+    "top_row_extract":         "first_fruits",
+    "bottom_row_extract":      "last",
+    "left_col_extract":        "set_apart",
+    "right_col_extract":       "set_apart",
+    "shift_right_1":           "passage",
+    "shift_left_1":            "passage",
+    "shift_up_1":              "rising",
+    "shift_down_1":            "low_places",
 }

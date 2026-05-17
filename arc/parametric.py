@@ -1368,6 +1368,238 @@ def fit_fill_hollow(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
     return op
 
 
+# ---------------------------------------------------------------
+#  smallest_component_recolor — smallest non-bg component → inferred color.
+# ---------------------------------------------------------------
+
+def fit_smallest_recolor(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    target: int | None = None
+    erase_rest: bool | None = None
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        bg = _background(inp)
+        comps = _components_4(inp, bg)
+        if len(comps) < 2:
+            return None
+        smallest = min(comps, key=len)
+        small_set = set(smallest)
+        out_colors = {out[r][c] for r, c in smallest}
+        if len(out_colors) != 1:
+            return None
+        out_color = next(iter(out_colors))
+        if out_color == _comp_color(inp, smallest):
+            return None
+        if target is None:
+            target = out_color
+        elif target != out_color:
+            return None
+        # Rest behavior
+        rest_erased = True; rest_preserved = True
+        for r, row in enumerate(inp):
+            for c, v in enumerate(row):
+                if (r, c) in small_set:
+                    continue
+                if v == bg:
+                    if out[r][c] != bg:
+                        rest_erased = rest_preserved = False
+                else:
+                    if out[r][c] != bg:
+                        rest_erased = False
+                    if out[r][c] != v:
+                        rest_preserved = False
+        if rest_erased and not rest_preserved:
+            this_erase = True
+        elif rest_preserved and not rest_erased:
+            this_erase = False
+        elif rest_erased and rest_preserved:
+            this_erase = False
+        else:
+            return None
+        if erase_rest is None:
+            erase_rest = this_erase
+        elif erase_rest != this_erase:
+            return None
+    if target is None or erase_rest is None:
+        return None
+    c_target, do_erase = target, erase_rest
+
+    def apply(g: Grid) -> Grid:
+        bg = _background(g)
+        comps = _components_4(g, bg)
+        if not comps:
+            return [list(r) for r in g]
+        smallest = min(comps, key=len)
+        small = set(smallest)
+        out = []
+        for r, row in enumerate(g):
+            new_row = []
+            for c, v in enumerate(row):
+                if (r, c) in small:
+                    new_row.append(c_target)
+                elif do_erase and v != bg:
+                    new_row.append(bg)
+                else:
+                    new_row.append(v)
+            out.append(new_row)
+        return out
+    return apply
+
+
+# ---------------------------------------------------------------
+#  Output shape is a count of components × something.
+# ---------------------------------------------------------------
+
+def fit_output_NxN_count(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    """Output is NxN where N = count of fg components; cells all one color."""
+    if len(pairs) < 2:
+        return None
+    color: int | None = None
+    for inp, out in pairs:
+        bg = _background(inp)
+        comps = _components_4(inp, bg)
+        n = len(comps)
+        ro, co = _shape(out)
+        if (ro, co) != (n, n):
+            return None
+        out_colors = {out[r][c] for r in range(ro) for c in range(co) if out[r][c] != bg}
+        if len(out_colors) > 1:
+            return None
+        # Could be all bg.
+        c = next(iter(out_colors)) if out_colors else None
+        if color is None:
+            color = c
+        elif color != c:
+            return None
+    if color is None:
+        return None
+    c_fixed = color
+
+    def apply(g: Grid) -> Grid:
+        bg = _background(g)
+        comps = _components_4(g, bg)
+        n = len(comps)
+        if n == 0:
+            raise ValueError("output_NxN_count: no components")
+        return [[c_fixed] * n for _ in range(n)]
+    return apply
+
+
+# ---------------------------------------------------------------
+#  keep_unique_color_component — keep the component whose color
+#  appears exactly once across all components.
+# ---------------------------------------------------------------
+
+def fit_keep_unique_color_component(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    """Many ARC tasks: one component has a unique color; that's the answer."""
+    if len(pairs) < 2:
+        return None
+    erase_rest = True  # require this variant
+    keep_color_or_unique: str | None = None  # tracking only
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        bg = _background(inp)
+        comps = _components_4(inp, bg)
+        if len(comps) < 2:
+            return None
+        # Count color occurrences across components
+        comp_colors = [_comp_color(inp, c) for c in comps]
+        counts: dict[int, int] = {}
+        for cc in comp_colors:
+            counts[cc] = counts.get(cc, 0) + 1
+        unique_colors = [c for c, n in counts.items() if n == 1]
+        if len(unique_colors) != 1:
+            return None
+        uc = unique_colors[0]
+        # The unique-colored component(s) must be preserved
+        kept_idx = [i for i, c in enumerate(comp_colors) if c == uc]
+        kept_set = set()
+        for i in kept_idx:
+            kept_set.update(comps[i])
+        for r, row in enumerate(inp):
+            for c, v in enumerate(row):
+                if (r, c) in kept_set:
+                    if out[r][c] != v:
+                        return None
+                else:
+                    if out[r][c] != bg:
+                        return None
+        keep_color_or_unique = "unique"
+    if keep_color_or_unique is None:
+        return None
+
+    def apply(g: Grid) -> Grid:
+        bg = _background(g)
+        comps = _components_4(g, bg)
+        if not comps:
+            return [list(r) for r in g]
+        comp_colors = [_comp_color(g, c) for c in comps]
+        counts: dict[int, int] = {}
+        for cc in comp_colors:
+            counts[cc] = counts.get(cc, 0) + 1
+        unique_colors = [c for c, n in counts.items() if n == 1]
+        if len(unique_colors) != 1:
+            raise ValueError("keep_unique_color: no/multi unique colors in test")
+        uc = unique_colors[0]
+        kept_idx = [i for i, c in enumerate(comp_colors) if c == uc]
+        kept = set()
+        for i in kept_idx:
+            kept.update(comps[i])
+        return [[g[r][c] if (r, c) in kept else bg for c in range(_shape(g)[1])]
+                for r in range(_shape(g)[0])]
+    return apply
+
+
+# ---------------------------------------------------------------
+#  recolor_smallest_to_uniquecolor — smallest gets recolored to the
+#  one color not currently in palette. Subsumes some classification tasks.
+# ---------------------------------------------------------------
+
+def fit_recolor_largest_keep_rest(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    """Like largest_to_color but preserves other components instead of erasing."""
+    target: int | None = None
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        bg = _background(inp)
+        comps = _components_4(inp, bg)
+        if not comps:
+            return None
+        biggest = max(comps, key=len)
+        out_colors = {out[r][c] for r, c in biggest}
+        if len(out_colors) != 1:
+            return None
+        out_color = next(iter(out_colors))
+        if out_color == _comp_color(inp, biggest):
+            return None
+        if target is None:
+            target = out_color
+        elif target != out_color:
+            return None
+        big = set(biggest)
+        for r, row in enumerate(inp):
+            for c, v in enumerate(row):
+                if (r, c) in big:
+                    continue
+                if out[r][c] != v:
+                    return None
+    if target is None:
+        return None
+    c_target = target
+
+    def apply(g: Grid) -> Grid:
+        bg = _background(g)
+        comps = _components_4(g, bg)
+        if not comps:
+            return [list(r) for r in g]
+        biggest = max(comps, key=len)
+        big = set(biggest)
+        return [[c_target if (r, c) in big else g[r][c]
+                 for c in range(_shape(g)[1])] for r in range(_shape(g)[0])]
+    return apply
+
+
 FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] = [
     ("color_permutation",         fit_color_permutation),
     ("swap_two_colors",           fit_swap_two_colors),
@@ -1376,6 +1608,10 @@ FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] 
     ("keep_components_of_color",  fit_keep_components_of_color),
     ("recolor_by_size_rank",      fit_recolor_by_size_rank),
     ("largest_to_color",          fit_largest_to_color),
+    ("recolor_largest_keep_rest", fit_recolor_largest_keep_rest),
+    ("smallest_recolor",          fit_smallest_recolor),
+    ("keep_unique_color_component", fit_keep_unique_color_component),
+    ("output_NxN_count",          fit_output_NxN_count),
     ("outline_objects",           fit_outline_objects),
     ("fill_components_to_bbox",   fit_fill_components_to_bbox),
     ("fill_hollow",               fit_fill_hollow),
@@ -1419,6 +1655,10 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "overlay_halves":            "witness",
     "template_classify":         "judge",
     "largest_to_color":          "naming",
+    "recolor_largest_keep_rest": "anointing",
+    "smallest_recolor":          "least",
+    "keep_unique_color_component": "elect",
+    "output_NxN_count":          "counting",
     "fill_hollow":               "filling",
     "line_between_two_points":   "joining",
     "count_to_strip":            "counting",
