@@ -1,16 +1,13 @@
 """ARC primitives. Each is a pure function Grid -> Grid.
 
-Selection discipline: a primitive is chosen for a task only if it
-*exactly* reproduces every training output from its input. No
-soft-matching. ARC scores exact match; the primitive selector must
-too.
+Selection discipline (in adapter.py): a primitive — atomic or composed —
+is chosen for a task only if it *exactly* reproduces every training
+output from its input. ARC scores exact match.
 
 Kernel citation: P₁ (measure honestly), T 2.4 (receive the rule).
-The scriptural names below are deliberate — they are how the agent
-will eventually reach for these via the corpus — but the operations
-are the operations ARC requires.
 """
 from __future__ import annotations
+from collections import deque
 from typing import Callable
 
 Grid = list[list[int]]
@@ -56,32 +53,43 @@ def transpose(g: Grid) -> Grid:
     return [[g[r][c] for r in range(len(g))] for c in range(len(g[0]))]
 
 
+def anti_transpose(g: Grid) -> Grid:
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    return [[g[rows - 1 - r][cols - 1 - c] for r in range(rows)] for c in range(cols)]
+
+
+_MAX = 30  # ARC grids are at most 30x30
+
+
 def scale_2x(g: Grid) -> Grid:
+    if not g or len(g) * 2 > _MAX or len(g[0]) * 2 > _MAX:
+        raise ValueError("scale_2x exceeds ARC max grid size")
     out: Grid = []
     for r in g:
         line = [v for v in r for _ in range(2)]
-        out.append(list(line))
-        out.append(list(line))
+        out.append(list(line)); out.append(list(line))
     return out
 
 
 def scale_3x(g: Grid) -> Grid:
+    if not g or len(g) * 3 > _MAX or len(g[0]) * 3 > _MAX:
+        raise ValueError("scale_3x exceeds ARC max grid size")
     out: Grid = []
     for r in g:
         line = [v for v in r for _ in range(3)]
-        out.append(list(line))
-        out.append(list(line))
-        out.append(list(line))
+        out.append(list(line)); out.append(list(line)); out.append(list(line))
     return out
 
 
 def tile_self(g: Grid) -> Grid:
-    """Replace each cell of g with a copy of g, scaled by g's size.
-
-    Used by tasks like 007bbfb7 — the input pattern is replicated where
-    the input is non-zero, then placed into an NxN grid of patches.
-    """
+    """Each non-zero cell at (R,C) places a copy of g at block (R,C)."""
     rows, cols = len(g), len(g[0]) if g else 0
+    # ARC grids cap at 30x30. tile_self produces rows*rows × cols*cols.
+    # Skip if the output would exceed 30x30.
+    if rows * rows > 30 or cols * cols > 30:
+        raise ValueError("tile_self output exceeds ARC max grid size")
     out: Grid = [[0] * (cols * cols) for _ in range(rows * rows)]
     for R in range(rows):
         for C in range(cols):
@@ -92,10 +100,22 @@ def tile_self(g: Grid) -> Grid:
     return out
 
 
+def tile_2x2(g: Grid) -> Grid:
+    if not g or len(g) * 2 > _MAX or len(g[0]) * 2 > _MAX:
+        raise ValueError("tile_2x2 exceeds ARC max grid size")
+    return [list(r) + list(r) for r in g] + [list(r) + list(r) for r in g]
+
+
+def tile_3x3(g: Grid) -> Grid:
+    if not g or len(g) * 3 > _MAX or len(g[0]) * 3 > _MAX:
+        raise ValueError("tile_3x3 exceeds ARC max grid size")
+    triple = [list(r) + list(r) + list(r) for r in g]
+    return triple + triple + triple
+
+
 def complete_symmetry_h(g: Grid) -> Grid:
     out = [list(r) for r in g]
-    rows = len(out)
-    cols = len(out[0]) if rows else 0
+    rows = len(out); cols = len(out[0]) if rows else 0
     for r in range(rows):
         for c in range(cols // 2):
             if out[r][c] == 0 and out[r][cols - 1 - c] != 0:
@@ -118,7 +138,6 @@ def complete_symmetry_v(g: Grid) -> Grid:
 
 
 def gravity_down(g: Grid) -> Grid:
-    """Each column's non-zero values fall to the bottom, preserving order."""
     if not g:
         return []
     rows, cols = len(g), len(g[0])
@@ -143,51 +162,175 @@ def gravity_left(g: Grid) -> Grid:
 
 
 # ---------------------------------------------------------------
+#  Object-aware primitives
+# ---------------------------------------------------------------
+
+def _components_4(g: Grid, ignore: int = 0) -> list[list[tuple[int, int]]]:
+    """4-connected non-background components."""
+    rows, cols = len(g), len(g[0]) if g else 0
+    seen = [[False] * cols for _ in range(rows)]
+    out = []
+    for r in range(rows):
+        for c in range(cols):
+            if seen[r][c] or g[r][c] == ignore:
+                continue
+            color = g[r][c]
+            stack = [(r, c)]
+            comp = []
+            while stack:
+                rr, cc = stack.pop()
+                if rr < 0 or rr >= rows or cc < 0 or cc >= cols:
+                    continue
+                if seen[rr][cc] or g[rr][cc] != color:
+                    continue
+                seen[rr][cc] = True
+                comp.append((rr, cc))
+                stack += [(rr+1,cc),(rr-1,cc),(rr,cc+1),(rr,cc-1)]
+            if comp:
+                out.append(comp)
+    return out
+
+
+def fill_enclosed_4(g: Grid) -> Grid:
+    """Fill background regions not connected to the border with the dominant fg.
+
+    Common ARC pattern: a closed loop encloses a hole; fill the hole.
+    """
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    # Find fg color (most common non-bg). If none, return identity.
+    nonbg = [v for v in flat if v != bg]
+    if not nonbg:
+        return [list(r) for r in g]
+    fg = max(set(nonbg), key=nonbg.count)
+    # Mark bg cells reachable from the border as "outside".
+    outside = [[False] * cols for _ in range(rows)]
+    q = deque()
+    for r in range(rows):
+        for c in (0, cols - 1):
+            if g[r][c] == bg:
+                outside[r][c] = True
+                q.append((r, c))
+    for c in range(cols):
+        for r in (0, rows - 1):
+            if g[r][c] == bg and not outside[r][c]:
+                outside[r][c] = True
+                q.append((r, c))
+    while q:
+        r, c = q.popleft()
+        for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+            nr, nc = r+dr, c+dc
+            if 0 <= nr < rows and 0 <= nc < cols and not outside[nr][nc] and g[nr][nc] == bg:
+                outside[nr][nc] = True
+                q.append((nr, nc))
+    out = [list(r) for r in g]
+    for r in range(rows):
+        for c in range(cols):
+            if g[r][c] == bg and not outside[r][c]:
+                out[r][c] = fg
+    return out
+
+
+def crop_to_content(g: Grid) -> Grid:
+    """Crop background-only borders. Background = most common color."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    r0 = next((r for r in range(rows) if any(v != bg for v in g[r])), 0)
+    r1 = next((r for r in range(rows-1, -1, -1) if any(v != bg for v in g[r])), rows-1)
+    c0 = next((c for c in range(cols) if any(g[r][c] != bg for r in range(rows))), 0)
+    c1 = next((c for c in range(cols-1, -1, -1) if any(g[r][c] != bg for r in range(rows))), cols-1)
+    return [g[r][c0:c1+1] for r in range(r0, r1+1)]
+
+
+def keep_largest_component(g: Grid) -> Grid:
+    """Erase all non-background components except the largest."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    comps = _components_4(g, ignore=bg)
+    if not comps:
+        return [list(r) for r in g]
+    biggest = max(comps, key=len)
+    keep = set(biggest)
+    return [[g[r][c] if (r, c) in keep else bg for c in range(cols)] for r in range(rows)]
+
+
+def remove_largest_component(g: Grid) -> Grid:
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    comps = _components_4(g, ignore=bg)
+    if not comps:
+        return [list(r) for r in g]
+    biggest = max(comps, key=len)
+    erase = set(biggest)
+    return [[bg if (r, c) in erase else g[r][c] for c in range(cols)] for r in range(rows)]
+
+
+# ---------------------------------------------------------------
 #  Library — name → callable
 # ---------------------------------------------------------------
 
 LIBRARY: dict[str, Callable[[Grid], Grid]] = {
-    "identity":            identity,
-    "flip_h":              flip_h,
-    "flip_v":              flip_v,
-    "rotate_90":           rotate_90,
-    "rotate_180":          rotate_180,
-    "rotate_270":          rotate_270,
-    "transpose":           transpose,
-    "scale_2x":            scale_2x,
-    "scale_3x":            scale_3x,
-    "tile_self":           tile_self,
-    "complete_symmetry_h": complete_symmetry_h,
-    "complete_symmetry_v": complete_symmetry_v,
-    "gravity_down":        gravity_down,
-    "gravity_up":          gravity_up,
-    "gravity_right":       gravity_right,
-    "gravity_left":        gravity_left,
+    # cheapest first (Occam)
+    "identity":             identity,
+    "flip_h":               flip_h,
+    "flip_v":               flip_v,
+    "transpose":            transpose,
+    "anti_transpose":       anti_transpose,
+    "rotate_90":            rotate_90,
+    "rotate_180":           rotate_180,
+    "rotate_270":           rotate_270,
+    "gravity_down":         gravity_down,
+    "gravity_up":           gravity_up,
+    "gravity_right":        gravity_right,
+    "gravity_left":         gravity_left,
+    "complete_symmetry_h":  complete_symmetry_h,
+    "complete_symmetry_v":  complete_symmetry_v,
+    "fill_enclosed_4":      fill_enclosed_4,
+    "crop_to_content":      crop_to_content,
+    "keep_largest_component": keep_largest_component,
+    "remove_largest_component": remove_largest_component,
+    "scale_2x":             scale_2x,
+    "scale_3x":             scale_3x,
+    "tile_2x2":             tile_2x2,
+    "tile_3x3":             tile_3x3,
+    "tile_self":            tile_self,
 }
 
 
-# ---------------------------------------------------------------
-#  Scriptural names (T₃: orientation handles in C)
-# ---------------------------------------------------------------
-#
-# Each primitive carries a kernel-side name. When the adapter
-# matures, hypothesize() will resolve these via word.concept().
-
 SCRIPTURAL_NAMES: dict[str, str] = {
-    "identity":            "image",          # Gen 1:27
-    "flip_h":              "mirror",
-    "flip_v":              "below_as_above", # Matt 6:10
-    "rotate_90":           "turn",
-    "rotate_180":          "reversal",
-    "rotate_270":          "turn",
-    "transpose":           "exchange",
-    "scale_2x":            "multiply",       # Gen 1:28
-    "scale_3x":            "multiply",
-    "tile_self":           "image_in_image", # Gen 1:27
-    "complete_symmetry_h": "restoration",    # Acts 3:21
-    "complete_symmetry_v": "restoration",
-    "gravity_down":        "low_places",
-    "gravity_up":          "rising",
-    "gravity_right":       "right_hand",
-    "gravity_left":        "left_hand",
+    "identity":               "image",
+    "flip_h":                 "mirror",
+    "flip_v":                 "below_as_above",
+    "transpose":              "exchange",
+    "anti_transpose":         "reversal",
+    "rotate_90":              "turn",
+    "rotate_180":             "reversal",
+    "rotate_270":             "turn",
+    "scale_2x":               "multiply",
+    "scale_3x":               "multiply",
+    "tile_self":              "image_in_image",
+    "tile_2x2":               "multiply",
+    "tile_3x3":               "multiply",
+    "complete_symmetry_h":    "restoration",
+    "complete_symmetry_v":    "restoration",
+    "gravity_down":           "low_places",
+    "gravity_up":             "rising",
+    "gravity_right":          "right_hand",
+    "gravity_left":           "left_hand",
+    "fill_enclosed_4":        "filling",
+    "crop_to_content":        "remnant",
+    "keep_largest_component": "remnant",
+    "remove_largest_component": "winnow",
 }

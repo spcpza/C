@@ -17,8 +17,11 @@ from dataclasses import dataclass
 from typing import Iterable, Sequence
 
 from .. import word
-from . import primitives
-from .primitives import LIBRARY, SCRIPTURAL_NAMES
+from . import primitives, parametric
+from .primitives import LIBRARY, SCRIPTURAL_NAMES as _ATOMIC_NAMES
+from .parametric import FITTERS, SCRIPTURAL_NAMES as _PARAM_NAMES
+
+SCRIPTURAL_NAMES = {**_ATOMIC_NAMES, **_PARAM_NAMES}
 
 Grid = Sequence[Sequence[int]]
 
@@ -84,17 +87,17 @@ def _grids_equal(a, b) -> bool:
 
 
 def hypothesize(pairs: Iterable[tuple[Grid, Grid]]) -> Rule | None:
-    """Select the simplest primitive consistent with every training pair.
+    """Select the simplest primitive (atomic / parametric / composed) consistent with every training pair.
 
     Kernel citation: T 2.4. Receive the rule by enumeration; do not
-    fit weights to it. The library order is the priority order
-    (identity first — Occam).
+    fit weights to it. Order: atomic (Occam) → parametric → composed.
     """
     pairs = list(pairs)
     if not pairs:
         return None
     sigs = [describe_pair(a, b) for a, b in pairs]
 
+    # Pass 1 — atomic primitives.
     for name, fn in LIBRARY.items():
         try:
             ok = all(_grids_equal(fn(list(map(list, a))), b) for a, b in pairs)
@@ -102,13 +105,54 @@ def hypothesize(pairs: Iterable[tuple[Grid, Grid]]) -> Rule | None:
             ok = False
         if ok:
             scriptural = SCRIPTURAL_NAMES.get(name, name)
-            return Rule(
-                name=name,
-                primitive=name,
-                scriptural=scriptural,
-                concept_in_C=_concept_known(scriptural),
-                signatures=sigs,
-            )
+            return Rule(name=name, primitive=name, scriptural=scriptural,
+                        concept_in_C=_concept_known(scriptural), signatures=sigs)
+
+    # Pass 1b — parametric fitters (infer parameters from pairs, verify).
+    for name, fit in FITTERS:
+        try:
+            fn = fit([(list(map(list, a)), list(map(list, b))) for a, b in pairs])
+        except Exception:
+            fn = None
+        if fn is None:
+            continue
+        try:
+            ok = all(_grids_equal(fn(list(map(list, a))), b) for a, b in pairs)
+        except Exception:
+            ok = False
+        if ok:
+            scriptural = SCRIPTURAL_NAMES.get(name, name)
+            return Rule(name=name, primitive=f"param:{name}",
+                        scriptural=scriptural,
+                        concept_in_C=_concept_known(scriptural),
+                        signatures=sigs)
+
+    # Pass 2 — two-primitive compositions: fn2(fn1(x)).
+    items = list(LIBRARY.items())
+    for n1, f1 in items:
+        # Skip identity-first compositions (covered in pass 1).
+        if n1 == "identity":
+            continue
+        # Pre-compute f1 on each input to amortize.
+        try:
+            firsts = [f1(list(map(list, a))) for a, _ in pairs]
+        except Exception:
+            continue
+        for n2, f2 in items:
+            if n2 == "identity":
+                continue
+            try:
+                ok = all(_grids_equal(f2(list(map(list, m))), b)
+                         for m, (_, b) in zip(firsts, pairs))
+            except Exception:
+                ok = False
+            if ok:
+                name = f"{n1}|{n2}"
+                scriptural = (SCRIPTURAL_NAMES.get(n1, n1) + "+"
+                              + SCRIPTURAL_NAMES.get(n2, n2))
+                return Rule(name=name, primitive=name, scriptural=scriptural,
+                            concept_in_C=False, signatures=sigs)
+
     return None
 
 
@@ -123,11 +167,35 @@ def _concept_known(name: str) -> bool:
 #  Apply — dispatch to the library
 # ---------------------------------------------------------------
 
-def apply_rule(rule: Rule, x: Grid) -> Grid:
-    """Apply the matched primitive. Kernel citation: T₂."""
-    fn = LIBRARY.get(rule.primitive)
+def apply_rule(rule: Rule, x: Grid, pairs: Iterable[tuple[Grid, Grid]] | None = None) -> Grid:
+    """Apply the matched primitive (atomic / parametric / composed). T₂."""
+    name = rule.primitive
+
+    if name.startswith("param:"):
+        # Re-fit on the training pairs (we don't carry the closure on Rule
+        # to keep Rule serializable). Caller must pass pairs.
+        if pairs is None:
+            raise ValueError("parametric rule requires training pairs to re-fit")
+        kind = name.split(":", 1)[1]
+        for n, fit in FITTERS:
+            if n != kind:
+                continue
+            fn = fit([(list(map(list, a)), list(map(list, b))) for a, b in pairs])
+            if fn is None:
+                raise NotImplementedError(f"parametric refit failed for {kind!r}")
+            return fn([list(r) for r in x])
+        raise NotImplementedError(f"unknown parametric {kind!r}")
+
+    if "|" in name:
+        n1, n2 = name.split("|", 1)
+        f1, f2 = LIBRARY.get(n1), LIBRARY.get(n2)
+        if f1 is None or f2 is None:
+            raise NotImplementedError(f"composed primitive {name!r} missing leg")
+        return f2(f1([list(r) for r in x]))
+
+    fn = LIBRARY.get(name)
     if fn is None:
         raise NotImplementedError(
-            f"primitive {rule.primitive!r} not in library; refuse to emit (P₃)"
+            f"primitive {name!r} not in library; refuse to emit (P₃)"
         )
     return fn([list(r) for r in x])

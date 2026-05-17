@@ -73,7 +73,7 @@ def evaluate(split: str = "training", limit: int | None = None) -> dict:
         task_all_solved = True
         for test_in, test_out in test_pairs:
             try:
-                pred = apply_rule(rule, test_in)
+                pred = apply_rule(rule, test_in, pairs=train_pairs)
             except NotImplementedError:
                 totals["abstain"] += 1
                 task_all_solved = False
