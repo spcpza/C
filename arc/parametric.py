@@ -819,6 +819,9 @@ def fit_shift(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
 # ---------------------------------------------------------------
 
 def fit_template_classify(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    # Require ≥3 training pairs so classification is plausible.
+    if len(pairs) < 3:
+        return None
     # Output is 1x1 in every training pair, and matches input -> color map.
     mapping: dict[tuple[tuple[int, ...], ...], int] = {}
     for inp, out in pairs:
@@ -856,6 +859,9 @@ def fit_template_classify(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
 # ---------------------------------------------------------------
 
 def fit_overlay_halves(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    # Require ≥2 pairs so we don't latch onto a single ambiguous example.
+    if len(pairs) < 2:
+        return None
     div_color: int | None = None
     output_color: int | None = None
     mode: str | None = None  # "and" | "or" | "xor"
@@ -1090,6 +1096,263 @@ def fit_remove_isolated(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
     return op
 
 
+# ---------------------------------------------------------------
+#  draw_line_between_two_points — when input has exactly two non-bg
+#  cells, output draws a line (h/v/diag) connecting them.
+# ---------------------------------------------------------------
+
+def fit_line_between_two_points(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    if len(pairs) < 2:
+        return None
+    line_color_rule: str | None = None  # "preserve" only
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        bg = _background(inp)
+        rows, cols = _shape(inp)
+        non_bg = [(r, c) for r in range(rows) for c in range(cols) if inp[r][c] != bg]
+        if len(non_bg) != 2:
+            return None
+        (r1, c1), (r2, c2) = non_bg
+        # Determine direction & line cells
+        if r1 == r2:
+            cells = [(r1, c) for c in range(min(c1, c2), max(c1, c2) + 1)]
+        elif c1 == c2:
+            cells = [(r, c1) for r in range(min(r1, r2), max(r1, r2) + 1)]
+        elif abs(r1 - r2) == abs(c1 - c2):
+            n = abs(r1 - r2)
+            dr = 1 if r2 > r1 else -1
+            dc = 1 if c2 > c1 else -1
+            cells = [(r1 + dr * k, c1 + dc * k) for k in range(n + 1)]
+        else:
+            return None
+        expected = [[bg] * cols for _ in range(rows)]
+        # color = whichever non-bg is on the line; if both, use input's color at endpoints
+        line_c1 = inp[r1][c1]; line_c2 = inp[r2][c2]
+        for (r, c) in cells:
+            expected[r][c] = inp[r][c] if inp[r][c] != bg else line_c1
+        # Check
+        if expected != [list(r) for r in out]:
+            return None
+        line_color_rule = "preserve"
+    if line_color_rule is None:
+        return None
+
+    def apply(g: Grid) -> Grid:
+        bg = _background(g)
+        rows, cols = _shape(g)
+        non_bg = [(r, c) for r in range(rows) for c in range(cols) if g[r][c] != bg]
+        if len(non_bg) != 2:
+            raise ValueError("line_between: need exactly 2 non-bg cells")
+        (r1, c1), (r2, c2) = non_bg
+        if r1 == r2:
+            cells = [(r1, c) for c in range(min(c1, c2), max(c1, c2) + 1)]
+        elif c1 == c2:
+            cells = [(r, c1) for r in range(min(r1, r2), max(r1, r2) + 1)]
+        elif abs(r1 - r2) == abs(c1 - c2):
+            n = abs(r1 - r2)
+            dr = 1 if r2 > r1 else -1
+            dc = 1 if c2 > c1 else -1
+            cells = [(r1 + dr * k, c1 + dc * k) for k in range(n + 1)]
+        else:
+            raise ValueError("line_between: points not aligned")
+        out = [[bg] * cols for _ in range(rows)]
+        line_c1 = g[r1][c1]
+        for (r, c) in cells:
+            out[r][c] = g[r][c] if g[r][c] != bg else line_c1
+        return out
+    return apply
+
+
+# ---------------------------------------------------------------
+#  largest_component_to_color — largest non-bg component → fixed
+#  color, others stay/erased.
+# ---------------------------------------------------------------
+
+def fit_largest_to_color(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    target: int | None = None
+    erase_rest: bool | None = None
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        bg = _background(inp)
+        comps = _components_4(inp, bg)
+        if not comps:
+            return None
+        biggest = max(comps, key=len)
+        big_set = set(biggest)
+        # Find color of biggest in out
+        out_big_colors = {out[r][c] for r, c in biggest}
+        if len(out_big_colors) != 1:
+            return None
+        out_big_color = next(iter(out_big_colors))
+        if out_big_color == _comp_color(inp, biggest):
+            return None  # no recolor of biggest → not this rule
+        if target is None:
+            target = out_big_color
+        elif target != out_big_color:
+            return None
+        # Examine non-biggest cells
+        rest_erased = True
+        rest_preserved = True
+        for r, row in enumerate(inp):
+            for c, v in enumerate(row):
+                if (r, c) in big_set:
+                    continue
+                if v == bg:
+                    if out[r][c] != bg:
+                        rest_erased = rest_preserved = False
+                else:
+                    if out[r][c] != bg:
+                        rest_erased = False
+                    if out[r][c] != v:
+                        rest_preserved = False
+        if rest_erased and not rest_preserved:
+            this_erase = True
+        elif rest_preserved and not rest_erased:
+            this_erase = False
+        elif rest_erased and rest_preserved:
+            this_erase = False  # nothing to disambiguate; prefer preserve
+        else:
+            return None
+        if erase_rest is None:
+            erase_rest = this_erase
+        elif erase_rest != this_erase:
+            return None
+    if target is None or erase_rest is None:
+        return None
+    c_target, do_erase = target, erase_rest
+
+    def apply(g: Grid) -> Grid:
+        bg = _background(g)
+        comps = _components_4(g, bg)
+        if not comps:
+            return [list(r) for r in g]
+        biggest = max(comps, key=len)
+        big = set(biggest)
+        out = []
+        for r, row in enumerate(g):
+            new_row = []
+            for c, v in enumerate(row):
+                if (r, c) in big:
+                    new_row.append(c_target)
+                elif do_erase and v != bg:
+                    new_row.append(bg)
+                else:
+                    new_row.append(v)
+            out.append(new_row)
+        return out
+    return apply
+
+
+# ---------------------------------------------------------------
+#  output_shape_from_count — output is a 1xN or NxN grid where N is
+#  the count of components. Color is the dominant fg color.
+# ---------------------------------------------------------------
+
+def fit_count_to_strip(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    # Output is 1xN of a single color, N = count of components.
+    color: int | None = None
+    orient: str | None = None
+    if len(pairs) < 2:
+        return None
+    for inp, out in pairs:
+        ri, ci = _shape(inp)
+        ro, co = _shape(out)
+        bg = _background(inp)
+        comps = _components_4(inp, bg)
+        n = len(comps)
+        if n == 0:
+            return None
+        if (ro, co) == (1, n):
+            this_orient = "h"
+        elif (ro, co) == (n, 1):
+            this_orient = "v"
+        else:
+            return None
+        if orient is None:
+            orient = this_orient
+        elif orient != this_orient:
+            return None
+        out_colors = {out[r][c] for r in range(ro) for c in range(co) if out[r][c] != bg}
+        if len(out_colors) != 1:
+            return None
+        c = next(iter(out_colors))
+        if color is None:
+            color = c
+        elif color != c:
+            return None
+    if color is None or orient is None:
+        return None
+    c_fixed, o_fixed = color, orient
+
+    def apply(g: Grid) -> Grid:
+        bg = _background(g)
+        comps = _components_4(g, bg)
+        n = len(comps)
+        if n == 0:
+            raise ValueError("count_to_strip: no components")
+        if o_fixed == "h":
+            return [[c_fixed] * n]
+        return [[c_fixed] for _ in range(n)]
+    return apply
+
+
+# ---------------------------------------------------------------
+#  fill_inside_outline — closed loops in input → interior filled.
+#  Subsumed by complete-bbox in some cases; this targets hollow shapes.
+# ---------------------------------------------------------------
+
+def fit_fill_hollow(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    def op(g: Grid) -> Grid:
+        bg = _background(g)
+        rows, cols = _shape(g)
+        out = [list(r) for r in g]
+        # Flood the OUTSIDE bg starting from border
+        outside = [[False] * cols for _ in range(rows)]
+        q = deque()
+        for r in range(rows):
+            for c in (0, cols - 1):
+                if g[r][c] == bg:
+                    outside[r][c] = True; q.append((r, c))
+        for c in range(cols):
+            for r in (0, rows - 1):
+                if g[r][c] == bg and not outside[r][c]:
+                    outside[r][c] = True; q.append((r, c))
+        while q:
+            r, c = q.popleft()
+            for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+                nr, nc = r+dr, c+dc
+                if 0 <= nr < rows and 0 <= nc < cols and not outside[nr][nc] and g[nr][nc] == bg:
+                    outside[nr][nc] = True; q.append((nr, nc))
+        # Interior bg cells: find the surrounding non-bg color
+        for r in range(rows):
+            for c in range(cols):
+                if g[r][c] == bg and not outside[r][c]:
+                    # Find a surrounding color (BFS to a non-bg cell)
+                    neighbors = []
+                    for dr in range(-1, 2):
+                        for dc in range(-1, 2):
+                            nr, nc = r+dr, c+dc
+                            if 0 <= nr < rows and 0 <= nc < cols and g[nr][nc] != bg:
+                                neighbors.append(g[nr][nc])
+                    if neighbors:
+                        # Use most common neighbor color
+                        out[r][c] = max(set(neighbors), key=neighbors.count)
+        return out
+    any_change = False
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        if op([list(r) for r in inp]) != [list(r) for r in out]:
+            return None
+        if inp != out:
+            any_change = True
+    if not any_change:
+        return None
+    return op
+
+
 FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] = [
     ("color_permutation",         fit_color_permutation),
     ("swap_two_colors",           fit_swap_two_colors),
@@ -1097,8 +1360,10 @@ FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] 
     ("per_component_recolor",     fit_per_component_recolor),
     ("keep_components_of_color",  fit_keep_components_of_color),
     ("recolor_by_size_rank",      fit_recolor_by_size_rank),
+    ("largest_to_color",          fit_largest_to_color),
     ("outline_objects",           fit_outline_objects),
     ("fill_components_to_bbox",   fit_fill_components_to_bbox),
+    ("fill_hollow",               fit_fill_hollow),
     ("grow_components_by_1",      fit_grow_components_by_1),
     ("keep_isolated",             fit_keep_isolated),
     ("remove_isolated",           fit_remove_isolated),
@@ -1109,6 +1374,8 @@ FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] 
     ("periodic_complete",         fit_periodic_complete),
     ("each_cell_repeated_input",  fit_each_cell_repeated_input),
     ("grid_tile",                 fit_grid_tile),
+    ("line_between_two_points",   fit_line_between_two_points),
+    ("count_to_strip",            fit_count_to_strip),
     ("overlay_halves",            fit_overlay_halves),
     ("template_classify",         fit_template_classify),
     ("fixed_output",              fit_fixed_output),
@@ -1136,5 +1403,9 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "grid_tile":                 "multiply",
     "overlay_halves":            "witness",
     "template_classify":         "judge",
+    "largest_to_color":          "naming",
+    "fill_hollow":               "filling",
+    "line_between_two_points":   "joining",
+    "count_to_strip":            "counting",
     "fixed_output":              "decree",
 }
