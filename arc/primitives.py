@@ -872,6 +872,148 @@ def bbox_only(g: Grid) -> Grid:
     return out
 
 
+def conway_step(g: Grid) -> Grid:
+    """1 step Conway's GoL: bg=dead, fg=alive. Keeps the dominant fg color."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    nonbg = [v for v in flat if v != bg]
+    if not nonbg:
+        return [list(r) for r in g]
+    alive = max(set(nonbg), key=nonbg.count)
+    out = [[bg] * cols for _ in range(rows)]
+    for r in range(rows):
+        for c in range(cols):
+            n = 0
+            for dr in (-1, 0, 1):
+                for dc in (-1, 0, 1):
+                    if dr == 0 and dc == 0:
+                        continue
+                    nr, nc = r+dr, c+dc
+                    if 0 <= nr < rows and 0 <= nc < cols and g[nr][nc] != bg:
+                        n += 1
+            v = g[r][c]
+            if v != bg and (n == 2 or n == 3):
+                out[r][c] = alive
+            elif v == bg and n == 3:
+                out[r][c] = alive
+    return out
+
+
+def remove_one_per_color(g: Grid) -> Grid:
+    """Remove exactly one cell per non-bg color (the first occurrence)."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [list(r) for r in g]
+    seen: set[int] = set()
+    rows, cols = len(g), len(g[0])
+    for r in range(rows):
+        for c in range(cols):
+            v = g[r][c]
+            if v != bg and v not in seen:
+                out[r][c] = bg
+                seen.add(v)
+    return out
+
+
+def keep_one_per_color(g: Grid) -> Grid:
+    """Keep only one cell per non-bg color."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [[bg] * cols for _ in range(rows)]
+    seen: set[int] = set()
+    for r in range(rows):
+        for c in range(cols):
+            v = g[r][c]
+            if v != bg and v not in seen:
+                out[r][c] = v
+                seen.add(v)
+    return out
+
+
+def cross_at_each_fg(g: Grid) -> Grid:
+    """For each fg cell, fill its 4-neighbors with same color."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [list(r) for r in g]
+    for r in range(rows):
+        for c in range(cols):
+            if g[r][c] != bg:
+                for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+                    nr, nc = r+dr, c+dc
+                    if 0 <= nr < rows and 0 <= nc < cols and out[nr][nc] == bg:
+                        out[nr][nc] = g[r][c]
+    return out
+
+
+def add_outer_border(g: Grid) -> Grid:
+    """Wrap grid in 1-cell border of dominant fg."""
+    if not g or len(g) + 2 > _MAX or len(g[0]) + 2 > _MAX:
+        raise ValueError("add_outer_border: exceeds ARC max")
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    nonbg = [v for v in flat if v != bg]
+    if not nonbg:
+        raise ValueError("add_outer_border: no fg")
+    bc = max(set(nonbg), key=nonbg.count)
+    out = [[bc] * (cols + 2)]
+    for row in g:
+        out.append([bc] + list(row) + [bc])
+    out.append([bc] * (cols + 2))
+    return out
+
+
+def double_each_axis(g: Grid) -> Grid:
+    """Each row appears twice; each col appears twice (= 2x2 expand block of g)."""
+    return scale_2x(g)  # same as scale_2x; alias for compositional access
+
+
+def odd_rows_only(g: Grid) -> Grid:
+    """Output: rows 0, 2, 4, ..."""
+    if not g:
+        return []
+    return [list(g[r]) for r in range(0, len(g), 2)]
+
+
+def odd_cols_only(g: Grid) -> Grid:
+    if not g:
+        return []
+    return [list(row[::2]) for row in g]
+
+
+def even_rows_only(g: Grid) -> Grid:
+    if not g or len(g) < 2:
+        return []
+    return [list(g[r]) for r in range(1, len(g), 2)]
+
+
+def even_cols_only(g: Grid) -> Grid:
+    if not g or not g[0] or len(g[0]) < 2:
+        return []
+    return [list(row[1::2]) for row in g]
+
+
+def colors_by_count_strip(g: Grid) -> Grid:
+    """Output: 1xK row of colors sorted by frequency descending."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    counts = {c: flat.count(c) for c in set(flat)}
+    ranked = sorted(counts, key=lambda c: -counts[c])
+    return [ranked]
+
+
 def complete_symmetry_h(g: Grid) -> Grid:
     out = [list(r) for r in g]
     rows = len(out); cols = len(out[0]) if rows else 0
@@ -1129,6 +1271,16 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "rotate_palette":       rotate_palette,
     "majority_of_three_neighbors": majority_of_three_neighbors,
     "bbox_only":            bbox_only,
+    "conway_step":          conway_step,
+    "remove_one_per_color": remove_one_per_color,
+    "keep_one_per_color":   keep_one_per_color,
+    "cross_at_each_fg":     cross_at_each_fg,
+    "add_outer_border":     add_outer_border,
+    "odd_rows_only":        odd_rows_only,
+    "odd_cols_only":        odd_cols_only,
+    "even_rows_only":       even_rows_only,
+    "even_cols_only":       even_cols_only,
+    "colors_by_count_strip": colors_by_count_strip,
 }
 
 
@@ -1220,4 +1372,14 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "rotate_palette":          "passage",
     "majority_of_three_neighbors": "majority",
     "bbox_only":               "boundary",
+    "conway_step":             "increase",
+    "remove_one_per_color":    "first_fruits",
+    "keep_one_per_color":      "distinguishing",
+    "cross_at_each_fg":        "increase",
+    "add_outer_border":        "covering",
+    "odd_rows_only":           "set_apart",
+    "odd_cols_only":           "set_apart",
+    "even_rows_only":          "set_apart",
+    "even_cols_only":          "set_apart",
+    "colors_by_count_strip":   "ordering",
 }

@@ -246,14 +246,14 @@ def hypothesize(pairs: Iterable[tuple[Grid, Grid]]) -> Rule | None:
         # We use a 2-step search where param goes first.
         # Skip: this direction is symmetric and already explored when param fits alone.
 
-    # Pass 3 — three-atomic composition, only on small grids (≤ 12) to
-    # keep the 55^3 search tractable. Holdout-validated.
+    # Pass 3 — three-atomic composition over full library, gated on small
+    # grids (max dim ≤ 6) to keep search tractable. Holdout-validated.
     max_dim = max((max(len(a), len(a[0]) if a else 0) for a, _ in pairs), default=0)
-    if len(pairs) >= 2 and max_dim <= 12:
-        # Use last pair as holdout for verification only.
+    items_for_3step = items if (len(pairs) >= 2 and max_dim <= 6) else []
+    if items_for_3step:
         train_pairs = pairs[:-1]
         holdout = pairs[-1]
-        for n1, f1 in items:
+        for n1, f1 in items_for_3step:
             if n1 == "identity":
                 continue
             try:
@@ -261,7 +261,7 @@ def hypothesize(pairs: Iterable[tuple[Grid, Grid]]) -> Rule | None:
                 h_first = f1(list(map(list, holdout[0])))
             except Exception:
                 continue
-            for n2, f2 in items:
+            for n2, f2 in items_for_3step:
                 if n2 == "identity":
                     continue
                 try:
@@ -269,14 +269,13 @@ def hypothesize(pairs: Iterable[tuple[Grid, Grid]]) -> Rule | None:
                     h_second = f2(list(map(list, h_first)))
                 except Exception:
                     continue
-                for n3, f3 in items:
+                for n3, f3 in items_for_3step:
                     if n3 == "identity":
                         continue
                     try:
                         ok = all(_grids_equal(f3(list(map(list, m))), b)
                                  for m, (_, b) in zip(seconds, train_pairs))
                         if ok:
-                            # Verify on holdout too.
                             ok = _grids_equal(f3(list(map(list, h_second))), holdout[1])
                     except Exception:
                         ok = False
