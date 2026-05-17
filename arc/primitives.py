@@ -635,6 +635,127 @@ def collapse_to_palette(g: Grid) -> Grid:
     return [seen]
 
 
+def main_diagonal(g: Grid) -> Grid:
+    if not g:
+        return []
+    n = min(len(g), len(g[0]))
+    return [[g[i][i]] for i in range(n)]
+
+
+def anti_diagonal(g: Grid) -> Grid:
+    if not g:
+        return []
+    n = min(len(g), len(g[0]))
+    return [[g[i][len(g[0]) - 1 - i]] for i in range(n)]
+
+
+def swap_halves_h(g: Grid) -> Grid:
+    """Swap left and right halves."""
+    if not g or not g[0]:
+        return []
+    w = len(g[0]) // 2
+    return [list(r[w:]) + list(r[:w]) if len(r) % 2 == 0 else list(r[w+1:]) + [r[w]] + list(r[:w])
+            for r in g]
+
+
+def swap_halves_v(g: Grid) -> Grid:
+    if not g:
+        return []
+    h = len(g) // 2
+    return ([list(r) for r in g[h:]] + [list(r) for r in g[:h]]) if len(g) % 2 == 0 \
+           else ([list(r) for r in g[h+1:]] + [list(g[h])] + [list(r) for r in g[:h]])
+
+
+def per_row_sort(g: Grid) -> Grid:
+    """Each row sorted ascending."""
+    return [sorted(list(r)) for r in g]
+
+
+def per_col_sort(g: Grid) -> Grid:
+    return transpose(per_row_sort(transpose(g)))
+
+
+def per_row_reverse(g: Grid) -> Grid:
+    return [list(reversed(r)) for r in g]
+
+
+def per_row_unique_pad_left(g: Grid) -> Grid:
+    """Each row → distinct values (in order), left-padded with bg to original width."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    cols = len(g[0])
+    out = []
+    for row in g:
+        seen: list[int] = []
+        for v in row:
+            if v not in seen:
+                seen.append(v)
+        out.append([bg] * (cols - len(seen)) + seen)
+    return out
+
+
+def first_col_only(g: Grid) -> Grid:
+    """Keep only first column, blank rest."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    cols = len(g[0])
+    return [[r[0]] + [bg] * (cols - 1) for r in g]
+
+
+def last_col_only(g: Grid) -> Grid:
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    cols = len(g[0])
+    return [[bg] * (cols - 1) + [r[-1]] for r in g]
+
+
+def keep_min_color(g: Grid) -> Grid:
+    """Keep only cells with the rarest non-bg color; erase the rest."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    nonbg = [v for v in flat if v != bg]
+    if not nonbg:
+        return [list(r) for r in g]
+    target = min(set(nonbg), key=nonbg.count)
+    return [[v if v == target else bg for v in row] for row in g]
+
+
+def keep_max_color(g: Grid) -> Grid:
+    """Keep only cells with the most common non-bg color."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    nonbg = [v for v in flat if v != bg]
+    if not nonbg:
+        return [list(r) for r in g]
+    target = max(set(nonbg), key=nonbg.count)
+    return [[v if v == target else bg for v in row] for row in g]
+
+
+def count_palette_as_strip(g: Grid) -> Grid:
+    """Output is a 1xN row where N = number of distinct non-bg colors, each cell = a color."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    seen: list[int] = []
+    for v in flat:
+        if v != bg and v not in seen:
+            seen.append(v)
+    if not seen:
+        return [[bg]]
+    return [seen]
+
+
 def complete_symmetry_h(g: Grid) -> Grid:
     out = [list(r) for r in g]
     rows = len(out); cols = len(out[0]) if rows else 0
@@ -870,6 +991,19 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "thicken_1":            thicken_1,
     "first_nonbg_per_col":  first_nonbg_per_col,
     "collapse_to_palette":  collapse_to_palette,
+    "main_diagonal":        main_diagonal,
+    "anti_diagonal":        anti_diagonal,
+    "swap_halves_h":        swap_halves_h,
+    "swap_halves_v":        swap_halves_v,
+    "per_row_sort":         per_row_sort,
+    "per_col_sort":         per_col_sort,
+    "per_row_reverse":      per_row_reverse,
+    "per_row_unique_pad_left": per_row_unique_pad_left,
+    "first_col_only":       first_col_only,
+    "last_col_only":        last_col_only,
+    "keep_min_color":       keep_min_color,
+    "keep_max_color":       keep_max_color,
+    "count_palette_as_strip": count_palette_as_strip,
 }
 
 
@@ -939,4 +1073,17 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "thicken_1":               "increase",
     "first_nonbg_per_col":     "gathering",
     "collapse_to_palette":     "distinguishing",
+    "main_diagonal":           "way",
+    "anti_diagonal":           "way",
+    "swap_halves_h":           "exchange",
+    "swap_halves_v":           "exchange",
+    "per_row_sort":            "ordering",
+    "per_col_sort":            "ordering",
+    "per_row_reverse":         "reversal",
+    "per_row_unique_pad_left": "distinguishing",
+    "first_col_only":          "first_fruits",
+    "last_col_only":           "last",
+    "keep_min_color":          "least",
+    "keep_max_color":          "majority",
+    "count_palette_as_strip":  "counting",
 }
