@@ -1139,6 +1139,117 @@ def grid_within_grid(g: Grid) -> Grid:
     return out
 
 
+def double_rows(g: Grid) -> Grid:
+    """Each row appears twice consecutively."""
+    if not g or len(g) * 2 > _MAX:
+        raise ValueError("double_rows: too large")
+    out = []
+    for r in g:
+        out.append(list(r)); out.append(list(r))
+    return out
+
+
+def double_cols(g: Grid) -> Grid:
+    if not g or len(g[0]) * 2 > _MAX:
+        raise ValueError("double_cols: too large")
+    return [[v for v in r for _ in range(2)] for r in g]
+
+
+def keep_only_largest_color_cells(g: Grid) -> Grid:
+    """Like keep_max_color but renames the result to bg."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    nonbg = [v for v in flat if v != bg]
+    if not nonbg:
+        return [list(r) for r in g]
+    target = max(set(nonbg), key=nonbg.count)
+    return [[v if v == target else bg for v in row] for row in g]
+
+
+def shift_objects_to_left(g: Grid) -> Grid:
+    """Each row's non-bg values compacted to the left."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    cols = len(g[0])
+    out = []
+    for r in g:
+        nb = [v for v in r if v != bg]
+        out.append(nb + [bg] * (cols - len(nb)))
+    return out
+
+
+def shift_objects_to_right(g: Grid) -> Grid:
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    cols = len(g[0])
+    out = []
+    for r in g:
+        nb = [v for v in r if v != bg]
+        out.append([bg] * (cols - len(nb)) + nb)
+    return out
+
+
+def shift_objects_to_top(g: Grid) -> Grid:
+    return transpose(shift_objects_to_left(transpose(g)))
+
+
+def shift_objects_to_bot(g: Grid) -> Grid:
+    return transpose(shift_objects_to_right(transpose(g)))
+
+
+def remove_zero_rows(g: Grid) -> Grid:
+    """Remove rows that are entirely bg."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [list(r) for r in g if any(v != bg for v in r)]
+    return out if out else [[bg] * len(g[0])]
+
+
+def remove_zero_cols(g: Grid) -> Grid:
+    return transpose(remove_zero_rows(transpose(g)))
+
+
+def union_overlay_h(g: Grid) -> Grid:
+    """Overlay left half onto right half (non-bg wins)."""
+    if not g or not g[0]:
+        return []
+    cols = len(g[0])
+    half = cols // 2
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = []
+    for row in g:
+        left = row[:half]
+        right = row[half:]
+        merged = [right[i] if right[i] != bg else left[i] for i in range(min(len(left), len(right)))]
+        out.append(merged)
+    return out
+
+
+def union_overlay_v(g: Grid) -> Grid:
+    """Overlay top half onto bottom half (non-bg wins)."""
+    if not g:
+        return []
+    rows = len(g)
+    half = rows // 2
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = []
+    for r in range(half):
+        top = g[r]; bot = g[rows - 1 - r]
+        merged = [bot[i] if bot[i] != bg else top[i] for i in range(len(top))]
+        out.append(merged)
+    return out
+
+
 def complete_symmetry_h(g: Grid) -> Grid:
     out = [list(r) for r in g]
     rows = len(out); cols = len(out[0]) if rows else 0
@@ -1411,6 +1522,17 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "add_to_each_corner":   add_to_each_corner,
     "gravity_centroid":     gravity_centroid,
     "grid_within_grid":     grid_within_grid,
+    "double_rows":          double_rows,
+    "double_cols":          double_cols,
+    "keep_only_largest_color_cells": keep_only_largest_color_cells,
+    "shift_objects_to_left": shift_objects_to_left,
+    "shift_objects_to_right": shift_objects_to_right,
+    "shift_objects_to_top":  shift_objects_to_top,
+    "shift_objects_to_bot":  shift_objects_to_bot,
+    "remove_zero_rows":     remove_zero_rows,
+    "remove_zero_cols":     remove_zero_cols,
+    "union_overlay_h":      union_overlay_h,
+    "union_overlay_v":      union_overlay_v,
 }
 
 
@@ -1517,4 +1639,15 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "add_to_each_corner":      "covering",
     "gravity_centroid":        "gathering",
     "grid_within_grid":        "image_in_image",
+    "double_rows":             "multiply",
+    "double_cols":             "multiply",
+    "keep_only_largest_color_cells": "majority",
+    "shift_objects_to_left":   "gathering",
+    "shift_objects_to_right":  "gathering",
+    "shift_objects_to_top":    "gathering",
+    "shift_objects_to_bot":    "gathering",
+    "remove_zero_rows":        "remnant",
+    "remove_zero_cols":        "remnant",
+    "union_overlay_h":         "witness",
+    "union_overlay_v":         "witness",
 }
