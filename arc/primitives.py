@@ -756,6 +756,122 @@ def count_palette_as_strip(g: Grid) -> Grid:
     return [seen]
 
 
+def reflect_main_diag(g: Grid) -> Grid:
+    """Reflect across main diagonal — equivalent to transpose for square."""
+    return transpose(g)
+
+
+def reflect_anti_diag(g: Grid) -> Grid:
+    return anti_transpose(g)
+
+
+def expand_2x2_pixel(g: Grid) -> Grid:
+    """Each pixel becomes a 2x2 block of the same color."""
+    return scale_2x(g)  # alias
+
+
+def keep_only_borders(g: Grid) -> Grid:
+    """Keep only border row+col cells; erase interior."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [[bg] * cols for _ in range(rows)]
+    for c in range(cols):
+        out[0][c] = g[0][c]; out[rows-1][c] = g[rows-1][c]
+    for r in range(rows):
+        out[r][0] = g[r][0]; out[r][cols-1] = g[r][cols-1]
+    return out
+
+
+def keep_only_corners(g: Grid) -> Grid:
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [[bg] * cols for _ in range(rows)]
+    out[0][0] = g[0][0]
+    out[0][cols-1] = g[0][cols-1]
+    out[rows-1][0] = g[rows-1][0]
+    out[rows-1][cols-1] = g[rows-1][cols-1]
+    return out
+
+
+def remove_borders(g: Grid) -> Grid:
+    """Crop 1-cell border."""
+    if not g or len(g) < 3 or len(g[0]) < 3:
+        raise ValueError("remove_borders: too small")
+    return [list(r[1:-1]) for r in g[1:-1]]
+
+
+def palette_as_col(g: Grid) -> Grid:
+    """Vertical version of count_palette_as_strip."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    seen: list[int] = []
+    for v in flat:
+        if v != bg and v not in seen:
+            seen.append(v)
+    if not seen:
+        return [[bg]]
+    return [[v] for v in seen]
+
+
+def rotate_palette(g: Grid) -> Grid:
+    """Cyclically rotate colors: c_i → c_{i+1 mod k} where k = distinct colors."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    palette = sorted(set(flat))
+    if len(palette) < 2:
+        raise ValueError("rotate_palette: needs ≥2 colors")
+    nxt = {palette[i]: palette[(i + 1) % len(palette)] for i in range(len(palette))}
+    return [[nxt[v] for v in row] for row in g]
+
+
+def majority_of_three_neighbors(g: Grid) -> Grid:
+    """Each cell becomes its 4-neighbor majority (cellular automaton)."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    out = [[0] * cols for _ in range(rows)]
+    for r in range(rows):
+        for c in range(cols):
+            counts: dict[int, int] = {}
+            for dr, dc in ((0,0),(1,0),(-1,0),(0,1),(0,-1)):
+                nr, nc = r+dr, c+dc
+                if 0 <= nr < rows and 0 <= nc < cols:
+                    counts[g[nr][nc]] = counts.get(g[nr][nc], 0) + 1
+            out[r][c] = max(counts, key=counts.get)
+    return out
+
+
+def bbox_only(g: Grid) -> Grid:
+    """Output is full input shape, but only bbox cells around non-bg keep their color."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    nonbg = [(r, c) for r in range(rows) for c in range(cols) if g[r][c] != bg]
+    if not nonbg:
+        return [list(r) for r in g]
+    r0 = min(r for r,_ in nonbg); r1 = max(r for r,_ in nonbg)
+    c0 = min(c for _,c in nonbg); c1 = max(c for _,c in nonbg)
+    out = [[bg] * cols for _ in range(rows)]
+    # Get color of first non-bg
+    fg = g[nonbg[0][0]][nonbg[0][1]]
+    for c in range(c0, c1+1):
+        out[r0][c] = fg; out[r1][c] = fg
+    for r in range(r0, r1+1):
+        out[r][c0] = fg; out[r][c1] = fg
+    return out
+
+
 def complete_symmetry_h(g: Grid) -> Grid:
     out = [list(r) for r in g]
     rows = len(out); cols = len(out[0]) if rows else 0
@@ -1004,6 +1120,15 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "keep_min_color":       keep_min_color,
     "keep_max_color":       keep_max_color,
     "count_palette_as_strip": count_palette_as_strip,
+    "reflect_main_diag":    reflect_main_diag,
+    "reflect_anti_diag":    reflect_anti_diag,
+    "keep_only_borders":    keep_only_borders,
+    "keep_only_corners":    keep_only_corners,
+    "remove_borders":       remove_borders,
+    "palette_as_col":       palette_as_col,
+    "rotate_palette":       rotate_palette,
+    "majority_of_three_neighbors": majority_of_three_neighbors,
+    "bbox_only":            bbox_only,
 }
 
 
@@ -1086,4 +1211,13 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "keep_min_color":          "least",
     "keep_max_color":          "majority",
     "count_palette_as_strip":  "counting",
+    "reflect_main_diag":       "mirror",
+    "reflect_anti_diag":       "mirror",
+    "keep_only_borders":       "boundary",
+    "keep_only_corners":       "set_apart",
+    "remove_borders":          "inner",
+    "palette_as_col":          "counting",
+    "rotate_palette":          "passage",
+    "majority_of_three_neighbors": "majority",
+    "bbox_only":               "boundary",
 }

@@ -1556,6 +1556,89 @@ def fit_keep_unique_color_component(pairs: list[tuple[Grid, Grid]]) -> Callable 
 #  one color not currently in palette. Subsumes some classification tasks.
 # ---------------------------------------------------------------
 
+# ---------------------------------------------------------------
+#  scale_n — every pixel becomes an N×N block. N inferred.
+# ---------------------------------------------------------------
+
+def fit_scale_n(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    n: int | None = None
+    for inp, out in pairs:
+        ri, ci = _shape(inp)
+        ro, co = _shape(out)
+        if ri == 0 or ci == 0 or ro % ri or co % ci:
+            return None
+        scale_r = ro // ri; scale_c = co // ci
+        if scale_r != scale_c or scale_r < 2:
+            return None
+        for r in range(ri):
+            for c in range(ci):
+                v = inp[r][c]
+                for dr in range(scale_r):
+                    for dc in range(scale_r):
+                        if out[r * scale_r + dr][c * scale_r + dc] != v:
+                            return None
+        if n is None:
+            n = scale_r
+        elif n != scale_r:
+            return None
+    if n is None:
+        return None
+    n_fixed = n
+
+    def apply(g: Grid) -> Grid:
+        ri, ci = _shape(g)
+        if ri * n_fixed > 30 or ci * n_fixed > 30:
+            raise ValueError("scale_n: exceeds ARC max")
+        out = [[0] * (ci * n_fixed) for _ in range(ri * n_fixed)]
+        for r in range(ri):
+            for c in range(ci):
+                v = g[r][c]
+                for dr in range(n_fixed):
+                    for dc in range(n_fixed):
+                        out[r * n_fixed + dr][c * n_fixed + dc] = v
+        return out
+    return apply
+
+
+def fit_tile_NxM(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    n: int | None = None
+    m: int | None = None
+    for inp, out in pairs:
+        ri, ci = _shape(inp)
+        ro, co = _shape(out)
+        if ri == 0 or ci == 0 or ro % ri or co % ci:
+            return None
+        N = ro // ri; M = co // ci
+        if (N, M) == (1, 1):
+            return None
+        for R in range(N):
+            for C in range(M):
+                for r in range(ri):
+                    for c in range(ci):
+                        if out[R * ri + r][C * ci + c] != inp[r][c]:
+                            return None
+        if n is None:
+            n, m = N, M
+        elif (n, m) != (N, M):
+            return None
+    if n is None or m is None:
+        return None
+    n_fixed, m_fixed = n, m
+
+    def apply(g: Grid) -> Grid:
+        ri, ci = _shape(g)
+        if ri * n_fixed > 30 or ci * m_fixed > 30:
+            raise ValueError("tile_NxM: exceeds ARC max")
+        out = [[0] * (ci * m_fixed) for _ in range(ri * n_fixed)]
+        for R in range(n_fixed):
+            for C in range(m_fixed):
+                for r in range(ri):
+                    for c in range(ci):
+                        out[R * ri + r][C * ci + c] = g[r][c]
+        return out
+    return apply
+
+
 def fit_recolor_largest_keep_rest(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
     """Like largest_to_color but preserves other components instead of erasing."""
     target: int | None = None
@@ -1624,6 +1707,8 @@ FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] 
     ("extract_neighborhood",      fit_extract_neighborhood),
     ("periodic_complete",         fit_periodic_complete),
     ("each_cell_repeated_input",  fit_each_cell_repeated_input),
+    ("scale_n",                   fit_scale_n),
+    ("tile_NxM",                  fit_tile_NxM),
     ("grid_tile",                 fit_grid_tile),
     ("line_between_two_points",   fit_line_between_two_points),
     ("count_to_strip",            fit_count_to_strip),
@@ -1651,6 +1736,8 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "extract_neighborhood":      "set_apart",
     "periodic_complete":         "restoration",
     "each_cell_repeated_input":  "image_in_image",
+    "scale_n":                   "multiply",
+    "tile_NxM":                  "multiply",
     "grid_tile":                 "multiply",
     "overlay_halves":            "witness",
     "template_classify":         "judge",
