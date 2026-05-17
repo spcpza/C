@@ -1376,6 +1376,103 @@ def diag_flip_then_v_flip(g: Grid) -> Grid:
     return flip_v(transpose(g))
 
 
+def rotate_each_row_by_1_right(g: Grid) -> Grid:
+    """Cyclically rotate each row right by 1."""
+    if not g:
+        return []
+    return [[r[-1]] + list(r[:-1]) for r in g]
+
+
+def rotate_each_row_by_1_left(g: Grid) -> Grid:
+    if not g:
+        return []
+    return [list(r[1:]) + [r[0]] for r in g]
+
+
+def rotate_each_col_by_1_down(g: Grid) -> Grid:
+    if not g:
+        return []
+    return transpose(rotate_each_row_by_1_right(transpose(g)))
+
+
+def rotate_each_col_by_1_up(g: Grid) -> Grid:
+    if not g:
+        return []
+    return transpose(rotate_each_row_by_1_left(transpose(g)))
+
+
+def colors_present_as_count_grid(g: Grid) -> Grid:
+    """Output: 1xK row where K = distinct non-bg colors, cells = bg.
+
+    Sometimes simpler than colors_count_to_grid.
+    """
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    palette = sorted(set(flat) - {bg})
+    if not palette:
+        raise ValueError("colors_present_as_count_grid: no fg")
+    return [[bg] * len(palette)]
+
+
+def first_row(g: Grid) -> Grid:
+    if not g:
+        return []
+    return [list(g[0])]
+
+
+def first_col(g: Grid) -> Grid:
+    if not g:
+        return []
+    return [[r[0]] for r in g]
+
+
+def remove_first_row(g: Grid) -> Grid:
+    if not g or len(g) < 2:
+        raise ValueError("remove_first_row: too small")
+    return [list(r) for r in g[1:]]
+
+
+def remove_first_col(g: Grid) -> Grid:
+    if not g or len(g[0]) < 2:
+        raise ValueError("remove_first_col: too small")
+    return [list(r[1:]) for r in g]
+
+
+def remove_last_row(g: Grid) -> Grid:
+    if not g or len(g) < 2:
+        raise ValueError("remove_last_row: too small")
+    return [list(r) for r in g[:-1]]
+
+
+def remove_last_col(g: Grid) -> Grid:
+    if not g or len(g[0]) < 2:
+        raise ValueError("remove_last_col: too small")
+    return [list(r[:-1]) for r in g]
+
+
+def transpose_then_flip_each_row(g: Grid) -> Grid:
+    return [list(reversed(r)) for r in transpose(g)]
+
+
+def square_pad_with_bg(g: Grid) -> Grid:
+    """Pad to a square using bg."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    side = max(rows, cols)
+    if side > _MAX:
+        raise ValueError("square_pad: too large")
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [[bg] * side for _ in range(side)]
+    for r in range(rows):
+        for c in range(cols):
+            out[r][c] = g[r][c]
+    return out
+
+
 def complete_symmetry_h(g: Grid) -> Grid:
     out = [list(r) for r in g]
     rows = len(out); cols = len(out[0]) if rows else 0
@@ -1670,6 +1767,19 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "each_object_to_color_of_neighbor": each_object_to_color_of_neighbor,
     "diag_flip_then_h_flip": diag_flip_then_h_flip,
     "diag_flip_then_v_flip": diag_flip_then_v_flip,
+    "rotate_each_row_by_1_right": rotate_each_row_by_1_right,
+    "rotate_each_row_by_1_left":  rotate_each_row_by_1_left,
+    "rotate_each_col_by_1_down":  rotate_each_col_by_1_down,
+    "rotate_each_col_by_1_up":    rotate_each_col_by_1_up,
+    "colors_present_as_count_grid": colors_present_as_count_grid,
+    "first_row":            first_row,
+    "first_col":            first_col,
+    "remove_first_row":     remove_first_row,
+    "remove_first_col":     remove_first_col,
+    "remove_last_row":      remove_last_row,
+    "remove_last_col":      remove_last_col,
+    "transpose_then_flip_each_row": transpose_then_flip_each_row,
+    "square_pad_with_bg":   square_pad_with_bg,
 }
 
 
@@ -1798,4 +1908,17 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "each_object_to_color_of_neighbor": "renaming",
     "diag_flip_then_h_flip":   "mirror",
     "diag_flip_then_v_flip":   "mirror",
+    "rotate_each_row_by_1_right": "passage",
+    "rotate_each_row_by_1_left":  "passage",
+    "rotate_each_col_by_1_down":  "passage",
+    "rotate_each_col_by_1_up":    "passage",
+    "colors_present_as_count_grid": "counting",
+    "first_row":               "first_fruits",
+    "first_col":               "first_fruits",
+    "remove_first_row":        "remnant",
+    "remove_first_col":        "remnant",
+    "remove_last_row":         "remnant",
+    "remove_last_col":         "remnant",
+    "transpose_then_flip_each_row": "mirror",
+    "square_pad_with_bg":      "covering",
 }
