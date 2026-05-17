@@ -74,7 +74,8 @@ def evaluate(split: str = "training", limit: int | None = None) -> dict:
         for test_in, test_out in test_pairs:
             try:
                 pred = apply_rule(rule, test_in, pairs=train_pairs)
-            except NotImplementedError:
+            except (NotImplementedError, ValueError):
+                # ValueError = primitive abstained mid-apply (P₃).
                 totals["abstain"] += 1
                 task_all_solved = False
                 continue

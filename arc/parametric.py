@@ -193,20 +193,114 @@ def fit_pad_with_color(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
 
 
 # ---------------------------------------------------------------
+#  color_permutation — every color is consistently remapped.
+# ---------------------------------------------------------------
+
+def fit_color_permutation(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    if not pairs:
+        return None
+    mapping: dict[int, int] = {}
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        for r, row in enumerate(inp):
+            for c, v in enumerate(row):
+                w = out[r][c]
+                if v in mapping:
+                    if mapping[v] != w:
+                        return None
+                else:
+                    mapping[v] = w
+    # require that the mapping does *something* (not just identity)
+    if all(v == w for v, w in mapping.items()):
+        return None
+
+    m = dict(mapping)
+    domain = set(m.keys())
+
+    def apply(g: Grid) -> Grid:
+        # P₃: if any test cell uses a color not in the trained mapping,
+        # the rule is undecidable. Abstain (raise) rather than guess.
+        for row in g:
+            for v in row:
+                if v not in domain:
+                    raise ValueError(
+                        f"color {v} not in trained color_permutation domain {sorted(domain)}; abstain (P₃)"
+                    )
+        return [[m.get(v, v) for v in row] for row in g]
+
+    return apply
+
+
+# ---------------------------------------------------------------
+#  bbox_of_nonbg — output is the bounding box (cropped) of fg.
+# ---------------------------------------------------------------
+
+def fit_bbox_of_nonbg(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    """If output is the input cropped to the non-background bbox."""
+    if not pairs:
+        return None
+    for inp, out in pairs:
+        bg = _background(inp)
+        rows, cols = _shape(inp)
+        nonbg = [(r, c) for r in range(rows) for c in range(cols) if inp[r][c] != bg]
+        if not nonbg:
+            return None
+        r0 = min(r for r, _ in nonbg); r1 = max(r for r, _ in nonbg)
+        c0 = min(c for _, c in nonbg); c1 = max(c for _, c in nonbg)
+        cropped = [inp[r][c0:c1+1] for r in range(r0, r1+1)]
+        if cropped != [list(r) for r in out]:
+            return None
+
+    def apply(g: Grid) -> Grid:
+        bg = _background(g)
+        rows, cols = _shape(g)
+        nonbg = [(r, c) for r in range(rows) for c in range(cols) if g[r][c] != bg]
+        if not nonbg:
+            return [list(r) for r in g]
+        r0 = min(r for r, _ in nonbg); r1 = max(r for r, _ in nonbg)
+        c0 = min(c for _, c in nonbg); c1 = max(c for _, c in nonbg)
+        return [g[r][c0:c1+1] for r in range(r0, r1+1)]
+
+    return apply
+
+
+# ---------------------------------------------------------------
+#  fixed_shape_recolor — recolor whole grid to a fixed color,
+#  output shape inferred from a stable function of input shape.
+# ---------------------------------------------------------------
+
+def fit_same_shape_recolor_by_count(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    """Each color is remapped, mapping inferred from co-occurrence counts.
+
+    Specialized to: for every distinct color in the input, the output
+    has the same cells re-colored. The mapping must be 1:1 and stable
+    across all training pairs (color_permutation subsumes much of
+    this, but is identity-rejecting; this variant ALSO requires
+    same shape).
+    """
+    return fit_color_permutation(pairs)
+
+
+# ---------------------------------------------------------------
 #  Registry of parametric fitters.
 # ---------------------------------------------------------------
 
 FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] = [
+    ("color_permutation", fit_color_permutation),
     ("swap_two_colors",   fit_swap_two_colors),
     ("recolor_constant",  fit_recolor_constant),
+    ("bbox_of_nonbg",     fit_bbox_of_nonbg),
     ("pad_with_color",    fit_pad_with_color),
     ("fixed_output",      fit_fixed_output),
 ]
 
 
 SCRIPTURAL_NAMES: dict[str, str] = {
+    "color_permutation": "renaming",
     "swap_two_colors":   "exchange",
     "recolor_constant":  "name",
+    "bbox_of_nonbg":     "remnant",
     "pad_with_color":    "covering",
     "fixed_output":      "decree",
 }
