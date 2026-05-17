@@ -1683,7 +1683,109 @@ def fit_recolor_largest_keep_rest(pairs: list[tuple[Grid, Grid]]) -> Callable | 
     return apply
 
 
+# ---------------------------------------------------------------
+#  classify_by_count_components — output is 1×1; color depends on
+#  the number of 4-connected non-bg components in input.
+# ---------------------------------------------------------------
+
+def fit_classify_by_count_components(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    if len(pairs) < 3:
+        return None
+    mapping: dict[int, int] = {}
+    for inp, out in pairs:
+        if _shape(out) != (1, 1):
+            return None
+        bg = _background(inp)
+        n = len(_components_4(inp, bg))
+        c = out[0][0]
+        if n in mapping and mapping[n] != c:
+            return None
+        mapping[n] = c
+    if len(mapping) < 2:
+        return None
+    m = dict(mapping)
+
+    def apply(g: Grid) -> Grid:
+        bg = _background(g)
+        n = len(_components_4(g, bg))
+        if n not in m:
+            raise ValueError(
+                f"classify_by_count_components: count {n} not in trained mapping; abstain"
+            )
+        return [[m[n]]]
+    return apply
+
+
+# ---------------------------------------------------------------
+#  classify_by_palette_size — output is 1×1 by distinct-color count.
+# ---------------------------------------------------------------
+
+def fit_classify_by_palette_size(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    if len(pairs) < 3:
+        return None
+    mapping: dict[int, int] = {}
+    for inp, out in pairs:
+        if _shape(out) != (1, 1):
+            return None
+        n = len(set(_flat(inp)))
+        c = out[0][0]
+        if n in mapping and mapping[n] != c:
+            return None
+        mapping[n] = c
+    if len(mapping) < 2:
+        return None
+    m = dict(mapping)
+
+    def apply(g: Grid) -> Grid:
+        n = len(set(_flat(g)))
+        if n not in m:
+            raise ValueError(
+                f"classify_by_palette_size: count {n} not in trained mapping; abstain"
+            )
+        return [[m[n]]]
+    return apply
+
+
+# ---------------------------------------------------------------
+#  classify_by_symmetry — output 1×1; color depends on which symmetries hold.
+# ---------------------------------------------------------------
+
+def fit_classify_by_symmetry(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    if len(pairs) < 3:
+        return None
+    mapping: dict[tuple[bool, bool], int] = {}
+    for inp, out in pairs:
+        if _shape(out) != (1, 1):
+            return None
+        rows = len(inp); cols = len(inp[0]) if rows else 0
+        h = all(inp[r] == list(reversed(inp[r])) for r in range(rows))
+        v = inp[: rows // 2] == [list(r) for r in reversed(inp)][: rows // 2]
+        key = (h, v)
+        c = out[0][0]
+        if key in mapping and mapping[key] != c:
+            return None
+        mapping[key] = c
+    if len(mapping) < 2:
+        return None
+    m = dict(mapping)
+
+    def apply(g: Grid) -> Grid:
+        rows = len(g); cols = len(g[0]) if rows else 0
+        h = all(g[r] == list(reversed(g[r])) for r in range(rows))
+        v = g[: rows // 2] == [list(r) for r in reversed(g)][: rows // 2]
+        key = (h, v)
+        if key not in m:
+            raise ValueError(
+                f"classify_by_symmetry: ({h},{v}) not in trained mapping; abstain"
+            )
+        return [[m[key]]]
+    return apply
+
+
 FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] = [
+    ("classify_by_count_components", fit_classify_by_count_components),
+    ("classify_by_palette_size",  fit_classify_by_palette_size),
+    ("classify_by_symmetry",      fit_classify_by_symmetry),
     ("color_permutation",         fit_color_permutation),
     ("swap_two_colors",           fit_swap_two_colors),
     ("recolor_constant",          fit_recolor_constant),
@@ -1719,6 +1821,9 @@ FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] 
 
 
 SCRIPTURAL_NAMES: dict[str, str] = {
+    "classify_by_count_components": "counting",
+    "classify_by_palette_size":  "counting",
+    "classify_by_symmetry":      "judge",
     "color_permutation":         "renaming",
     "swap_two_colors":           "exchange",
     "recolor_constant":          "name",
