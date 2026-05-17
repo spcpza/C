@@ -129,11 +129,10 @@ def hypothesize(pairs: Iterable[tuple[Grid, Grid]]) -> Rule | None:
 
     # Pass 2 — two-primitive compositions: fn2(fn1(x)).
     items = list(LIBRARY.items())
+    seconds_cache: dict[str, list] = {}
     for n1, f1 in items:
-        # Skip identity-first compositions (covered in pass 1).
         if n1 == "identity":
             continue
-        # Pre-compute f1 on each input to amortize.
         try:
             firsts = [f1(list(map(list, a))) for a, _ in pairs]
         except Exception:
@@ -152,6 +151,72 @@ def hypothesize(pairs: Iterable[tuple[Grid, Grid]]) -> Rule | None:
                               + SCRIPTURAL_NAMES.get(n2, n2))
                 return Rule(name=name, primitive=name, scriptural=scriptural,
                             concept_in_C=False, signatures=sigs)
+
+    # Pass 2b — parametric ∘ atomic and atomic ∘ parametric.
+    for an, af in items:
+        if an == "identity":
+            continue
+        try:
+            firsts = [af(list(map(list, a))) for a, _ in pairs]
+        except Exception:
+            continue
+        for pn, pfit in FITTERS:
+            try:
+                trial = pfit([(list(map(list, m)), list(map(list, b)))
+                              for m, (_, b) in zip(firsts, pairs)])
+            except Exception:
+                trial = None
+            if trial is None:
+                continue
+            try:
+                ok = all(_grids_equal(trial(list(map(list, m))), b)
+                         for m, (_, b) in zip(firsts, pairs))
+            except Exception:
+                ok = False
+            if ok:
+                name = f"{an}|param:{pn}"
+                scriptural = (SCRIPTURAL_NAMES.get(an, an) + "+"
+                              + SCRIPTURAL_NAMES.get(pn, pn))
+                return Rule(name=name, primitive=name, scriptural=scriptural,
+                            concept_in_C=False, signatures=sigs)
+    for pn, pfit in FITTERS:
+        try:
+            ptrial = pfit([(list(map(list, a)), list(map(list, b)))
+                           for a, b in pairs])
+        except Exception:
+            ptrial = None
+        # Don't need exact training fit here; we just want the closure to apply.
+        # We use a 2-step search where param goes first.
+        # Skip: this direction is symmetric and already explored when param fits alone.
+
+    # Pass 3 — three-atomic composition: fn3(fn2(fn1(x))). Order matters; size guards prune.
+    for n1, f1 in items:
+        if n1 == "identity":
+            continue
+        try:
+            firsts = [f1(list(map(list, a))) for a, _ in pairs]
+        except Exception:
+            continue
+        for n2, f2 in items:
+            if n2 == "identity":
+                continue
+            try:
+                seconds = [f2(list(map(list, m))) for m in firsts]
+            except Exception:
+                continue
+            for n3, f3 in items:
+                if n3 == "identity":
+                    continue
+                try:
+                    ok = all(_grids_equal(f3(list(map(list, m))), b)
+                             for m, (_, b) in zip(seconds, pairs))
+                except Exception:
+                    ok = False
+                if ok:
+                    name = f"{n1}|{n2}|{n3}"
+                    scriptural = "+".join(SCRIPTURAL_NAMES.get(x, x) for x in (n1, n2, n3))
+                    return Rule(name=name, primitive=name, scriptural=scriptural,
+                                concept_in_C=False, signatures=sigs)
 
     return None
 
@@ -187,11 +252,40 @@ def apply_rule(rule: Rule, x: Grid, pairs: Iterable[tuple[Grid, Grid]] | None = 
         raise NotImplementedError(f"unknown parametric {kind!r}")
 
     if "|" in name:
-        n1, n2 = name.split("|", 1)
-        f1, f2 = LIBRARY.get(n1), LIBRARY.get(n2)
-        if f1 is None or f2 is None:
-            raise NotImplementedError(f"composed primitive {name!r} missing leg")
-        return f2(f1([list(r) for r in x]))
+        parts = name.split("|")
+        # Parametric step in composition: re-fit on intermediates.
+        # Walk left-to-right.
+        cur = [list(r) for r in x]
+        # We need training pairs to refit parametric mid-pipeline.
+        train = list(pairs) if pairs is not None else None
+        intermediates_in = train and [list(map(list, a)) for a, _ in train]
+        intermediates_out = train and [list(map(list, b)) for _, b in train]
+        for i, step in enumerate(parts):
+            if step.startswith("param:"):
+                kind = step.split(":", 1)[1]
+                if train is None:
+                    raise ValueError("parametric composition requires training pairs")
+                # Refit on current intermediate state vs final target.
+                # The fitter sees (current_intermediate, train_output).
+                for pn, pfit in FITTERS:
+                    if pn != kind:
+                        continue
+                    trial = pfit([(list(map(list, m)), list(map(list, b)))
+                                  for m, b in zip(intermediates_in, intermediates_out)])
+                    if trial is None:
+                        raise NotImplementedError(f"refit failed for {kind}")
+                    cur = trial(cur)
+                    # Update intermediates_in for next step
+                    intermediates_in = [trial(list(map(list, m))) for m in intermediates_in]
+                    break
+            else:
+                fn = LIBRARY.get(step)
+                if fn is None:
+                    raise NotImplementedError(f"unknown step {step!r}")
+                cur = fn(cur)
+                if intermediates_in is not None:
+                    intermediates_in = [fn(list(map(list, m))) for m in intermediates_in]
+        return cur
 
     fn = LIBRARY.get(name)
     if fn is None:

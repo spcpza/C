@@ -468,27 +468,329 @@ def fit_outline_objects(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
 #  Registry of parametric fitters.
 # ---------------------------------------------------------------
 
+# ---------------------------------------------------------------
+#  fill_components_solid — every component (4-conn) becomes a solid
+#  rectangle of its color (its bounding box, filled).
+# ---------------------------------------------------------------
+
+def fit_fill_components_to_bbox(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        bg = _background(inp)
+        comps = _components_4(inp, bg)
+        expected = [[bg] * _shape(inp)[1] for _ in range(_shape(inp)[0])]
+        for comp in comps:
+            color = _comp_color(inp, comp)
+            r0 = min(r for r,_ in comp); r1 = max(r for r,_ in comp)
+            c0 = min(c for _,c in comp); c1 = max(c for _,c in comp)
+            for r in range(r0, r1+1):
+                for c in range(c0, c1+1):
+                    expected[r][c] = color
+        if expected != [list(r) for r in out]:
+            return None
+        if expected == [list(r) for r in inp]:
+            # No change → identity in disguise; this fitter shouldn't claim it.
+            return None
+
+    def apply(g: Grid) -> Grid:
+        bg = _background(g)
+        comps = _components_4(g, bg)
+        out = [list(r) for r in g]
+        for comp in comps:
+            color = _comp_color(g, comp)
+            r0 = min(r for r,_ in comp); r1 = max(r for r,_ in comp)
+            c0 = min(c for _,c in comp); c1 = max(c for _,c in comp)
+            for r in range(r0, r1+1):
+                for c in range(c0, c1+1):
+                    out[r][c] = color
+        return out
+
+    return apply
+
+
+# ---------------------------------------------------------------
+#  grow_components_by_1 — each component expands by 1 cell (4-conn).
+# ---------------------------------------------------------------
+
+def fit_grow_components_by_1(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    def grow(g: Grid) -> Grid:
+        bg = _background(g)
+        rows, cols = _shape(g)
+        out = [list(r) for r in g]
+        for r in range(rows):
+            for c in range(cols):
+                if g[r][c] == bg:
+                    for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+                        nr, nc = r+dr, c+dc
+                        if 0 <= nr < rows and 0 <= nc < cols and g[nr][nc] != bg:
+                            out[r][c] = g[nr][nc]
+                            break
+        return out
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        if grow([list(r) for r in inp]) != [list(r) for r in out]:
+            return None
+        if inp == out:
+            return None
+    return grow
+
+
+# ---------------------------------------------------------------
+#  extract_marker_neighborhood — input has a unique-color cell;
+#  output is the NxN neighborhood around it (N inferred).
+# ---------------------------------------------------------------
+
+def fit_extract_neighborhood(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    rad: int | None = None
+    target_color: int | None = None
+    for inp, out in pairs:
+        rows, cols = _shape(inp)
+        # Find a color that appears exactly once.
+        flat = _flat(inp)
+        unique = [v for v in set(flat) if flat.count(v) == 1]
+        if len(unique) != 1:
+            return None
+        marker = unique[0]
+        if target_color is None:
+            target_color = marker
+        elif target_color != marker:
+            return None
+        # Find marker position
+        positions = [(r, c) for r in range(rows) for c in range(cols)
+                     if inp[r][c] == marker]
+        mr, mc = positions[0]
+        # Output should be a (2k+1) x (2k+1) neighborhood
+        oh, ow = _shape(out)
+        if oh != ow or oh % 2 == 0:
+            return None
+        k = oh // 2
+        if rad is None:
+            rad = k
+        elif rad != k:
+            return None
+        # Extract from input
+        ext: Grid = []
+        for r in range(mr - k, mr + k + 1):
+            row = []
+            for c in range(mc - k, mc + k + 1):
+                if 0 <= r < rows and 0 <= c < cols:
+                    row.append(inp[r][c])
+                else:
+                    row.append(_background(inp))
+            ext.append(row)
+        if ext != [list(r) for r in out]:
+            return None
+    if rad is None or target_color is None:
+        return None
+    k_fixed = rad
+    color_fixed = target_color
+
+    def apply(g: Grid) -> Grid:
+        rows, cols = _shape(g)
+        flat = _flat(g)
+        unique = [v for v in set(flat) if flat.count(v) == 1]
+        if color_fixed not in unique:
+            raise ValueError(
+                f"marker color {color_fixed} not unique in test input; abstain (P₃)"
+            )
+        positions = [(r, c) for r in range(rows) for c in range(cols)
+                     if g[r][c] == color_fixed]
+        mr, mc = positions[0]
+        bg = _background(g)
+        ext: Grid = []
+        for r in range(mr - k_fixed, mr + k_fixed + 1):
+            row = []
+            for c in range(mc - k_fixed, mc + k_fixed + 1):
+                if 0 <= r < rows and 0 <= c < cols:
+                    row.append(g[r][c])
+                else:
+                    row.append(bg)
+            ext.append(row)
+        return ext
+
+    return apply
+
+
+# ---------------------------------------------------------------
+#  per_component_recolor — every component of color X becomes color Y,
+#  mapping inferred from training (more general than swap).
+# ---------------------------------------------------------------
+
+def fit_per_component_recolor(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    mapping: dict[int, int] = {}
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        bg = _background(inp)
+        if _background(out) != bg:
+            return None
+        # Every cell preserves position; only color may change
+        for r, row in enumerate(inp):
+            for c, v in enumerate(row):
+                w = out[r][c]
+                if v == bg:
+                    if w != bg:
+                        return None
+                    continue
+                if v in mapping:
+                    if mapping[v] != w:
+                        return None
+                else:
+                    mapping[v] = w
+    if not mapping or all(v == w for v, w in mapping.items()):
+        return None
+    m = dict(mapping); domain = set(m.keys())
+
+    def apply(g: Grid) -> Grid:
+        bg = _background(g)
+        for row in g:
+            for v in row:
+                if v != bg and v not in domain:
+                    raise ValueError(
+                        f"non-bg color {v} not in trained mapping; abstain (P₃)"
+                    )
+        return [[m.get(v, v) if v != bg else bg for v in row] for row in g]
+    return apply
+
+
+# ---------------------------------------------------------------
+#  axis_periodic_complete — input has a periodic pattern with holes (bg);
+#  output fills the holes with the inferred period.
+# ---------------------------------------------------------------
+
+def fit_periodic_complete(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    """Detect horizontal/vertical/both periodicity and complete."""
+    def complete(g: Grid, period_r: int | None, period_c: int | None) -> Grid:
+        rows, cols = _shape(g)
+        bg = _background(g)
+        out = [list(r) for r in g]
+        # Build position -> color votes by congruence class
+        votes: dict[tuple[int, int], dict[int, int]] = {}
+        for r in range(rows):
+            for c in range(cols):
+                v = g[r][c]
+                if v == bg:
+                    continue
+                pr = r % period_r if period_r else r
+                pc = c % period_c if period_c else c
+                key = (pr, pc)
+                votes.setdefault(key, {}).setdefault(v, 0)
+                votes[key][v] += 1
+        for r in range(rows):
+            for c in range(cols):
+                if g[r][c] != bg:
+                    continue
+                pr = r % period_r if period_r else r
+                pc = c % period_c if period_c else c
+                key = (pr, pc)
+                if key not in votes:
+                    continue
+                # Take majority color for that class.
+                best = max(votes[key].items(), key=lambda kv: kv[1])
+                out[r][c] = best[0]
+        return out
+
+    # Try (period_r, period_c) combinations small.
+    best_periods: tuple[int | None, int | None] | None = None
+    for pr in [None, 2, 3, 4]:
+        for pc in [None, 2, 3, 4]:
+            if pr is None and pc is None:
+                continue
+            ok = True
+            for inp, out in pairs:
+                if _shape(inp) != _shape(out):
+                    ok = False
+                    break
+                if complete([list(r) for r in inp], pr, pc) != [list(r) for r in out]:
+                    ok = False
+                    break
+            if ok:
+                # Must change something for at least one pair.
+                changed = any(inp != out for inp, out in pairs)
+                if changed:
+                    best_periods = (pr, pc)
+                    break
+        if best_periods:
+            break
+    if not best_periods:
+        return None
+    pr, pc = best_periods
+
+    def apply(g: Grid) -> Grid:
+        return complete([list(r) for r in g], pr, pc)
+    return apply
+
+
+# ---------------------------------------------------------------
+#  per_color_subgrid_stack — split input by color, stack rows.
+#  (Several ARC tasks: extract a sub-grid per palette color.)
+# ---------------------------------------------------------------
+
+def fit_each_cell_repeated_input(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    """Output = tile_self of input (each non-bg cell of input gets a copy of input)."""
+    def op(g: Grid) -> Grid:
+        rows, cols = _shape(g)
+        if rows * rows > 30 or cols * cols > 30:
+            raise ValueError("too large")
+        bg = _background(g)
+        out = [[bg] * (cols * cols) for _ in range(rows * rows)]
+        for R in range(rows):
+            for C in range(cols):
+                if g[R][C] != bg:
+                    for r in range(rows):
+                        for c in range(cols):
+                            out[R * rows + r][C * cols + c] = g[r][c]
+        return out
+    for inp, out in pairs:
+        try:
+            if op([list(r) for r in inp]) != [list(r) for r in out]:
+                return None
+        except Exception:
+            return None
+        if inp == out:
+            return None
+    return op
+
+
+# ---------------------------------------------------------------
+#  Registry of parametric fitters.
+# ---------------------------------------------------------------
+
 FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] = [
-    ("color_permutation",        fit_color_permutation),
-    ("swap_two_colors",          fit_swap_two_colors),
-    ("recolor_constant",         fit_recolor_constant),
-    ("keep_components_of_color", fit_keep_components_of_color),
-    ("recolor_by_size_rank",     fit_recolor_by_size_rank),
-    ("outline_objects",          fit_outline_objects),
-    ("bbox_of_nonbg",            fit_bbox_of_nonbg),
-    ("pad_with_color",           fit_pad_with_color),
-    ("fixed_output",             fit_fixed_output),
+    ("color_permutation",         fit_color_permutation),
+    ("swap_two_colors",           fit_swap_two_colors),
+    ("recolor_constant",          fit_recolor_constant),
+    ("per_component_recolor",     fit_per_component_recolor),
+    ("keep_components_of_color",  fit_keep_components_of_color),
+    ("recolor_by_size_rank",      fit_recolor_by_size_rank),
+    ("outline_objects",           fit_outline_objects),
+    ("fill_components_to_bbox",   fit_fill_components_to_bbox),
+    ("grow_components_by_1",      fit_grow_components_by_1),
+    ("bbox_of_nonbg",             fit_bbox_of_nonbg),
+    ("pad_with_color",            fit_pad_with_color),
+    ("extract_neighborhood",      fit_extract_neighborhood),
+    ("periodic_complete",         fit_periodic_complete),
+    ("each_cell_repeated_input",  fit_each_cell_repeated_input),
+    ("fixed_output",              fit_fixed_output),
 ]
 
 
 SCRIPTURAL_NAMES: dict[str, str] = {
-    "color_permutation":        "renaming",
-    "swap_two_colors":          "exchange",
-    "recolor_constant":         "name",
-    "keep_components_of_color": "winnow",
-    "recolor_by_size_rank":     "ordering",
-    "outline_objects":          "boundary",
-    "bbox_of_nonbg":            "remnant",
-    "pad_with_color":           "covering",
-    "fixed_output":             "decree",
+    "color_permutation":         "renaming",
+    "swap_two_colors":           "exchange",
+    "recolor_constant":          "name",
+    "per_component_recolor":     "renaming",
+    "keep_components_of_color":  "winnow",
+    "recolor_by_size_rank":      "ordering",
+    "outline_objects":           "boundary",
+    "fill_components_to_bbox":   "filling",
+    "grow_components_by_1":      "increase",
+    "bbox_of_nonbg":             "remnant",
+    "pad_with_color":            "covering",
+    "extract_neighborhood":      "set_apart",
+    "periodic_complete":         "restoration",
+    "each_cell_repeated_input":  "image_in_image",
+    "fixed_output":              "decree",
 }
