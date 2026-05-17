@@ -113,6 +113,108 @@ def tile_3x3(g: Grid) -> Grid:
     return triple + triple + triple
 
 
+# ---------------------------------------------------------------
+#  Mirror-stacking primitives — output is input concatenated with
+#  its own flip in one of four directions.
+# ---------------------------------------------------------------
+
+def mirror_right(g: Grid) -> Grid:
+    """g | flip_h(g)  (concat horizontally with horizontal mirror)."""
+    if not g or len(g[0]) * 2 > _MAX:
+        raise ValueError("mirror_right exceeds ARC max grid size")
+    return [list(r) + list(reversed(r)) for r in g]
+
+
+def mirror_left(g: Grid) -> Grid:
+    if not g or len(g[0]) * 2 > _MAX:
+        raise ValueError("mirror_left exceeds ARC max grid size")
+    return [list(reversed(r)) + list(r) for r in g]
+
+
+def mirror_below(g: Grid) -> Grid:
+    if not g or len(g) * 2 > _MAX:
+        raise ValueError("mirror_below exceeds ARC max grid size")
+    return [list(r) for r in g] + [list(r) for r in reversed(g)]
+
+
+def mirror_above(g: Grid) -> Grid:
+    if not g or len(g) * 2 > _MAX:
+        raise ValueError("mirror_above exceeds ARC max grid size")
+    return [list(r) for r in reversed(g)] + [list(r) for r in g]
+
+
+def stack_below(g: Grid) -> Grid:
+    """g / g (vertical concat with self)."""
+    if not g or len(g) * 2 > _MAX:
+        raise ValueError("stack_below exceeds ARC max grid size")
+    return [list(r) for r in g] + [list(r) for r in g]
+
+
+def stack_right(g: Grid) -> Grid:
+    if not g or len(g[0]) * 2 > _MAX:
+        raise ValueError("stack_right exceeds ARC max grid size")
+    return [list(r) + list(r) for r in g]
+
+
+# ---------------------------------------------------------------
+#  Deduplicate consecutive rows/cols.
+# ---------------------------------------------------------------
+
+def dedup_rows(g: Grid) -> Grid:
+    if not g:
+        return []
+    out = [list(g[0])]
+    for r in g[1:]:
+        if list(r) != out[-1]:
+            out.append(list(r))
+    return out
+
+
+def dedup_cols(g: Grid) -> Grid:
+    if not g:
+        return []
+    cols = list(zip(*g))
+    out_cols = [list(cols[0])]
+    for c in cols[1:]:
+        if list(c) != out_cols[-1]:
+            out_cols.append(list(c))
+    return [list(row) for row in zip(*out_cols)]
+
+
+# ---------------------------------------------------------------
+#  Unique values per row / col (collapsed).
+# ---------------------------------------------------------------
+
+def unique_per_row(g: Grid) -> Grid:
+    """Each row → its unique values in order of first appearance."""
+    out = []
+    for row in g:
+        seen: list[int] = []
+        for v in row:
+            if v not in seen:
+                seen.append(v)
+        out.append(seen)
+    # Pad to common width
+    w = max((len(r) for r in out), default=0)
+    return [r + [0] * (w - len(r)) for r in out]
+
+
+# ---------------------------------------------------------------
+#  Negate (every non-bg → 0, every bg → 1) — for simple binary tasks.
+# ---------------------------------------------------------------
+
+def negate_binary(g: Grid) -> Grid:
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    fg_set = set(flat) - {bg}
+    if len(fg_set) != 1:
+        raise ValueError("negate_binary: requires exactly one fg color")
+    fg = next(iter(fg_set))
+    return [[bg if v == fg else fg for v in row] for row in g]
+
+
 def complete_symmetry_h(g: Grid) -> Grid:
     out = [list(r) for r in g]
     rows = len(out); cols = len(out[0]) if rows else 0
@@ -306,6 +408,16 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "tile_2x2":             tile_2x2,
     "tile_3x3":             tile_3x3,
     "tile_self":            tile_self,
+    "mirror_right":         mirror_right,
+    "mirror_left":          mirror_left,
+    "mirror_below":         mirror_below,
+    "mirror_above":         mirror_above,
+    "stack_below":          stack_below,
+    "stack_right":          stack_right,
+    "dedup_rows":           dedup_rows,
+    "dedup_cols":           dedup_cols,
+    "unique_per_row":       unique_per_row,
+    "negate_binary":        negate_binary,
 }
 
 
@@ -333,4 +445,14 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "crop_to_content":        "remnant",
     "keep_largest_component": "remnant",
     "remove_largest_component": "winnow",
+    "mirror_right":           "mirror",
+    "mirror_left":            "mirror",
+    "mirror_below":           "below_as_above",
+    "mirror_above":           "above_as_below",
+    "stack_below":            "multiply",
+    "stack_right":            "multiply",
+    "dedup_rows":             "remnant",
+    "dedup_cols":             "remnant",
+    "unique_per_row":         "distinguishing",
+    "negate_binary":          "reversal",
 }
