@@ -1535,6 +1535,108 @@ def reverse_palette(g: Grid) -> Grid:
     return [[9 - v for v in row] for row in g]
 
 
+def crop_to_nonzero_rows(g: Grid) -> Grid:
+    """Keep only rows that have at least one non-bg cell."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [list(r) for r in g if any(v != bg for v in r)]
+    return out if out else [list(g[0])]
+
+
+def crop_to_nonzero_cols(g: Grid) -> Grid:
+    return transpose(crop_to_nonzero_rows(transpose(g)))
+
+
+def smallest_dim_first(g: Grid) -> Grid:
+    """Make the smaller of (rows, cols) the row count by transposing if needed."""
+    if not g:
+        return []
+    return g if len(g) <= len(g[0]) else transpose(g)
+
+
+def largest_dim_first(g: Grid) -> Grid:
+    if not g:
+        return []
+    return g if len(g) >= len(g[0]) else transpose(g)
+
+
+def fill_bg_with_first_fg(g: Grid) -> Grid:
+    """Replace bg with the first non-bg color seen."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    nonbg = [v for v in flat if v != bg]
+    if not nonbg:
+        raise ValueError("fill_bg_with_first_fg: no fg")
+    target = nonbg[0]
+    return [[target if v == bg else v for v in row] for row in g]
+
+
+def keep_largest_n_components(g: Grid, n: int = 2) -> Grid:
+    """Keep the 2 largest non-bg components."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    seen = [[False]*cols for _ in range(rows)]
+    comps: list[tuple[list, int]] = []
+    for r in range(rows):
+        for c in range(cols):
+            if seen[r][c] or g[r][c] == bg:
+                continue
+            color = g[r][c]
+            stack = [(r,c)]; comp = []
+            while stack:
+                rr, cc = stack.pop()
+                if rr<0 or rr>=rows or cc<0 or cc>=cols: continue
+                if seen[rr][cc] or g[rr][cc] != color: continue
+                seen[rr][cc] = True; comp.append((rr, cc))
+                stack += [(rr+1,cc),(rr-1,cc),(rr,cc+1),(rr,cc-1)]
+            comps.append((comp, color))
+    comps.sort(key=lambda kv: -len(kv[0]))
+    keep_cells: set[tuple[int, int]] = set()
+    for comp, _ in comps[:n]:
+        keep_cells.update(comp)
+    return [[g[r][c] if (r, c) in keep_cells else bg
+             for c in range(cols)] for r in range(rows)]
+
+
+def keep_largest_2_components(g: Grid) -> Grid:
+    return keep_largest_n_components(g, 2)
+
+
+def transpose_main(g: Grid) -> Grid:
+    """Alias for transpose to provide a distinct name."""
+    return transpose(g)
+
+
+def empty_grid_same_size(g: Grid) -> Grid:
+    """Output is the same size as input, all bg."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    return [[bg] * cols for _ in range(rows)]
+
+
+def repeat_first_row(g: Grid) -> Grid:
+    """Each row becomes the first row."""
+    if not g:
+        return []
+    return [list(g[0]) for _ in g]
+
+
+def repeat_first_col(g: Grid) -> Grid:
+    if not g:
+        return []
+    return [[r[0]] * len(r) for r in g]
+
+
 def double_bg_with_objects(g: Grid) -> Grid:
     """Each non-bg cell stays; each bg cell stays bg. (Used as alias for identity-with-erase.)
 
@@ -1856,6 +1958,15 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "keep_only_full_rows":  keep_only_full_rows,
     "keep_only_full_cols":  keep_only_full_cols,
     "reverse_palette":      reverse_palette,
+    "crop_to_nonzero_rows": crop_to_nonzero_rows,
+    "crop_to_nonzero_cols": crop_to_nonzero_cols,
+    "smallest_dim_first":   smallest_dim_first,
+    "largest_dim_first":    largest_dim_first,
+    "fill_bg_with_first_fg": fill_bg_with_first_fg,
+    "keep_largest_2_components": keep_largest_2_components,
+    "empty_grid_same_size": empty_grid_same_size,
+    "repeat_first_row":     repeat_first_row,
+    "repeat_first_col":     repeat_first_col,
 }
 
 
@@ -2002,4 +2113,13 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "keep_only_full_rows":     "remnant",
     "keep_only_full_cols":     "remnant",
     "reverse_palette":         "reversal",
+    "crop_to_nonzero_rows":    "remnant",
+    "crop_to_nonzero_cols":    "remnant",
+    "smallest_dim_first":      "ordering",
+    "largest_dim_first":       "ordering",
+    "fill_bg_with_first_fg":   "filling",
+    "keep_largest_2_components": "remnant",
+    "empty_grid_same_size":    "void",
+    "repeat_first_row":        "first_fruits",
+    "repeat_first_col":        "first_fruits",
 }
