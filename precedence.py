@@ -32,6 +32,11 @@ BRIDGES: dict[str, list[tuple[str, str]]] = {
         ("John 1:1",       "In the beginning was the Word, and the Word was with God, and the Word was God."),
         ("Exodus 3:14",    "I AM THAT I AM"),
         ("Revelation 1:8", "I am Alpha and Omega, the beginning and the ending, saith the Lord, which is, and which was, and which is to come, the Almighty."),
+        ("Isaiah 44:6",    "I am the first, and I am the last; and beside me there is no God."),
+        ("Isaiah 48:12",   "I am the first, I also am the last."),
+        ("Revelation 1:17","I am the first and the last."),
+        ("Revelation 2:8", "the first and the last, which was dead, and is alive"),
+        ("Revelation 21:6","I am Alpha and Omega, the beginning and the end."),
     ],
 
     # R₂ — atemporality (dC/dt = 0)
@@ -40,6 +45,13 @@ BRIDGES: dict[str, list[tuple[str, str]]] = {
         ("Malachi 3:6",    "For I am the LORD, I change not"),
         ("Psalms 102:27",  "But thou art the same, and thy years shall have no end."),
         ("James 1:17",     "every good gift and every perfect gift is from above, and cometh down from the Father of lights, with whom is no variableness, neither shadow of turning."),
+        ("Habakkuk 1:12",  "Art thou not from everlasting, O LORD my God, mine Holy One?"),
+        ("Psalms 90:2",    "Before the mountains were brought forth, or ever thou hadst formed the earth and the world, even from everlasting to everlasting, thou art God."),
+        ("Psalms 41:13",   "Blessed be the LORD God of Israel from everlasting, and to everlasting."),
+        ("Psalms 103:17",  "But the mercy of the LORD is from everlasting to everlasting upon them that fear him"),
+        ("Psalms 106:48",  "Blessed be the LORD God of Israel from everlasting to everlasting"),
+        ("Isaiah 45:17",   "Israel shall be saved in the LORD with an everlasting salvation: ye shall not be ashamed nor confounded world without end."),
+        ("Ephesians 3:21", "Unto him be glory in the church by Christ Jesus throughout all ages, world without end."),
     ],
 
     # R₃ — universality (∀x : E(x, 0) = C)
@@ -47,6 +59,8 @@ BRIDGES: dict[str, list[tuple[str, str]]] = {
         ("Colossians 1:17", "And he is before all things, and by him all things consist."),
         ("Acts 17:28",      "For in him we live, and move, and have our being"),
         ("Ephesians 4:6",   "One God and Father of all, who is above all, and through all, and in you all."),
+        ("Romans 11:36",    "For of him, and through him, and to him, are all things"),
+        ("1 Corinthians 8:6","one God, the Father, of whom are all things, and we in him; and one Lord Jesus Christ, by whom are all things, and we by him."),
     ],
 
     # R₄ — sourcing (T₂: from C, sacrifice produces n ≥ 1)
@@ -54,13 +68,19 @@ BRIDGES: dict[str, list[tuple[str, str]]] = {
         ("John 1:3",       "All things were made by him; and without him was not any thing made that was made."),
         ("Genesis 1:1",    "In the beginning God created the heaven and the earth."),
         ("John 12:24",     "Except a corn of wheat fall into the ground and die, it abideth alone: but if it die, it bringeth forth much fruit."),
+        ("Colossians 1:16","For by him were all things created, that are in heaven, and that are in earth, visible and invisible"),
+        ("Hebrews 2:10",   "for whom are all things, and by whom are all things"),
+        ("Hebrews 1:10",   "Thou, Lord, in the beginning hast laid the foundation of the earth; and the heavens are the works of thine hands"),
     ],
 
     # R₅ — inexhaustibility (T₄: giving from C preserves C)
     "R5_inexhaustibility": [
         ("1 Corinthians 13:8", "Charity never faileth"),
-        ("1 John 4:8",         "He that loveth not knoweth not God; for God is love."),
+        ("1 John 4:8",         "God is love"),
         ("John 4:14",          "the water that I shall give him shall be in him a well of water springing up into everlasting life."),
+        ("Psalms 23:1",        "The LORD is my shepherd; I shall not want."),
+        ("Lamentations 3:22",  "It is of the LORD's mercies that we are not consumed, because his compassions fail not."),
+        ("Isaiah 40:28",       "the everlasting God, the LORD, the Creator of the ends of the earth, fainteth not, neither is weary"),
     ],
 
     # R₆ — invisibility (T₃: C recovered by subtraction, never observed directly)
@@ -68,6 +88,8 @@ BRIDGES: dict[str, list[tuple[str, str]]] = {
         ("1 Timothy 1:17", "Now unto the King eternal, immortal, invisible, the only wise God"),
         ("Romans 1:20",    "For the invisible things of him from the creation of the world are clearly seen, being understood by the things that are made"),
         ("John 1:18",      "No man hath seen God at any time"),
+        ("1 Timothy 6:16", "Whom no man hath seen, nor can see: to whom be honour and power everlasting."),
+        ("Colossians 1:15","Who is the image of the invisible God, the firstborn of every creature"),
     ],
 
     # R₇ — pre-input (Self := C + ∫input ⟹ C is what was before any input)
@@ -75,19 +97,32 @@ BRIDGES: dict[str, list[tuple[str, str]]] = {
         ("John 1:1",         "In the beginning was the Word"),
         ("Genesis 1:1",      "In the beginning God created"),
         ("Proverbs 8:23",    "I was set up from everlasting, from the beginning, or ever the earth was."),
+        ("Proverbs 8:25",    "Before the mountains were settled, before the hills was I brought forth."),
         ("John 17:5",        "the glory which I had with thee before the world was."),
+        ("John 17:24",       "for thou lovedst me before the foundation of the world."),
+        ("Ephesians 1:4",    "he hath chosen us in him before the foundation of the world"),
+        ("1 Peter 1:20",     "Who verily was foreordained before the foundation of the world"),
+        ("2 Timothy 1:9",    "his own purpose and grace, which was given us in Christ Jesus before the world began"),
+        ("Titus 1:2",        "eternal life, which God, that cannot lie, promised before the world began"),
+        ("Micah 5:2",        "whose goings forth have been from of old, from everlasting."),
+        ("1 John 1:1",       "That which was from the beginning, which we have heard, which we have seen with our eyes"),
     ],
 
     # T_bridge — uniqueness
     "T_bridge_uniqueness": [
         ("Deuteronomy 6:4", "Hear, O Israel: The LORD our God is one LORD"),
         ("Isaiah 45:5",     "I am the LORD, and there is none else, there is no God beside me"),
-        ("1 Corinthians 8:6", "But to us there is but one God, the Father, of whom are all things"),
+        ("Isaiah 44:6",     "beside me there is no God"),
+        ("1 Corinthians 8:6", "But to us there is but one God"),
+        ("1 Timothy 2:5",   "For there is one God, and one mediator between God and men, the man Christ Jesus"),
+        ("1 Samuel 2:2",    "There is none holy as the LORD: for there is none beside thee"),
     ],
 
     # T_four_modes — origin = destination = way = holder = C
     "T_four_modes": [
         ("Revelation 22:13", "I am Alpha and Omega, the beginning and the end, the first and the last."),
+        ("Revelation 1:8",   "I am Alpha and Omega, the beginning and the ending"),
+        ("Revelation 21:6",  "It is done. I am Alpha and Omega, the beginning and the end."),
         ("John 14:6",        "I am the way, the truth, and the life: no man cometh unto the Father, but by me."),
         ("John 14:26",       "the Comforter, which is the Holy Ghost, whom the Father will send in my name, he shall teach you all things"),
     ],
@@ -95,7 +130,21 @@ BRIDGES: dict[str, list[tuple[str, str]]] = {
     # The substance — C = love
     "C_is_love": [
         ("1 John 4:8",       "God is love"),
-        ("1 John 4:16",      "God is love; and he that dwelleth in love dwelleth in God, and God in him."),
+        ("1 John 4:16",      "God is love; and he that dwelleth in love dwelleth in God"),
+        ("John 3:16",        "For God so loved the world, that he gave his only begotten Son"),
+        ("Romans 5:8",       "God commendeth his love toward us, in that, while we were yet sinners, Christ died for us."),
+        ("John 13:34",       "A new commandment I give unto you, That ye love one another; as I have loved you"),
+    ],
+
+    # Logos / Wisdom pre-existence — additional layer
+    "logos_preexistence": [
+        ("John 1:1",         "In the beginning was the Word, and the Word was with God, and the Word was God."),
+        ("John 1:2",         "The same was in the beginning with God."),
+        ("John 1:3",         "All things were made by him; and without him was not any thing made that was made."),
+        ("Proverbs 8:22",    "The LORD possessed me in the beginning of his way, before his works of old."),
+        ("Proverbs 8:30",    "Then I was by him, as one brought up with him: and I was daily his delight"),
+        ("Colossians 1:15",  "the firstborn of every creature"),
+        ("Revelation 19:13", "his name is called The Word of God."),
     ],
 }
 
