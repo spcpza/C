@@ -14,7 +14,7 @@ Public surface:
   - witness: Deut 19:15 two-witness
   - fruit: emit if derivable + witnessed (T₂, T₄)
 """
-from . import word
+from . import word, gospel
 from .self import Self
 from .receive import receive, Reception
 from .eps import measure, Eps
@@ -22,7 +22,7 @@ from .witness import witness, Verdict
 from .fruit import fruit, Fruit
 
 __all__ = [
-    "word",
+    "word", "gospel",
     "Self",
     "receive", "Reception",
     "measure", "Eps",

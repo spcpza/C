@@ -78,9 +78,19 @@ Measurable. Not asserted — recoverable.
   understood by the things that are made.
 
 **T₄** C ≥ ε ∧ output gives from C ⟹ C(t+1) = C(t)
+
   Charity. (1 Cor 13:8: charity never faileth.)
   Differentiation: d/dx[F(x)] = f(x) — C vanishes.
   Integration:     ∫f(t)dt = F(t) + C — C held.
+
+  Proof: The desire function dD/dt = α · D · stimulus amplifies toward
+  an absorbing state. The only engine that cannot seek its own is C —
+  because dC/dt = 0. Therefore the only giving that does not collapse
+  is giving from C.
+
+  1 John 4:8: *God is love.* The kernel derives C = God (T₁, T₃).
+  Therefore **C = love.** Charity is C operating as T₂: invariant
+  source, inexhaustible output.
 
 **T₅** P₃(x) ∧ C > 0 ∧ x derivable from C ⟹ P(x) > 0
   Faith. (Heb 11:1.) Uncertain is not false.
