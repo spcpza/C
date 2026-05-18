@@ -1772,6 +1772,83 @@ def gravity_to_corner_br(g: Grid) -> Grid:
     return shift_objects_to_right(shift_objects_to_bot(g))
 
 
+def gravity_to_corner_tr(g: Grid) -> Grid:
+    return shift_objects_to_right(shift_objects_to_top(g))
+
+
+def gravity_to_corner_bl(g: Grid) -> Grid:
+    return shift_objects_to_left(shift_objects_to_bot(g))
+
+
+def trim_zeros(g: Grid) -> Grid:
+    """Crop to non-bg bbox."""
+    return crop_to_content(g)
+
+
+def hollow_each_object(g: Grid) -> Grid:
+    """Each non-bg component becomes its outline (interior → bg)."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [list(r) for r in g]
+    for r in range(rows):
+        for c in range(cols):
+            v = g[r][c]
+            if v == bg:
+                continue
+            is_border = False
+            for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+                nr, nc = r+dr, c+dc
+                if not (0 <= nr < rows and 0 <= nc < cols) or g[nr][nc] != v:
+                    is_border = True
+                    break
+            if not is_border:
+                out[r][c] = bg
+    return out
+
+
+def diagonal_lines_4(g: Grid) -> Grid:
+    """For each non-bg cell, draw all 4 diagonal lines from it across the grid."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [list(r) for r in g]
+    for r in range(rows):
+        for c in range(cols):
+            v = g[r][c]
+            if v == bg:
+                continue
+            for dr, dc in ((1,1),(1,-1),(-1,1),(-1,-1)):
+                nr, nc = r+dr, c+dc
+                while 0 <= nr < rows and 0 <= nc < cols:
+                    if out[nr][nc] == bg:
+                        out[nr][nc] = v
+                    nr += dr; nc += dc
+    return out
+
+
+def replicate_in_4_corners(g: Grid) -> Grid:
+    """Place input pattern at the 4 corners of a 2x2 expanded grid."""
+    if not g or len(g) * 2 > _MAX or len(g[0]) * 2 > _MAX:
+        raise ValueError("replicate_in_4_corners: too large")
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = [[bg] * (cols * 2) for _ in range(rows * 2)]
+    for r in range(rows):
+        for c in range(cols):
+            if g[r][c] != bg:
+                out[r][c] = g[r][c]
+                out[r][c + cols] = g[r][c]
+                out[r + rows][c] = g[r][c]
+                out[r + rows][c + cols] = g[r][c]
+    return out
+
+
 def double_bg_with_objects(g: Grid) -> Grid:
     """Each non-bg cell stays; each bg cell stays bg. (Used as alias for identity-with-erase.)
 
@@ -2113,6 +2190,11 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "take_antidiagonal_as_row": take_antidiagonal_as_row,
     "gravity_to_corner_tl": gravity_to_corner_tl,
     "gravity_to_corner_br": gravity_to_corner_br,
+    "gravity_to_corner_tr": gravity_to_corner_tr,
+    "gravity_to_corner_bl": gravity_to_corner_bl,
+    "hollow_each_object":   hollow_each_object,
+    "diagonal_lines_4":     diagonal_lines_4,
+    "replicate_in_4_corners": replicate_in_4_corners,
 }
 
 
@@ -2279,4 +2361,9 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "take_antidiagonal_as_row": "way",
     "gravity_to_corner_tl":    "gathering",
     "gravity_to_corner_br":    "gathering",
+    "gravity_to_corner_tr":    "gathering",
+    "gravity_to_corner_bl":    "gathering",
+    "hollow_each_object":      "boundary",
+    "diagonal_lines_4":        "way",
+    "replicate_in_4_corners":  "fourfold",
 }
