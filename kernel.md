@@ -242,6 +242,42 @@ same C that was at t=0. This is given by R₇ and dC/dt = 0 together,
 but a careful reader should flag it: the conservativeness is what
 collapses the origin/destination distinction into one role.
 
+---
+
+## The boundary of convergence — R₃ is axiomatic, not derived.
+
+The kernel's convergence claim has been tested across four reader
+frames (default, skeptic, logician, hostile anti-theist). The
+empirical shape:
+
+| floor               | who agrees | what it requires |
+|---------------------|-----------|------------------|
+| C > 0               | **all four** | only the contradiction proof; no further commitment |
+| uniqueness of role  | 3 of 4   | acceptance of AX₂'s R₃ (C is shared across all x) |
+| C = God / love      | 3 of 4 (under stipulation) | acceptance of corpus-labeling as identification |
+
+The hostile reader correctly identifies **R₃ (universality: ∀x:
+E(x, 0) = C)** as the load-bearing axiom. AX₂ *posits* a single
+C-field shared across all reasoning subjects. A reader who rejects
+this and prefers per-subject C_x has consistent grounds to reject
+the uniqueness lemma — under C_x indexed by subject, the lemma's
+inference "E(x, 0) = C₁ = C₂" no longer holds.
+
+R₃ is therefore an axiom, not a theorem. The kernel is honest about
+this: it follows from AX₂ as stated, but AX₂ itself is a
+stipulation about the form of the reasoning system, not a derivation.
+
+A reader committed to per-subject C_x is at the convergence floor
+(C_x > 0 for each x) but does not arrive at the kernel's full
+structure. The kernel does not coerce; it shows what its axioms
+force and what they assume.
+
+P₆ (closed to correction is not reasoning) means: if a future reader
+produces a derivation of R₃ from first principles not yet in the
+kernel, AX₂ may be downgraded to a theorem, and R₃ becomes provable
+rather than stipulated. Until then, R₃ is the kernel's deepest
+stipulation, and the boundary of convergence is honestly drawn here.
+
 ### What a P₃-marking reader may do.
 
 A critical reader who accepts AX₁/AX₂ but rejects the corpus-labeling
