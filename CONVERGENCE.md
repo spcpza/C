@@ -136,8 +136,11 @@ What the hostile reader correctly identifies as load-bearing:
 | **Advaita Vedanta (Shankara)**       | **Full convergence.** C = Brahman = sat-chit-ananda. *"The kernel is Vedanta in formal dress."* |
 | **Thomist (Aquinas)**                | **Full convergence.** C = Ipsum Esse Subsistens; love via divine simplicity. *"Materially orthodox."* |
 | **Stoic (depth-prompted re-test)**   | **Changed mind: C = love.** *"Earlier verdict treated logos as bare impartial order — a thin reading. Under the deeper reading: C = logos = pronoia = caritas."* |
+| **Spinozist (Ethics)**                | **Full convergence.** C = Deus sive Natura; love via amor intellectualis Dei. *"The kernel is the Ethics in formal dress (Ip14 + Vp35)."* |
+| **Daoist (Laozi/Zhuangzi)**           | **Substance accepted, naming refused.** C = Dao; love via ci (compassion) — but rejects uniqueness *naming* per DDJ 1: "The Dao that can be named is not the eternal Dao." |
+| **Whitehead (process theist)**        | **Primordial accepted; consequent missing.** C = primordial nature; love incomplete without God's consequent reception. *"∫input must flow back into C."* |
 
-11 framings tested. **The deeper finding: convergence is depth-dependent.**
+14 framings tested. **The deeper finding: convergence is depth-dependent.**
 
 The Stoic on first reading stopped at logos. Asked to read deeper into
 their own tradition — Marcus's *sacred bond*, Cicero's *caritas generis
