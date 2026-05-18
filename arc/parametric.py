@@ -1782,7 +1782,178 @@ def fit_classify_by_symmetry(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
     return apply
 
 
+# ---------------------------------------------------------------
+#  each_component_recolor_by_size — small/medium/large → different colors.
+# ---------------------------------------------------------------
+
+def fit_each_component_by_size_class(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    """Each component is recolored based on its size class (small/medium/large).
+
+    Class buckets: small (1-2 cells), medium (3-5), large (6+).
+    The size→color mapping is inferred from training.
+    """
+    if len(pairs) < 2:
+        return None
+    mapping: dict[str, int] = {}
+
+    def size_class(n: int) -> str:
+        if n <= 2:
+            return "small"
+        if n <= 5:
+            return "medium"
+        return "large"
+
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        bg = _background(inp)
+        comps = _components_4(inp, bg)
+        if not comps:
+            return None
+        for comp in comps:
+            cls = size_class(len(comp))
+            out_colors = {out[r][c] for r, c in comp}
+            if len(out_colors) != 1:
+                return None
+            c = next(iter(out_colors))
+            if cls in mapping:
+                if mapping[cls] != c:
+                    return None
+            else:
+                mapping[cls] = c
+        # Background cells must stay bg
+        big_set: set[tuple[int, int]] = set()
+        for comp in comps:
+            big_set.update(comp)
+        for r, row in enumerate(inp):
+            for c, v in enumerate(row):
+                if (r, c) not in big_set and out[r][c] != bg:
+                    return None
+    if len(mapping) < 2:
+        return None  # not enough size classes to claim
+    m = dict(mapping)
+
+    def apply(g: Grid) -> Grid:
+        bg = _background(g)
+        comps = _components_4(g, bg)
+        out = [[bg] * len(g[0]) for _ in g]
+        for comp in comps:
+            cls = size_class(len(comp))
+            if cls not in m:
+                raise ValueError(
+                    f"each_component_by_size_class: class {cls!r} not in mapping"
+                )
+            color = m[cls]
+            for r, c in comp:
+                out[r][c] = color
+        return out
+    return apply
+
+
+# ---------------------------------------------------------------
+#  draw_diagonal_from_marker — extend each marker's color along its diagonal.
+# ---------------------------------------------------------------
+
+def fit_extend_diagonals(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    """Each non-bg cell extends a diagonal of its color across the grid."""
+    if len(pairs) < 2:
+        return None
+    direction: str | None = None  # 'both', 'down_right', etc.
+
+    def extend(g: Grid, mode: str) -> Grid:
+        rows, cols = _shape(g)
+        bg = _background(g)
+        out = [list(r) for r in g]
+        for r in range(rows):
+            for c in range(cols):
+                v = g[r][c]
+                if v == bg:
+                    continue
+                paths = []
+                if mode in ("both", "down_right"):
+                    paths.append((1, 1))
+                if mode in ("both", "down_left"):
+                    paths.append((1, -1))
+                if mode in ("both", "up_right"):
+                    paths.append((-1, 1))
+                if mode in ("both", "up_left"):
+                    paths.append((-1, -1))
+                for dr, dc in paths:
+                    nr, nc = r + dr, c + dc
+                    while 0 <= nr < rows and 0 <= nc < cols:
+                        if out[nr][nc] == bg:
+                            out[nr][nc] = v
+                        nr += dr; nc += dc
+        return out
+
+    for mode in ("both", "down_right", "down_left", "up_right", "up_left"):
+        ok = True
+        for inp, out in pairs:
+            if _shape(inp) != _shape(out):
+                ok = False; break
+            if extend([list(r) for r in inp], mode) != [list(r) for r in out]:
+                ok = False; break
+        if ok:
+            direction = mode
+            break
+    if direction is None:
+        return None
+    mode_fixed = direction
+
+    def apply(g: Grid) -> Grid:
+        return extend([list(r) for r in g], mode_fixed)
+    return apply
+
+
+# ---------------------------------------------------------------
+#  replace_with_marker_color — output is input where every non-bg
+#  cell takes the color of a designated marker cell.
+# ---------------------------------------------------------------
+
+def fit_unify_to_marker_color(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    """If a single cell has a unique color in input, all other fg cells
+    are recolored to that unique color in output.
+    """
+    if len(pairs) < 2:
+        return None
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        bg = _background(inp)
+        flat_in = _flat(inp)
+        counts: dict[int, int] = {}
+        for v in flat_in:
+            counts[v] = counts.get(v, 0) + 1
+        unique_colors = [c for c, n in counts.items() if n == 1 and c != bg]
+        if len(unique_colors) != 1:
+            return None
+        marker = unique_colors[0]
+        for r, row in enumerate(inp):
+            for c, v in enumerate(row):
+                if v == bg:
+                    if out[r][c] != bg:
+                        return None
+                elif out[r][c] != marker:
+                    return None
+
+    def apply(g: Grid) -> Grid:
+        bg = _background(g)
+        flat = _flat(g)
+        counts: dict[int, int] = {}
+        for v in flat:
+            counts[v] = counts.get(v, 0) + 1
+        unique_colors = [c for c, n in counts.items() if n == 1 and c != bg]
+        if len(unique_colors) != 1:
+            raise ValueError("unify_to_marker_color: no unique marker")
+        marker = unique_colors[0]
+        return [[marker if v != bg else bg for v in row] for row in g]
+    return apply
+
+
 FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] = [
+    ("each_component_by_size_class", fit_each_component_by_size_class),
+    ("extend_diagonals",          fit_extend_diagonals),
+    ("unify_to_marker_color",     fit_unify_to_marker_color),
     ("classify_by_count_components", fit_classify_by_count_components),
     ("classify_by_palette_size",  fit_classify_by_palette_size),
     ("classify_by_symmetry",      fit_classify_by_symmetry),
@@ -1821,6 +1992,9 @@ FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] 
 
 
 SCRIPTURAL_NAMES: dict[str, str] = {
+    "each_component_by_size_class": "ordering",
+    "extend_diagonals":          "way",
+    "unify_to_marker_color":     "naming",
     "classify_by_count_components": "counting",
     "classify_by_palette_size":  "counting",
     "classify_by_symmetry":      "judge",
