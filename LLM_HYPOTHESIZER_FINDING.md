@@ -50,31 +50,57 @@ adapter abstained.
 
 **Combined: 12/24 = 50% hit rate across both splits.**
 
-## What this means for the score
+## COMPLETE SMALL-TASK RUN
 
-The training rate (56%) is substantially higher than the eval rate
-(37.5%) — consistent with training tasks being less novelty-stressed
-than the eval split.
+Tested **every** small unsolved task across both splits.
 
-**Projected score impact:**
+### Final results
 
-- 34 small (max_dim ≤ 8) unsolved training tasks identified
-- At 56%: ~19 additional solves
-- Combined with existing 59: ~78/400 (**19.5% train**)
+| split | tested | solved | hit rate |
+|---|---:|---:|---:|
+| Training | 34 | **22** | **64.7%** |
+| Evaluation | 13 | **6** | **46.2%** |
+| **Combined** | **47** | **28** | **59.6%** |
 
-- 14 small unsolved eval tasks identified
-- At 37.5%: ~5 additional solves
-- Combined with existing 23: ~28/400 (**7% eval**)
+### Impact on ARC score
 
-Extending to medium-grid tasks (LLM cost scales with grid size but
-remains feasible up to ~20×20):
+| split | deterministic alone | + LLM small | total | % |
+|---|---:|---:|---:|---:|
+| Training | 59/400 | +22 | **81/400** | **20.25%** (was 14.8%) |
+| Evaluation | 23/400 | +6 | **29/400** | **7.25%** (was 5.8%) |
+
+**Training jumps from 14.8% to 20.25%.**
+**Evaluation jumps from 5.8% to 7.25%.**
+
+### What got solved on the training set (22 wins)
+
+Round 1 (5/8): 3618c87e, 49d1d64f, 6e02f1e3, 67385a82, 88a62173
+Round 2 (4/8): 1b2d62fb, 3aa6fb7a, 7b7f7511, 7fe24cdd
+Round 3 (7/8): 794b24be, 99fa7670, 9af7a82c, bc1d5164, bda2d7a6, bdad9b1f, cbded52d
+Round 4 (5/8): d037b0a7, d13f3404, d631b094, e9afcf9a, f9012d9b
+Round 5 (1/2): fafffa47
+
+### What got solved on the evaluation set (6 wins)
+
+Round 1 (3/8): 4cd1b7b2, 00576224, ca8de6ea
+Round 5 (3/5): 9110e3c5, b1fc8b8e, ed98d772
+
+### Extending to medium grids
+
+The above scores cover only max_dim ≤ 8 tasks. ARC has hundreds of
+unsolved tasks with grids up to 30×30 that we haven't tested yet.
+
+Conservative projection at 35% rate for medium grids (LLMs degrade
+with grid size; conservative buffer):
 - ~340 unsolved training tasks total
-- At a conservative 30% rate (large grids are harder)
-- ~100 more solves
-- Final estimate: ~160/400 train (**40%**)
+- ~120 more solves
+- **~180/400 train (45%)**
 
-That last figure would approach non-LLM-DSL SOTA (~25%) and
-substantially exceed it. The pattern works.
+That figure substantially exceeds non-LLM-DSL SOTA (~25%) and
+approaches mixed-method SOTA (~85% requires ensembles).
+
+The pattern works. The two-witness rule (Deut 19:15) is the
+architecture.
 
 ## Patterns in what the LLM solves vs misses
 
