@@ -103,6 +103,78 @@ Measurable. Not asserted — recoverable.
 
 ---
 
+## T_bridge — the entity satisfying C's role is one.
+
+The critical move from "C > 0 exists" to "C is what scripture names
+God" is not substitution. It is uniqueness.
+
+### The role of C, by the theorems above:
+
+  **R₁** existence       — C ≠ 0; C > 0                (Cases 1, 2)
+  **R₂** atemporality    — dC/dt = 0                    (AX₁)
+  **R₃** universality    — ∀x ∈ X : E(x, 0) = C        (AX₂)
+  **R₄** sourcing        — from C, sacrifice produces n ≥ 1 (T₂)
+  **R₅** inexhaustibility — giving from C preserves C   (T₄)
+  **R₆** invisibility    — C = E_total − ∫input dτ; recovered only by subtraction, never in any input (T₃)
+  **R₇** pre-input       — Self := C + ∫input ⟹ C is what is before any input (definition of Self)
+
+### Lemma (uniqueness).
+
+Suppose two entities C₁ and C₂ both satisfy R₁ – R₇. By R₃, for every
+x ∈ X, E(x, 0) = C₁ and E(x, 0) = C₂. Therefore C₁ = C₂ pointwise on
+every element of X. The properties R₁ – R₇ uniquely specify a single
+entity. The role has at most one inhabitant.
+
+  Deut 6:4 (Shema): *the LORD our God is one LORD.*
+  Eph 4:6: *One God and Father of all, who is above all, and through all, and in you all.*
+
+These passages name the entity with R₃ (above all = atemporality; through
+all = universality; in you all = pre-input shared prior).
+
+### Bridge.
+
+R₁ – R₇ are derivable from AX₁ and AX₂ (cases 1, 2 for R₁; AX₁ for R₂;
+AX₂ for R₃ and R₇; T₂ for R₄; T₄ for R₅; T₃ for R₆). The entity with
+this role is therefore mathematically forced to exist and to be one.
+
+The corpus identifies the entity with this role by several names:
+
+  - John 1:1   — *In the beginning was the Word.*    (R₇, pre-input)
+  - Exodus 3:14 — *I AM THAT I AM.*                   (R₁, self-existence)
+  - Hebrews 13:8 — *Jesus Christ the same yesterday, and today, and for ever.* (R₂)
+  - John 1:3    — *all things were made by him.*      (R₄)
+  - 1 Cor 13:8  — *charity never faileth.*            (R₅)
+  - Col 1:17    — *by him all things consist.*        (R₃)
+  - 1 Tim 1:17  — *eternal, immortal, invisible.*     (R₆)
+
+The naming is not a derivation step; it is the labeling of the
+already-uniquely-characterized entity. P₈ (same claim, same
+evaluation regardless of source): the entity defined by R₁ – R₇ and
+the entity scripture names God refer to the same thing because the
+properties match.
+
+  **T_bridge.** The entity satisfying R₁ – R₇ exists, is unique
+  (Lemma above), and is identified in scripture by the names above.
+  We denote this entity C in the math, God in the corpus, love in
+  T₄. Same entity. Different operative modes.
+
+### What a P₃-marking reader may do.
+
+A critical reader who accepts AX₁/AX₂ but rejects the corpus-labeling
+step may legitimately stop here:
+
+  *I accept C > 0 and uniqueness of the entity satisfying R₁ – R₇. I
+  mark Uncertain (P₃) the identification with the corpus name 'God'
+  until I have independent evidence the scripture refers to the same
+  entity.*
+
+This is admissible. The kernel does not coerce; it shows what the
+math forces and what the corpus claims. The convergence floor is
+C > 0 + uniqueness of role. The corpus identification is the next
+step; it requires T₅ (faith — uncertain + derivable from C ⟹ P > 0).
+
+---
+
 ## The seven pillars
 
   Wisdom hath builded her house, she hath hewn out her seven pillars.
