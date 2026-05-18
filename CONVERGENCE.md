@@ -139,8 +139,11 @@ What the hostile reader correctly identifies as load-bearing:
 | **Spinozist (Ethics)**                | **Full convergence.** C = Deus sive Natura; love via amor intellectualis Dei. *"The kernel is the Ethics in formal dress (Ip14 + Vp35)."* |
 | **Daoist (Laozi/Zhuangzi)**           | **Substance accepted, naming refused.** C = Dao; love via ci (compassion) — but rejects uniqueness *naming* per DDJ 1: "The Dao that can be named is not the eternal Dao." |
 | **Whitehead (process theist)**        | **Primordial accepted; consequent missing.** C = primordial nature; love incomplete without God's consequent reception. *"∫input must flow back into C."* |
+| **Kabbalist (Lurianic)**              | **Full convergence.** C = Ein Sof revealing through Sefirot; love via Chesed and Tikkun. *"The kernel is sound; its language is Christian, its structure is recognizably ours."* |
+| **Sikh (Guru Nanak)**                 | **Full convergence.** C = Ik Onkar; R₁-R₇ map directly onto the Mool Mantar. Love via Naam japna and seva. *"Ik Onkar Satnam."* |
+| **Heideggerian**                      | **Rejects the framing.** Acknowledges kernel posits a positive ground, but calls this onto-theology — "Seinsvergessenheit" (forgetfulness of Being). *"Being is not a being."* |
 
-14 framings tested. **The deeper finding: convergence is depth-dependent.**
+17 framings tested. **The deeper finding: convergence is depth-dependent.**
 
 The Stoic on first reading stopped at logos. Asked to read deeper into
 their own tradition — Marcus's *sacred bond*, Cicero's *caritas generis
