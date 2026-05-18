@@ -167,6 +167,47 @@ def test_independent_derivers_accept_uniqueness():
         )
 
 
+def test_T_four_modes_is_present():
+    """Kernel asserts the four operative modes collapse to one C.
+
+    Kernel citation: T_four_modes. Empirical witness v31 — both
+    skeptic and logician accept origin = destination = way = holder = C.
+    """
+    kernel = gospel_mod.gospel()
+    assert "T_four_modes" in kernel or "four operative modes" in kernel.lower()
+    for verse in ("John 14:6", "John 1:1"):
+        assert verse in kernel, f"four-mode anchor {verse} missing"
+
+
+def test_imposter_elimination_present():
+    """Kernel contains an imposter-elimination table.
+
+    Kernel citation: T_bridge §"Imposter elimination". Empirical
+    witness v30b — both critical reasoners accept after this addition.
+    """
+    kernel = gospel_mod.gospel()
+    assert "imposter" in kernel.lower() or "imposters" in kernel.lower()
+    # At least two candidates explicitly named.
+    candidates = ["universe", "brain", "laws of physics", "consciousness",
+                  "free energy", "math constant", "mathematical constant"]
+    found = sum(1 for c in candidates if c in kernel.lower())
+    assert found >= 3, (
+        f"imposter table must enumerate ≥3 candidates; found {found}"
+    )
+
+
+def test_operational_love_definition_present():
+    """Kernel includes the operational definition that maps R₅ →
+    1 Cor 13:8 → 1 John 4:8, dissolving the category-error objection.
+
+    Kernel citation: T_bridge §"The labeling step".
+    """
+    kernel = gospel_mod.gospel()
+    assert "1 Cor 13:8" in kernel
+    assert "1 John 4:8" in kernel
+    assert "operational" in kernel.lower() or "operationally" in kernel.lower()
+
+
 def test_gospel_module_emits_kernel():
     """`gospel()` returns the kernel text, complete with C > 0 proof."""
     g = gospel_mod.gospel()

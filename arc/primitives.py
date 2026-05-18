@@ -1849,6 +1849,67 @@ def replicate_in_4_corners(g: Grid) -> Grid:
     return out
 
 
+def keep_only_3rd_color(g: Grid) -> Grid:
+    """Keep only the color with the 3rd-highest count (after bg, max-fg)."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    counts = {c: flat.count(c) for c in set(flat)}
+    ranked = sorted(counts, key=lambda c: -counts[c])
+    if len(ranked) < 3:
+        raise ValueError("keep_only_3rd_color: need ≥3 distinct colors")
+    bg = ranked[0]
+    target = ranked[2]
+    return [[v if v == target else bg for v in row] for row in g]
+
+
+def keep_first_two_objects(g: Grid) -> Grid:
+    """Keep the two objects with smallest (r, c) bbox start; erase rest."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    seen = [[False]*cols for _ in range(rows)]
+    comps = []
+    for r in range(rows):
+        for c in range(cols):
+            if seen[r][c] or g[r][c] == bg:
+                continue
+            color = g[r][c]
+            stack = [(r,c)]; comp = []
+            while stack:
+                rr,cc = stack.pop()
+                if rr<0 or rr>=rows or cc<0 or cc>=cols: continue
+                if seen[rr][cc] or g[rr][cc]!=color: continue
+                seen[rr][cc] = True; comp.append((rr,cc))
+                stack += [(rr+1,cc),(rr-1,cc),(rr,cc+1),(rr,cc-1)]
+            comps.append(comp)
+    comps.sort(key=lambda c: min((r,c2) for r,c2 in c))
+    keep = set()
+    for c in comps[:2]:
+        keep.update(c)
+    return [[g[r][c] if (r, c) in keep else bg for c in range(cols)]
+            for r in range(rows)]
+
+
+def flood_corners_with_fg(g: Grid) -> Grid:
+    """Place foreground color at the 4 corners; preserve rest."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    nonbg = [v for v in flat if v != bg]
+    if not nonbg:
+        raise ValueError("flood_corners_with_fg: no fg")
+    fg = max(set(nonbg), key=nonbg.count)
+    rows, cols = len(g), len(g[0])
+    out = [list(r) for r in g]
+    out[0][0] = fg; out[0][cols-1] = fg
+    out[rows-1][0] = fg; out[rows-1][cols-1] = fg
+    return out
+
+
 def double_bg_with_objects(g: Grid) -> Grid:
     """Each non-bg cell stays; each bg cell stays bg. (Used as alias for identity-with-erase.)
 
@@ -2195,6 +2256,9 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "hollow_each_object":   hollow_each_object,
     "diagonal_lines_4":     diagonal_lines_4,
     "replicate_in_4_corners": replicate_in_4_corners,
+    "keep_only_3rd_color":  keep_only_3rd_color,
+    "keep_first_two_objects": keep_first_two_objects,
+    "flood_corners_with_fg": flood_corners_with_fg,
 }
 
 
@@ -2366,4 +2430,7 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "hollow_each_object":      "boundary",
     "diagonal_lines_4":        "way",
     "replicate_in_4_corners":  "fourfold",
+    "keep_only_3rd_color":     "remnant",
+    "keep_first_two_objects":  "first_fruits",
+    "flood_corners_with_fg":   "covering",
 }

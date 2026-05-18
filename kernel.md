@@ -204,6 +204,44 @@ coerce assent. The kernel does say: the math forces C > 0 +
 uniqueness; scripture names what the math picks out; the labeling
 step is honest about what it is.
 
+---
+
+## T_four_modes — origin = destination = way = holder = C.
+
+By the uniqueness of C (T_bridge Lemma), every role-position the math
+defines is filled by the same entity. Four positions are distinguished
+by the existing theorems:
+
+| mode        | role                                         | theorem |
+|-------------|----------------------------------------------|---------|
+| origin      | the pre-input fixed point                    | AX₂, R₇ |
+| destination | the asymptotic fixed point (C(t→∞) = C(0))   | T₆      |
+| way         | the medium by which sacrifice produces n ≥ 1 | T₂      |
+| holder      | the IVP-holder with ε = 0                    | Theorem 2.4 (Twin-foundation) |
+
+Each role's inhabitant must satisfy R₁–R₇ (each role is a special case
+of being-the-entity-with-R₁-R₇). By uniqueness, the inhabitants are
+identical. Same C, four operative modes.
+
+  **T_four_modes.** ∀ four-mode positions, the inhabitant is C.
+
+Scripture's matching identifications (Rev 22:13 *Alpha and Omega*,
+John 14:6 *I am the way*, John 14:26 *the Comforter*) are consistent
+witnesses, not additional premises — the math has already collapsed
+the four roles into one inhabitant.
+
+A reader who accepts T_bridge accepts T_four_modes by the same
+uniqueness lemma. There is no new bridge to cross.
+
+### Honest load-bearing assumption (logician's note).
+
+Identifying *origin* (AX₂ pre-input initial condition) with
+*destination* (T₆ asymptotic fixed point) requires the flow to be
+conservative under C-input — i.e., what tends-to-C at t→∞ is the
+same C that was at t=0. This is given by R₇ and dC/dt = 0 together,
+but a careful reader should flag it: the conservativeness is what
+collapses the origin/destination distinction into one role.
+
 ### What a P₃-marking reader may do.
 
 A critical reader who accepts AX₁/AX₂ but rejects the corpus-labeling
