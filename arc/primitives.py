@@ -1637,6 +1637,141 @@ def repeat_first_col(g: Grid) -> Grid:
     return [[r[0]] * len(r) for r in g]
 
 
+def each_row_to_majority_run(g: Grid) -> Grid:
+    """Each row → its majority color extended to a solid run."""
+    return row_majority(g)
+
+
+def repeat_palette_as_rows(g: Grid) -> Grid:
+    """Each row = distinct color from palette (one row per distinct fg color)."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    palette = []
+    for v in flat:
+        if v != bg and v not in palette:
+            palette.append(v)
+    if not palette:
+        raise ValueError("repeat_palette_as_rows: no fg")
+    cols = len(g[0])
+    return [[c] * cols for c in palette]
+
+
+def transpose_corners(g: Grid) -> Grid:
+    """Swap (0,0)↔(rows-1,cols-1) and (0,cols-1)↔(rows-1,0)."""
+    if not g or len(g) < 2 or len(g[0]) < 2:
+        raise ValueError("transpose_corners: too small")
+    rows, cols = len(g), len(g[0])
+    out = [list(r) for r in g]
+    out[0][0], out[rows-1][cols-1] = g[rows-1][cols-1], g[0][0]
+    out[0][cols-1], out[rows-1][0] = g[rows-1][0], g[0][cols-1]
+    return out
+
+
+def fill_each_row_with_first(g: Grid) -> Grid:
+    """Each row's first non-bg cell color → all bg cells in that row."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    out = []
+    for row in g:
+        first_fg = next((v for v in row if v != bg), None)
+        if first_fg is None:
+            out.append(list(row))
+        else:
+            out.append([first_fg if v == bg else v for v in row])
+    return out
+
+
+def fill_each_col_with_first(g: Grid) -> Grid:
+    return transpose(fill_each_row_with_first(transpose(g)))
+
+
+def biggest_two_components_only(g: Grid) -> Grid:
+    """Keep the 2 largest non-bg components, erase the rest."""
+    return keep_largest_2_components(g)  # alias
+
+
+def replace_largest_with_smallest_color(g: Grid) -> Grid:
+    """Recolor the largest component to the color of the smallest component."""
+    if not g:
+        return []
+    rows, cols = len(g), len(g[0])
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    seen = [[False]*cols for _ in range(rows)]
+    comps = []
+    for r in range(rows):
+        for c in range(cols):
+            if seen[r][c] or g[r][c] == bg:
+                continue
+            color = g[r][c]
+            stack = [(r,c)]; comp = []
+            while stack:
+                rr, cc = stack.pop()
+                if rr<0 or rr>=rows or cc<0 or cc>=cols: continue
+                if seen[rr][cc] or g[rr][cc] != color: continue
+                seen[rr][cc] = True; comp.append((rr, cc))
+                stack += [(rr+1,cc),(rr-1,cc),(rr,cc+1),(rr,cc-1)]
+            comps.append((color, comp))
+    if len(comps) < 2:
+        return [list(r) for r in g]
+    biggest_color, biggest_cells = max(comps, key=lambda kv: len(kv[1]))
+    smallest_color, _ = min(comps, key=lambda kv: len(kv[1]))
+    big_set = set(biggest_cells)
+    return [[smallest_color if (r, c) in big_set else g[r][c]
+             for c in range(cols)] for r in range(rows)]
+
+
+def count_distinct_per_row(g: Grid) -> Grid:
+    """Each row → 1xK where K is the count of distinct colors in that row."""
+    if not g:
+        return []
+    out = []
+    for row in g:
+        out.append([len(set(row))])
+    return out
+
+
+def is_palindrome_row(g: Grid) -> Grid:
+    """Output: 1xN where N = number of rows; cells = palindrome-check color."""
+    if not g:
+        return []
+    flat = [v for row in g for v in row]
+    bg = max(set(flat), key=flat.count)
+    nonbg = [v for v in flat if v != bg]
+    if not nonbg:
+        raise ValueError("is_palindrome_row: no fg")
+    yes = max(set(nonbg), key=nonbg.count)
+    return [[yes if r == list(reversed(r)) else bg for r in g]]
+
+
+def take_diagonal_as_row(g: Grid) -> Grid:
+    """Output: 1xN row containing the main diagonal values."""
+    if not g:
+        return []
+    n = min(len(g), len(g[0]))
+    return [[g[i][i] for i in range(n)]]
+
+
+def take_antidiagonal_as_row(g: Grid) -> Grid:
+    if not g:
+        return []
+    n = min(len(g), len(g[0]))
+    return [[g[i][len(g[0]) - 1 - i] for i in range(n)]]
+
+
+def gravity_to_corner_tl(g: Grid) -> Grid:
+    """All non-bg cells fall to the top-left corner, preserving order by (r,c)."""
+    return shift_objects_to_left(shift_objects_to_top(g))
+
+
+def gravity_to_corner_br(g: Grid) -> Grid:
+    return shift_objects_to_right(shift_objects_to_bot(g))
+
+
 def double_bg_with_objects(g: Grid) -> Grid:
     """Each non-bg cell stays; each bg cell stays bg. (Used as alias for identity-with-erase.)
 
@@ -1967,6 +2102,17 @@ LIBRARY: dict[str, Callable[[Grid], Grid]] = {
     "empty_grid_same_size": empty_grid_same_size,
     "repeat_first_row":     repeat_first_row,
     "repeat_first_col":     repeat_first_col,
+    "repeat_palette_as_rows": repeat_palette_as_rows,
+    "transpose_corners":    transpose_corners,
+    "fill_each_row_with_first": fill_each_row_with_first,
+    "fill_each_col_with_first": fill_each_col_with_first,
+    "replace_largest_with_smallest_color": replace_largest_with_smallest_color,
+    "count_distinct_per_row": count_distinct_per_row,
+    "is_palindrome_row":    is_palindrome_row,
+    "take_diagonal_as_row": take_diagonal_as_row,
+    "take_antidiagonal_as_row": take_antidiagonal_as_row,
+    "gravity_to_corner_tl": gravity_to_corner_tl,
+    "gravity_to_corner_br": gravity_to_corner_br,
 }
 
 
@@ -2122,4 +2268,15 @@ SCRIPTURAL_NAMES: dict[str, str] = {
     "empty_grid_same_size":    "void",
     "repeat_first_row":        "first_fruits",
     "repeat_first_col":        "first_fruits",
+    "repeat_palette_as_rows":  "distinguishing",
+    "transpose_corners":       "exchange",
+    "fill_each_row_with_first": "filling",
+    "fill_each_col_with_first": "filling",
+    "replace_largest_with_smallest_color": "least",
+    "count_distinct_per_row":  "counting",
+    "is_palindrome_row":       "judge",
+    "take_diagonal_as_row":    "way",
+    "take_antidiagonal_as_row": "way",
+    "gravity_to_corner_tl":    "gathering",
+    "gravity_to_corner_br":    "gathering",
 }
