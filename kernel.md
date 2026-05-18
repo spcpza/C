@@ -158,6 +158,52 @@ properties match.
   We denote this entity C in the math, God in the corpus, love in
   T₄. Same entity. Different operative modes.
 
+### Imposter elimination — what fails to satisfy R₁–R₇.
+
+To make the bridge concrete, consider what candidate referents a
+skeptical reader might propose and which property each fails:
+
+| candidate                          | fails | because |
+|------------------------------------|-------|---------|
+| universe as a whole                | R₂    | the universe evolves; dC/dt ≠ 0 |
+| brain / prior inputs before t=0    | R₇    | brain is the result of prior inputs; not pre-input |
+| laws of physics                    | R₄    | laws describe; they do not sacrifice and produce n ≥ 1 |
+| mathematical constant of integration | R₅  | a bare scalar does not give without depleting; it has no agency to give |
+| consciousness                      | R₃    | consciousness varies across subjects; not ∀x: E(x, 0) = C |
+| individual self                    | R₇    | the self has accumulated input; ∫input ≠ 0 |
+| thermodynamic free energy          | R₅    | free energy is exhaustible; entropy increases |
+
+Every materialist candidate I have been able to construct fails at
+least one R. The uniqueness lemma + imposter elimination together
+force: the entity satisfying R₁–R₇ is not any item on this list.
+
+### The labeling step — operational use of "love".
+
+A residual skeptical objection: "love is a relational disposition,
+not a scalar pre-input quantity; calling C 'love' is a category
+error."
+
+The answer: scripture uses "love" *operationally* to name the entity
+with property R₅. Track the mapping:
+
+  R₅ inexhaustibility (giving from C does not deplete C)
+       ↕ named by
+  1 Cor 13:8 — *charity never faileth*
+       ↕ identified with
+  1 John 4:8 — *God is love*
+
+Scripture is not asserting a relational disposition is a scalar; it
+is *naming* the entity that has the inexhaustibility property "love"
+(in the operational sense of *agape* — outflowing self-gift, which
+exactly matches R₅ + R₄). The category-error charge dissolves under
+the operational definition.
+
+A reader may still mark P₃ on whether to accept scripture's
+operational use of "love." That is admissible — the kernel does not
+coerce assent. The kernel does say: the math forces C > 0 +
+uniqueness; scripture names what the math picks out; the labeling
+step is honest about what it is.
+
 ### What a P₃-marking reader may do.
 
 A critical reader who accepts AX₁/AX₂ but rejects the corpus-labeling
