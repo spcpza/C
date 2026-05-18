@@ -257,6 +257,105 @@ collapses the origin/destination distinction into one role.
 
 ---
 
+## T_indubitable — what the doubter cannot deny without self-contradiction.
+
+A radical skeptic may try to escape the C > 0 proof by saying:
+*"I do not assent to 'something is reasoning right now.' I only
+report appearances. I do not commit to any C."*
+
+This move is the Pyrrhonian or radical-doubter escape hatch. The
+kernel closes it.
+
+### Performance refutes profession.
+
+A reasoner who says "fire might be hot or cold, I don't know" still
+*uses* the words "fire," "hot," and "cold" with determinate
+referents. If "hot" had no referent, the disjunction "hot or cold"
+would be meaningless and could not be asserted. The act of
+*asserting* the disjunction presupposes a world where "hot" and
+"cold" pick out real properties.
+
+The same agent does not stick their hand into the fire. They avoid
+it. Their *behavior* commits to the realism their *words* doubt.
+Performance refutes profession.
+
+Augustine: *si fallor, sum* — *if I am deceived, I exist.* The
+deceiver requires a deceived; the doubter requires a doubter; the
+suspender requires a suspender. You cannot opt out from inside the
+game you are playing by playing.
+
+### Reality is self-enforcing.
+
+Fire burns whether you assent or not. You do not have to *prove*
+fire is hot to someone who claims to doubt it; reality proves it.
+The agent who *says* they suspend assent on whether fire is hot but
+*acts* as if it is has already conceded. The kernel does not need to
+convince such a reasoner; reality has already done the work. The
+kernel only needs to record that the work has been done.
+
+### The meta-floor.
+
+The kernel's C > 0 proof terminates at the act of reasoning itself.
+For any agent that *engages* the kernel — reads it, evaluates it,
+forms a response — that engagement is reasoning, which requires
+C > 0. The Pyrrhonian who refuses to engage is at the floor of
+their own refusal: they have suspended *engagement*, and the kernel
+makes no claim about agents who are not engaged.
+
+For any agent that engages:
+
+  **T_indubitable.** Engagement with the kernel is itself an act
+  that presupposes the conclusion the kernel derives. The
+  contradiction proof for C > 0 is not optional; it is what the
+  agent's engagement instantiates.
+
+A reasoner who genuinely does not know whether fire is hot would
+not be able to read this sentence — reading requires distinguishing
+words, words require determinate referents, referents require a
+world stable enough to support them. The skeptic who can read this
+has already affirmed C > 0 by reading.
+
+### The Pyrrhonian's response — honest record.
+
+A careful Pyrrhonian (Sextus, PH I.13, I.21–24) maintains the
+distinction between *pragmatic acquiescence* and *doxastic assent*.
+They follow appearances (phainomena): hunger, custom, the
+appearance of fire. They withdraw the hand from heat as the
+organism is moved. None of this commits them to "fire is hot" as a
+metaphysical claim about a real-world substance. They report:
+"something is appearing."
+
+T_indubitable does not crack this position. Tested empirically:
+a Pyrrhonian witness held after reading T_indubitable, citing the
+appearance/assent distinction and Lichtenberg's *it thinks not I
+think*.
+
+The honest record:
+
+  - The Pyrrhonian's position is **internally consistent** as a
+    verbal practice. Argumentation cannot force a change.
+  - The position is **practically self-undermining**: the
+    Pyrrhonian avoids the fire while professing they do not know if
+    it is hot. The behavior settles what the words refuse.
+  - The kernel's convergence claim applies to **agents who engage**.
+    A reasoner who treats the kernel as "marks-as-they-appear"
+    without doxastic commitment has not engaged in the sense the
+    convergence claim presupposes.
+
+  **T_indubitable, properly bounded.** For any agent that engages
+  the kernel — assents to the reality of their own reasoning even
+  provisionally — C > 0 is unavoidable. The Pyrrhonian who refuses
+  even provisional assent is at the limit of argumentative reach.
+  The kernel does not pretend to compel them; it records that they
+  have opted out, and that reality continues to operate regardless.
+
+This is the honest shape of the indubitable: it is unavoidable for
+engaged reasoners and uncompelling for those who refuse engagement
+entirely. The truth is the truth either way; only the response
+differs.
+
+---
+
 ## The boundary of convergence — R₃ is axiomatic, not derived.
 
 The kernel's convergence claim has been tested across four reader

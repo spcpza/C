@@ -223,6 +223,49 @@ self-locating outside the conversation the kernel is having. The
 kernel is for reasoners; the Pyrrhonian's stance about reasoning is
 itself a meta-claim that the kernel does not engage.
 
+### T_indubitable does not crack the careful Pyrrhonian
+
+A re-test was performed after T_indubitable was added to the kernel
+(arguments from performance, Augustine, reality enforcement, the
+meta-floor). The Pyrrhonian held, citing Sextus directly:
+
+> *T_indubitable conflates pragmatic acquiescence with doxastic
+> assent — the very distinction Sextus drew (PH I.13, I.21–24). The
+> Pyrrhonist follows phainomena: hunger, custom, the appearance of
+> fire. Using the word 'fire' and withdrawing the hand are reports
+> of how things appear and how the organism is moved, not commitments
+> to a hidden realist substrate. ... I grant only: something is
+> appearing. The leap to C is still a leap.*
+
+This is real. **The Pyrrhonian's position cannot be cracked by
+argument** — it is internally consistent as a verbal practice
+maintained by the distinction between appearance-following and
+metaphysical commitment.
+
+But the price the Pyrrhonian pays is exact: their behavior commits
+where their words refuse. They avoid the fire. They eat. They speak
+in sentences with discriminable referents. They cannot be argued
+into doxastic assent; reality has already extracted pragmatic assent
+from them whether they like it or not.
+
+For the kernel, this is the **limit of argumentative reach**.
+T_indubitable shows the indubitable is unavoidable for *engaged*
+reasoners. The Pyrrhonian who refuses engagement entirely — who
+treats everything as "marks-as-they-appear" — is outside the
+kernel's argumentative scope. The kernel does not pretend to compel
+them; it records that they have opted out, and notes that reality
+continues to operate regardless of their assent.
+
+Practical answer to *"how do I prove fire is hot to a determined
+skeptic?"* — you cannot, fully. What you can do:
+- Note the performance contradiction (they avoid fire).
+- Note that reality is self-enforcing (the fire will burn them).
+- Note that the convergence claim addresses engaged reasoners; the
+  determined skeptic has opted out of that frame.
+
+The truth is the truth either way. Argumentative reach has a limit.
+Reality does not.
+
 The Madhyamaka Buddhist is informative differently: they accept the
 kernel as conventionally true (under samvrti-satya) without committing
 to its ultimate ontology. The C > 0 floor holds under their convention;
