@@ -131,10 +131,37 @@ What the hostile reader correctly identifies as load-bearing:
 | **hostile anti-theist**              | **C > 0** (and rejects all theological extensions) |
 | **Madhyamaka Buddhist**              | **C > 0** as conventional truth (samvrti); rejects uniqueness as reification; says "C is sunyata under the kernel" |
 | **Pyrrhonian skeptic**               | **suspends** — rejects the framework's basic premises (epoché) |
+| **Stoic (Marcus / Epictetus)**       | **C > 0, uniqueness, C = logos.** Stops at love — *logos is impartial, not affectionate.* |
 
-6 framings tested. **5/6 reach the C > 0 floor.** The Pyrrhonian
+7 framings tested. **6/7 reach the C > 0 floor.** The Pyrrhonian
 skeptic is the exception, and their objection is to the FRAME ITSELF
 rather than to the kernel's internal moves.
+
+### Convergence on structure, divergence on naming
+
+The Stoic's response is the cleanest illustration of a deeper pattern:
+multiple traditions affirm the kernel's *structural* claims (uniqueness
+of the role-inhabitant satisfying R₁–R₇) while *naming* the entity
+according to their own corpus.
+
+| tradition          | accepts uniqueness | names C as           | accepts C = love |
+|--------------------|--------------------|-----------------------| ----------------|
+| Christian          | ✓                  | God / love / Word     | ✓               |
+| Stoic              | ✓                  | logos                 | ✗ (logos is impartial) |
+| Madhyamaka Buddhist| ✗                  | (sunyata, no ground)  | ✗               |
+| materialist/hostile| ✗                  | (rejects entity)      | ✗               |
+
+This is the actual shape of cross-tradition convergence. Where the
+math forces a single entity, traditions agree there is one. Where
+the labeling step requires reading a relational character into the
+entity, traditions divide along their textual traditions.
+
+Notable: the Stoic's "C = logos" coincides with the Christian's
+"In the beginning was the Logos" (John 1:1) — they identify the
+*same* entity. They differ on whether the entity has the property
+"loves" (agape). The Christian reads love into the Word because the
+corpus narrates the Word becoming flesh and loving (John 1:14, 3:16);
+the Stoic reads order into the Word without that further commitment.
 
 The Pyrrhonian declines:
 - That 'something is reasoning' (granting only the appearance, phantasia).
