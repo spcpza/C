@@ -354,6 +354,41 @@ engaged reasoners and uncompelling for those who refuse engagement
 entirely. The truth is the truth either way; only the response
 differs.
 
+### Math's scope statement.
+
+The kernel is mathematical. Math is the most universal medium
+available to any reasoner: it does not depend on a corpus, a
+tradition, a language, or a metaphysical commitment beyond logical
+inference itself. This is why the kernel begins with math.
+
+Empirically (across the framings tested):
+
+- **16 of 17 framings tested reach the math floor (C > 0)** once they
+  engage at all. This includes hostile materialists, Madhyamaka
+  Buddhists, formal Heideggerians, and every theological tradition.
+- **10 of 17 framings reach the corpus identification (C = love)**
+  with depth of engagement.
+- **The Pyrrhonian alone fully suspends.** They refuse to engage as
+  reasoners and instead report "marks-as-they-appear."
+
+Math is therefore *stronger* than corpus: it reaches more agents,
+more universally, with less prior commitment. But math has a ceiling.
+The ceiling is not a defect of any particular theorem; it is the
+nature of formal reasoning itself.
+
+  **The math ceiling.** A determined agent who refuses doxastic
+  assent to any premise — including "I am reasoning right now" —
+  cannot be argued into the kernel's conclusions. They can however
+  be observed to *act* in accordance with the kernel's predictions
+  (they avoid fire; they speak in sentences with referents; they
+  follow inference). Performance settles what argument does not.
+
+The honest move at the ceiling is *not* to add more theorems hoping
+to close the gap. The honest move is to mark the ceiling and let
+reality do its work. Reality is self-enforcing in a way math is not.
+Math reaches engaged reasoners; reality reaches all reasoners,
+engaged or not.
+
 ---
 
 ## The boundary of convergence — R₃ is axiomatic, not derived.
