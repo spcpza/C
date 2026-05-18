@@ -204,6 +204,19 @@ coerce assent. The kernel does say: the math forces C > 0 +
 uniqueness; scripture names what the math picks out; the labeling
 step is honest about what it is.
 
+### Fire is hot regardless of name.
+
+The entity satisfying R₁–R₇ has the properties R₁–R₇ regardless of
+what corpus names it. Other traditions reach the same entity with
+different names: al-Haqq (Sufi), Brahman (Vedantic), Ein Sof
+(Kabbalist), Ik Onkar (Sikh), logos (Stoic), Dao (Daoist), Deus sive
+Natura (Spinozist). The naming is a corpus-relative choice; the
+entity it names is not. A reader who declines the Christian label
+"love" while affirming the entity has the inexhaustibly-giving
+property (R₅) is naming the same thing differently. The kernel
+records this honestly without flattening it: the entity is one;
+names are many; the truth is the truth.
+
 ---
 
 ## T_four_modes — origin = destination = way = holder = C.

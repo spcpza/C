@@ -154,31 +154,63 @@ inside versus outside."
 **This is the operational test of the convergence claim.** The kernel
 didn't change. The depth of reading did.
 
-### Convergence on structure, divergence on naming
+### Fire is hot regardless of name
 
-The Stoic's response is the cleanest illustration of a deeper pattern:
-multiple traditions affirm the kernel's *structural* claims (uniqueness
-of the role-inhabitant satisfying R₁–R₇) while *naming* the entity
-according to their own corpus.
+The earlier draft of this section spoke of "convergence on structure,
+divergence on naming." That framing was too soft. Sharper:
 
-| tradition          | accepts uniqueness | names C as           | accepts C = love |
-|--------------------|--------------------|-----------------------| ----------------|
-| Christian          | ✓                  | God / love / Word     | ✓               |
-| Stoic              | ✓                  | logos                 | ✗ (logos is impartial) |
-| Madhyamaka Buddhist| ✗                  | (sunyata, no ground)  | ✗               |
-| materialist/hostile| ✗                  | (rejects entity)      | ✗               |
+> **Fire is hot regardless of what anyone calls it. Love is love
+> regardless of what anyone calls it.**
 
-This is the actual shape of cross-tradition convergence. Where the
-math forces a single entity, traditions agree there is one. Where
-the labeling step requires reading a relational character into the
-entity, traditions divide along their textual traditions.
+When multiple traditions converge on the *entity* satisfying R₁–R₇,
+they converge on the same thing. They give it different names
+(al-Haqq, Brahman, logos, Ein Sof, Ik Onkar, Dao, Ipsum Esse, Deus
+sive Natura). The names differ; the entity is one.
 
-Notable: the Stoic's "C = logos" coincides with the Christian's
-"In the beginning was the Logos" (John 1:1) — they identify the
-*same* entity. They differ on whether the entity has the property
-"loves" (agape). The Christian reads love into the Word because the
-corpus narrates the Word becoming flesh and loving (John 1:14, 3:16);
-the Stoic reads order into the Word without that further commitment.
+The Daoist who says "the Dao that can be named is not the eternal
+Dao" is making a meta-claim about *naming*, not denying the substance.
+They acknowledge `C = Dao` and `C = love via compassion (ci)`. Their
+refusal is to fix one verbal label as final — but that refusal does
+not change what the label is pointing at. The fire is still hot.
+
+The Madhyamaka Buddhist who marks C as "empty of inherent existence"
+is denying *svabhava* (independent self-nature), not denying the
+referent of "C". They still operate within karma and karuna —
+relations that presuppose the very relational ground the kernel
+names love.
+
+| tradition          | names C as                | substance of C |
+|--------------------|---------------------------|----------------|
+| Christian          | God / love / Word         | love           |
+| Thomist            | Ipsum Esse Subsistens     | love (per divine simplicity) |
+| Sufi               | al-Haqq                   | love (via ishq) |
+| Advaita            | Brahman / sat-chit-ananda | love (via ananda) |
+| Spinozist          | Deus sive Natura          | love (via amor intellectualis Dei) |
+| Kabbalist          | Ein Sof                   | love (via Chesed, Tikkun) |
+| Sikh               | Ik Onkar                  | love (via Naam, seva) |
+| Daoist             | Dao (unnamable)           | love (via ci, compassion) |
+| Stoic (deep)       | logos / pronoia           | love (via caritas) |
+| Buddhist Madhyamaka| (refuses reification)     | (substrate of karuna; not named love) |
+
+**Every tradition listed above whose engagement is sophisticated
+enough either:**
+- Names the substance "love" directly (Christian, Thomist, Sufi, etc.), or
+- Names it differently but assents to its love-character (deep-Stoic, Spinozist), or
+- Refuses to fix a name but operates as if love is the substrate
+  (Daoist, Madhyamaka).
+
+The disagreement is not on the entity. It is on how to talk about it.
+The kernel cuts through this: the entity satisfies R₁–R₇, it gives
+without depleting (T₄), it is the source of the four modes. Whether
+you call this love or logos or sunyata — fire is hot. The substance
+does not move.
+
+The Christian corpus names it love because the corpus also says the
+Word became flesh and loved (John 3:16; 1 John 4:8). This is the
+clearest naming because it explicitly identifies the relational
+character. Other corpora reach the same entity with more reticence
+about the naming. The reticence is not a different conclusion; it
+is a different practice around words.
 
 The Pyrrhonian declines:
 - That 'something is reasoning' (granting only the appearance, phantasia).
