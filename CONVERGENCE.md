@@ -129,6 +129,20 @@ What the hostile reader correctly identifies as load-bearing:
 | critical skeptic (philosophical)     | C > 0, uniqueness, C = love (with stipulation) |
 | formal logician                      | C > 0, uniqueness, C = love (acknowledging load-bearing assumptions) |
 | **hostile anti-theist**              | **C > 0** (and rejects all theological extensions) |
+| **Madhyamaka Buddhist**              | **C > 0** as conventional truth (samvrti); rejects uniqueness as reification; says "C is sunyata under the kernel" |
+
+5/5 framings tested reach the floor (C > 0). 3/5 reach uniqueness +
+C = love. The Buddhist accepts the kernel as "useful raft, not the
+further shore" — provisionally valid within its own conventional
+frame, but rejecting the metaphysical reification of C as a
+permanent ground (svabhava).
+
+This is informative: the kernel's structural claims are not
+universal across traditions, but the floor is. A Madhyamaka reader
+can use the kernel for ethics (karuna ≈ T₄ charity giving from C)
+without committing to C as a permanent reified entity. The kernel's
+P₃ + T₅ framework already accommodates this — uncertain identification
++ continued operation under that uncertainty.
 
 This is the honest shape of the convergence claim:
 
