@@ -1950,7 +1950,177 @@ def fit_unify_to_marker_color(pairs: list[tuple[Grid, Grid]]) -> Callable | None
     return apply
 
 
+# ---------------------------------------------------------------
+#  move_objects_by_offset — translate all non-bg cells by a fixed (dr, dc).
+# ---------------------------------------------------------------
+
+def fit_move_objects(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    """All non-bg cells translate by the same (dr, dc); bg fills the rest."""
+    if not pairs:
+        return None
+    offset: tuple[int, int] | None = None
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        bg = _background(inp)
+        in_cells = [(r, c, v) for r, row in enumerate(inp)
+                    for c, v in enumerate(row) if v != bg]
+        out_cells = [(r, c, v) for r, row in enumerate(out)
+                     for c, v in enumerate(row) if v != bg]
+        if len(in_cells) != len(out_cells):
+            return None
+        if not in_cells:
+            continue
+        # Group by color and sort, then check uniform offset.
+        in_sorted = sorted(in_cells, key=lambda x: (x[2], x[0], x[1]))
+        out_sorted = sorted(out_cells, key=lambda x: (x[2], x[0], x[1]))
+        if [v for *_, v in in_sorted] != [v for *_, v in out_sorted]:
+            return None
+        diffs = [(o[0] - i[0], o[1] - i[1]) for i, o in zip(in_sorted, out_sorted)]
+        if len(set(diffs)) != 1:
+            return None
+        d = diffs[0]
+        if offset is None:
+            offset = d
+        elif offset != d:
+            return None
+    if offset is None or offset == (0, 0):
+        return None
+    dr, dc = offset
+
+    def apply(g: Grid) -> Grid:
+        rows, cols = _shape(g)
+        bg = _background(g)
+        out = [[bg] * cols for _ in range(rows)]
+        for r in range(rows):
+            for c in range(cols):
+                v = g[r][c]
+                if v == bg:
+                    continue
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols:
+                    out[nr][nc] = v
+        return out
+    return apply
+
+
+# ---------------------------------------------------------------
+#  reflect_about_marker_axis — input has a marker line; output reflects
+#  the rest of the input across that line.
+# ---------------------------------------------------------------
+
+def fit_reflect_about_axis(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    """Detect a constant-color row or column, reflect about it."""
+    axis_color: int | None = None
+    axis_kind: str | None = None  # 'row' or 'col'
+
+    def reflect(g: Grid, axis_c: int, kind: str) -> Grid:
+        rows, cols = _shape(g)
+        bg = _background(g)
+        out = [list(r) for r in g]
+        if kind == "row":
+            row_idx = next((r for r in range(rows)
+                            if all(g[r][c] == axis_c for c in range(cols))), None)
+            if row_idx is None:
+                return out
+            for r in range(rows):
+                if r == row_idx:
+                    continue
+                mirror_r = 2 * row_idx - r
+                if 0 <= mirror_r < rows and out[mirror_r] == [bg] * cols:
+                    out[mirror_r] = list(g[r])
+        else:  # col
+            col_idx = next((c for c in range(cols)
+                            if all(g[r][c] == axis_c for r in range(rows))), None)
+            if col_idx is None:
+                return out
+            for c in range(cols):
+                if c == col_idx:
+                    continue
+                mirror_c = 2 * col_idx - c
+                for r in range(rows):
+                    if 0 <= mirror_c < cols and out[r][mirror_c] == bg:
+                        out[r][mirror_c] = g[r][c]
+        return out
+
+    for inp, out in pairs:
+        if _shape(inp) != _shape(out):
+            return None
+        rows, cols = _shape(inp)
+        # Find a row that's constant non-bg
+        bg = _background(inp)
+        row_axis = next(((r, inp[r][0]) for r in range(rows)
+                         if len(set(inp[r])) == 1 and inp[r][0] != bg), None)
+        col_axis = next(((c, inp[0][c]) for c in range(cols)
+                         if len(set(inp[r][c] for r in range(rows))) == 1
+                         and inp[0][c] != bg), None)
+        if row_axis is None and col_axis is None:
+            return None
+        for kind, axis in (("row", row_axis), ("col", col_axis)):
+            if axis is None:
+                continue
+            _, color = axis
+            if reflect([list(r) for r in inp], color, kind) == [list(r) for r in out]:
+                if axis_color is None:
+                    axis_color, axis_kind = color, kind
+                    break
+                elif (axis_color, axis_kind) == (color, kind):
+                    break
+                else:
+                    return None
+        else:
+            return None
+    if axis_color is None or axis_kind is None:
+        return None
+    c_fixed, k_fixed = axis_color, axis_kind
+
+    def apply(g: Grid) -> Grid:
+        return reflect([list(r) for r in g], c_fixed, k_fixed)
+    return apply
+
+
+# ---------------------------------------------------------------
+#  one_object_per_row_palette — output is a row palette where each
+#  cell color reflects whether that row had ≥1 non-bg cell.
+# ---------------------------------------------------------------
+
+def fit_row_presence_strip(pairs: list[tuple[Grid, Grid]]) -> Callable | None:
+    """Output is 1xN where N = #rows; cell c = inferred presence color."""
+    if len(pairs) < 2:
+        return None
+    on_color: int | None = None; off_color: int | None = None
+    for inp, out in pairs:
+        rows = len(inp)
+        if _shape(out) != (1, rows):
+            return None
+        bg = _background(inp)
+        for r in range(rows):
+            present = any(v != bg for v in inp[r])
+            target = out[0][r]
+            if present:
+                if on_color is None:
+                    on_color = target
+                elif on_color != target:
+                    return None
+            else:
+                if off_color is None:
+                    off_color = target
+                elif off_color != target:
+                    return None
+    if on_color is None:
+        return None
+    on = on_color; off = off_color if off_color is not None else 0
+
+    def apply(g: Grid) -> Grid:
+        bg = _background(g)
+        return [[on if any(v != bg for v in g[r]) else off for r in range(len(g))]]
+    return apply
+
+
 FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] = [
+    ("move_objects",              fit_move_objects),
+    ("reflect_about_axis",        fit_reflect_about_axis),
+    ("row_presence_strip",        fit_row_presence_strip),
     ("each_component_by_size_class", fit_each_component_by_size_class),
     ("extend_diagonals",          fit_extend_diagonals),
     ("unify_to_marker_color",     fit_unify_to_marker_color),
@@ -1992,6 +2162,9 @@ FITTERS: list[tuple[str, Callable[[list[tuple[Grid, Grid]]], Callable | None]]] 
 
 
 SCRIPTURAL_NAMES: dict[str, str] = {
+    "move_objects":              "passage",
+    "reflect_about_axis":        "mirror",
+    "row_presence_strip":        "witness",
     "each_component_by_size_class": "ordering",
     "extend_diagonals":          "way",
     "unify_to_marker_color":     "naming",
