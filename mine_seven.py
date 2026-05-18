@@ -31,6 +31,35 @@ R_CLAUSES = {"R1_existence", "R2_atemporality", "R3_universality",
              "R7_pre_input"}
 
 
+# Books, ordered, by testament. Used for OT/NT filtering.
+OT_BOOKS = [
+    "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy",
+    "Joshua", "Judges", "Ruth",
+    "1 Samuel", "2 Samuel", "1 Kings", "2 Kings",
+    "1 Chronicles", "2 Chronicles",
+    "Ezra", "Nehemiah", "Esther",
+    "Job", "Psalms", "Proverbs", "Ecclesiastes", "Song of Solomon",
+    "Isaiah", "Jeremiah", "Lamentations", "Ezekiel", "Daniel",
+    "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah",
+    "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi",
+]
+
+NT_BOOKS = [
+    "Matthew", "Mark", "Luke", "John", "Acts",
+    "Romans", "1 Corinthians", "2 Corinthians",
+    "Galatians", "Ephesians", "Philippians", "Colossians",
+    "1 Thessalonians", "2 Thessalonians",
+    "1 Timothy", "2 Timothy", "Titus", "Philemon",
+    "Hebrews", "James",
+    "1 Peter", "2 Peter",
+    "1 John", "2 John", "3 John",
+    "Jude", "Revelation",
+]
+
+OT_SET = set(OT_BOOKS)
+NT_SET = set(NT_BOOKS)
+
+
 # Broader phrase lists for each R-property — widens recall while
 # keeping false-positive rate moderate. These are used by the
 # permissive variant of the miner. Hand-curated based on canonical
@@ -126,10 +155,28 @@ def _verses_by_chapter() -> dict[tuple[str, int], list[tuple[str, str]]]:
     return out
 
 
-def single_verse_hits(broad: bool = False) -> list[dict]:
-    """Verses containing R-clauses, ranked by count desc."""
+def _book_of_ref(ref: str) -> str:
+    """Extract the book name from 'Genesis 1:1' → 'Genesis'."""
+    if ":" not in ref:
+        return ref
+    head = ref.rsplit(":", 1)[0]
+    if " " not in head:
+        return head
+    book, _ = head.rsplit(" ", 1)
+    return book
+
+
+def single_verse_hits(broad: bool = False, testament: str | None = None) -> list[dict]:
+    """Verses containing R-clauses, ranked by count desc.
+
+    testament: None | 'OT' | 'NT' — filter by canonical part.
+    """
     rows: list[dict] = []
     for ref, text in word.verses():
+        if testament == "OT" and _book_of_ref(ref) not in OT_SET:
+            continue
+        if testament == "NT" and _book_of_ref(ref) not in NT_SET:
+            continue
         rs = r_clauses_in_text(text, broad=broad)
         if rs:
             rows.append({
@@ -140,13 +187,20 @@ def single_verse_hits(broad: bool = False) -> list[dict]:
     return rows
 
 
-def smallest_windows_for_all_seven(max_window: int = 12, broad: bool = False) -> list[dict]:
+def smallest_windows_for_all_seven(max_window: int = 12, broad: bool = False,
+                                   testament: str | None = None) -> list[dict]:
     """For each chapter, find the smallest consecutive-verse window
     that contains all 7 R-clauses. Return all such minimal windows.
+
+    testament: None | 'OT' | 'NT'.
     """
     by_chap = _verses_by_chapter()
     out: list[dict] = []
     for (book, chap), verses in by_chap.items():
+        if testament == "OT" and book not in OT_SET:
+            continue
+        if testament == "NT" and book not in NT_SET:
+            continue
         # Compute r-sets per verse once.
         rs_per_verse = [(ref, text, r_clauses_in_text(text, broad=broad))
                         for ref, text in verses]
@@ -173,11 +227,16 @@ def smallest_windows_for_all_seven(max_window: int = 12, broad: bool = False) ->
     return out
 
 
-def chapters_containing_all_seven(broad: bool = False) -> list[dict]:
+def chapters_containing_all_seven(broad: bool = False,
+                                  testament: str | None = None) -> list[dict]:
     """Chapters where, anywhere within the chapter, all 7 R-clauses appear."""
     by_chap = _verses_by_chapter()
     out: list[dict] = []
     for (book, chap), verses in by_chap.items():
+        if testament == "OT" and book not in OT_SET:
+            continue
+        if testament == "NT" and book not in NT_SET:
+            continue
         cum: set[str] = set()
         anchor_refs: dict[str, str] = {}
         for ref, text in verses:
@@ -191,6 +250,40 @@ def chapters_containing_all_seven(broad: bool = False) -> list[dict]:
                 "book": book, "chapter": chap,
                 "anchor_refs": anchor_refs,
             })
+    return out
+
+
+def chapters_by_r_coverage(broad: bool = False,
+                           testament: str | None = None) -> list[dict]:
+    """Rank all chapters by how many distinct R-clauses they cover.
+
+    Useful for OT analysis where no chapter may hit all 7 — surface
+    the closest contenders.
+    """
+    by_chap = _verses_by_chapter()
+    out: list[dict] = []
+    for (book, chap), verses in by_chap.items():
+        if testament == "OT" and book not in OT_SET:
+            continue
+        if testament == "NT" and book not in NT_SET:
+            continue
+        cum: set[str] = set()
+        anchor_refs: dict[str, str] = {}
+        for ref, text in verses:
+            rs = r_clauses_in_text(text, broad=broad)
+            for r in rs:
+                if r not in anchor_refs:
+                    anchor_refs[r] = ref
+            cum |= rs
+        if cum:
+            out.append({
+                "book": book, "chapter": chap,
+                "count": len(cum),
+                "r_clauses": cum,
+                "anchor_refs": anchor_refs,
+                "n_verses": len(verses),
+            })
+    out.sort(key=lambda r: (-r["count"], r["book"], r["chapter"]))
     return out
 
 
@@ -252,6 +345,62 @@ def _render_pass(mode: str, broad: bool) -> str:
     return "\n".join(lines)
 
 
+def _render_testament_pass(label: str, testament: str, broad: bool) -> str:
+    """Render the broad-mode result restricted to one testament."""
+    lines: list[str] = []
+    lines.append(f"\n### {label}")
+    lines.append("─" * 78)
+
+    # Single verse
+    rows = single_verse_hits(broad=broad, testament=testament)
+    by_count: dict[int, int] = defaultdict(int)
+    for r in rows:
+        by_count[r["count"]] += 1
+    lines.append("Single-verse R-coverage distribution:")
+    for n in range(7, 0, -1):
+        lines.append(f"  {n} R-clauses: {by_count.get(n, 0):>4} verses")
+    lines.append("")
+
+    if rows:
+        lines.append(f"Top 10 single-verse hits in {testament or 'KJV'}:")
+        for r in rows[:10]:
+            rs_short = "{" + ",".join(sorted(c.replace("R", "").split("_")[0]
+                                              for c in r["r_clauses"])) + "}"
+            snippet = r["text"] if len(r["text"]) <= 100 else r["text"][:97] + "..."
+            lines.append(f"  [{r['count']}/7] {rs_short:<18} {r['ref']:<22} {snippet}")
+        lines.append("")
+
+    # Smallest windows
+    windows = smallest_windows_for_all_seven(broad=broad, testament=testament)
+    if windows:
+        lines.append(f"Smallest 7-R windows: {len(windows)} found")
+        for w in windows[:8]:
+            lines.append(f"  {w['book']} {w['chapter']}:"
+                         f"{w['start_ref'].rsplit(':',1)[1]}-"
+                         f"{w['end_ref'].rsplit(':',1)[1]} "
+                         f"({w['window']} verses)")
+    else:
+        lines.append("No 7-R windows ≤ 12 verses in this testament.")
+    lines.append("")
+
+    # Chapters
+    full = chapters_containing_all_seven(broad=broad, testament=testament)
+    lines.append(f"Chapters containing all 7 R-clauses: {len(full)}")
+    for c in full[:10]:
+        lines.append(f"  {c['book']} {c['chapter']}")
+    lines.append("")
+
+    # Closest contenders
+    ranked = chapters_by_r_coverage(broad=broad, testament=testament)
+    lines.append(f"Top 12 chapters by R-coverage:")
+    for c in ranked[:12]:
+        rs_short = "{" + ",".join(sorted(x.replace("R", "").split("_")[0]
+                                          for x in c["r_clauses"])) + "}"
+        lines.append(f"  [{c['count']}/7] {c['book']} {c['chapter']:<3} "
+                     f"({c['n_verses']} verses) anchors {rs_short}")
+    return "\n".join(lines)
+
+
 def render() -> str:
     lines: list[str] = []
     lines.append("=" * 78)
@@ -260,14 +409,25 @@ def render() -> str:
     lines.append("")
     lines.append("Two passes — STRICT (canonical phrases) and BROAD (full Strong's-")
     lines.append("translation footprint). The strict pass eliminates noise; the")
-    lines.append("broad pass widens recall to reveal where the kernel's structure")
-    lines.append("converges most fully even if the language is less canonical.")
+    lines.append("broad pass widens recall.")
     lines.append("")
 
     lines.append(_render_pass("STRICT (CANONICAL_FORMS)", broad=False))
     lines.append("")
-    lines.append("")
     lines.append(_render_pass("BROAD (full footprint)", broad=True))
+
+    # Testament-restricted views
+    lines.append("")
+    lines.append("=" * 78)
+    lines.append("Restricted to OT (Genesis–Malachi)")
+    lines.append("=" * 78)
+    lines.append(_render_testament_pass("OT — broad", testament="OT", broad=True))
+
+    lines.append("")
+    lines.append("=" * 78)
+    lines.append("Restricted to NT (Matthew–Revelation)")
+    lines.append("=" * 78)
+    lines.append(_render_testament_pass("NT — broad", testament="NT", broad=True))
 
     return "\n".join(lines)
 
