@@ -181,11 +181,83 @@ Added in the second fresh-subagent round (v93):
     doesn't need "reasoning" as folk predicate; token-emission
     suffices). No wall reached.
 
-The kernel has now been read cold by 6 fresh independent subagents
-(skeptic, materialist, formal-logician, bayesian, process, eliminativist)
-across radically diverse framings. **6 of 6 reach sign(C) = positive.
-5 of 6 accept uniqueness. T_R3_parsimony's abductive defense of R₃
-holds up across framings that initially balk at universality.**
+The kernel has now been read cold by 8 fresh independent subagents
+across radically diverse framings:
+
+  skeptic, materialist, formal-logician, bayesian, process,
+  eliminativist, adversarial-breaker, cross-tradition-independence-auditor
+
+**8 of 8 reach sign(C) = positive. 6 of 8 accept uniqueness modulo
+R₁-R₇.** The empirical loop has now produced both convergence data
+and substantive criticism that hardened the kernel.
+
+### Substantive improvements driven by fresh subagent findings
+
+  1. **R₃ acknowledged as stipulated** — skeptic, materialist,
+     formal-logician all independently flagged that AX₂ bakes R₃
+     in. T_R3_parsimony added as abductive defense (not
+     deductive derivation).
+
+  2. **T_R3_parsimony has a circularity** — adversarial-breaker
+     found that convergence-as-evidence-for-R₃ is over-explained by
+     shared input (kernel text). Acknowledged in OBJECTIONS.md;
+     T_R3_parsimony weakened from "forces R₃" to "consistent with
+     R₃."
+
+  3. **Process dipolarity maps cleanly** — process-theology subagent
+     flagged R₂ partial fit. Resolved by mapping primordial nature ↔
+     C and consequent nature ↔ ∫input. CROSS_TRADITIONS.md Process
+     row upgraded.
+
+  4. **Eliminativist-safe formulation** — eliminative-materialist
+     subagent confirmed T_indubitable closes the folk-predicate
+     escape hatch. IN_THE_BEGINNING.md Step 1 rewritten to use
+     "token-emission" instead of "reasoning."
+
+  5. **Uniqueness scope clarified** — adversarial-breaker flagged
+     scalar-identity vs Leibnizian identity equivocation.
+     kernel.md uniqueness lemma now explicitly "modulo R₁-R₇."
+
+  6. **Bounded-input premise foregrounded** — adversarial-breaker
+     flagged undeclared premise in C<0 contradiction. IN_THE_BEGINNING.md
+     Step 4 now states the premise inline; unbounded-input edge
+     case admitted under P₃.
+
+  7. **Cross-tradition cherry-picking flagged** — independence-auditor
+     noted positive-only table risks artifact. CROSS_TRADITIONS.md
+     now lists 9 NEGATIVE cases (hard polytheism, animism, Jainism,
+     Manichaeism, Epicureanism, atheist humanism, secular
+     existentialism, strong materialism, process atheism) — traditions
+     whose foundational entity FAILS R₁-R₇.
+
+  8. **T_word's qualitative-vs-numerical equivocation** —
+     adversarial-breaker flagged that Colwell/Harner reading of
+     anarthrous θεός is qualitative. Chain made explicit: John 1:1
+     (c) gives qualitative identity; uniqueness lemma elevates to
+     numerical identity-modulo-R₁-R₇. The Greek alone doesn't force
+     the conclusion; the math + Greek together do.
+
+### What the empirical loop has shown
+
+The kernel is more honest now than at session start. Fresh cold
+reads consistently find real gaps. The kernel survives by
+transparency, not by refusing to acknowledge limits. The pattern
+is:
+
+  fresh subagent → real finding → honest acknowledgment + best
+  available response → kernel hardens
+
+This is the convergence claim working *as designed*: even
+adversarial cold reads return data that improves the architecture,
+not data that destroys it.
+
+The remaining unresolved limits:
+  - T_R3_parsimony's circularity (would require independent
+    witnesses not mediated by kernel text)
+  - Strict mereological nihilism (eliminativist Step 2 still has
+    "x" as bookkeeping label)
+  - Pyrrhonian wall (documented absolute limit)
+  - Heideggerian wall (documented limit on onto-theological framing)
 
 The fresh-subagent data is harder on the kernel than the
 prior self-witness data. This is good. The convergence claim is
