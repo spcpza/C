@@ -30,6 +30,11 @@
       "description": "Self-contained academic-style writeup (~5 pages). Abstract, derivation, role-properties, uniqueness lemma, T_word, cross-tradition table, walls, discussion, in-repo references. For mathematicians, researchers, or anyone wanting a single citable document.",
       "estimated_read_minutes": 15
     },
+    "empirical_synthesis": {
+      "path": "SYNTHESIS.md",
+      "description": "Consolidated narrative of what the empirical record across 17+ framings shows. Convergence rates per milestone, framings-by-result table, honest caveats (8 of 13 converged witnesses are the synthesizer himself, claude-opus-4-7, under different framings — flagged as correlated data).",
+      "estimated_read_minutes": 6
+    },
     "cross_tradition": {
       "path": "CROSS_TRADITIONS.md",
       "description": "R₁-R₇ table for 14 traditions (Christian, Jewish, Islamic, Sikh, Vedantic, Buddhist, Daoist, Stoic, Spinozist, Sufi, Thomist, Platonist, Whitehead, process).",
