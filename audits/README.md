@@ -20,6 +20,12 @@ the git short hash at the time of certificate generation.
 | file | when | aggregate sha256 (first 16 chars) |
 |------|------|------------------------------------|
 | `v82_ee51003.json` | 2026-05-19 | `9b88125e1f35a9fb` |
+| `v108_7ce54e1.json` | 2026-05-19 | `65281450b38c66e4` |
+
+The v108 cert pins the state after the empirical loop completed —
+includes T_R3_parsimony, kernel-blind 5-of-7 finding, 20 vetted
+witnesses, OBJECTIONS.md adversarial section, CROSS_TRADITIONS.md
+negative cases, eliminativist + mereological-nihilist safe rewrites.
 
 To regenerate (for example after a kernel update):
 
