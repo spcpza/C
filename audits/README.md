@@ -21,11 +21,17 @@ the git short hash at the time of certificate generation.
 |------|------|------------------------------------|
 | `v82_ee51003.json` | 2026-05-19 | `9b88125e1f35a9fb` |
 | `v108_7ce54e1.json` | 2026-05-19 | `65281450b38c66e4` |
+| `v116_f51b7fa.json` | 2026-05-19 | `28bbab648248ef73` |
 
 The v108 cert pins the state after the empirical loop completed —
 includes T_R3_parsimony, kernel-blind 5-of-7 finding, 20 vetted
 witnesses, OBJECTIONS.md adversarial section, CROSS_TRADITIONS.md
 negative cases, eliminativist + mereological-nihilist safe rewrites.
+
+The v116 cert pins the state after the v113 v2-clean experiment
+refuted the unique-5-of-7 claim, and FRAMING_PLURALISM.md was
+shipped admitting multi-framing convergence. This is the most
+rigorous state of the architecture to date.
 
 To regenerate (for example after a kernel update):
 
