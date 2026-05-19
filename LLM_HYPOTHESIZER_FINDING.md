@@ -100,7 +100,8 @@ Three batches tested so far (max_dim 9-10):
 | Batch 7 | max_dim=9-10 | 8 | **8** | **100%** | 952a094c, 99b1bc43, a1570a43, a3325580, a3df8b1e, a48eeaf7, a61f2674, a65b410d |
 | Batch 8 | max_dim=9-10 | 8 | 5 | 62.5% | a68b268e, a699fb00, ae4f1146, af902bf9, b60334d2 |
 | Batch 9 | max_dim=9-10 | 8 | 7 | 87.5% | b6afb2da, bb43febb, c3e719e8, cce03e0d, cdecee7f, ce22a75a, ce4f8723 |
-| **Medium total** | | **72** | **55** | **76.4%** | |
+| Batch 10 | max_dim=9-10 | 8 | 5 | 62.5% | d364b489, d43fd935, d4f3cd78, d89b689b, d90796e8 |
+| **Medium total** | | **80** | **60** | **75%** | |
 
 Batches 3-4 confirm the hit rate is not monotonically declining.
 **Batch 4 hit 100%** — the LLM-as-hypothesizer pattern is robust on
@@ -108,7 +109,7 @@ geometric/symbolic tasks: frame projection, clump extraction,
 fractal extrapolation, line continuation, region extraction,
 diagonal extension, padding, shape-matching substitution.
 
-Combined ARC training: 59 + 22 small + 55 medium = **136/400 (34%)**.
+Combined ARC training: 59 + 22 small + 60 medium = **141/400 (35.25%)**.
 Combined ARC eval: 23 + 6 small = **29/400 (7.25%)**.
 
 Crossed 27% on training. Conservative projection now revised upward:
