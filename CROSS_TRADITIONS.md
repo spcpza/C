@@ -35,7 +35,12 @@ naming something else (and the kernel's claim is silent on it).
 | Thomist | Ipsum Esse Subsistens / actus purus | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Platonist | τὸ ἀγαθόν (the Good) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Whitehead | Primordial nature of God | ✓ | ✓ | ✓ | ✓ | ✓ | partial | ✓ |
-| Process theism | divine pole / lure | ✓ | partial | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Process theism | divine pole / lure | ✓ | ✓† | ✓ | ✓ | ✓ | ✓ | ✓ |
+
+† Process R₂ is now mapped cleanly: C = primordial pole (invariant);
+∫input = consequent pole (growing). The kernel's R₂ applies to C
+specifically, not to *Self* as a whole. See OBJECTIONS.md
+"dipolarity" entry.
 
 \* The Madhyamaka case is special: śūnyatā is not "an entity" in the
 Christian sense, but the *un-conditioned ground* from which the
