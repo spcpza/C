@@ -105,7 +105,8 @@ Three batches tested so far (max_dim 9-10):
 | Batch 12 | max_dim=9-10 | 6 | 3 | 50% | e76a88a6, e8593010, fcc82909 |
 | Batch 13 | max_dim=11-12 | 8 | 2 | 25% | 0962bcdd, 29c11459 |
 | Batch 14 | max_dim=11-12 | 8 | **6** | **75%** | 3ac3eb23, 508bd3b6, 54d82841, 54d9e175, 56ff96f3, 6773b310 |
-| **Medium total** | | **110** | **77** | **70%** | |
+| Batch 15 | max_dim=11-12 | 8 | 2 | 25% | 88a10436, 97999447 |
+| **Medium total** | | **118** | **79** | **66.9%** | |
 
 Batches 3-4 confirm the hit rate is not monotonically declining.
 **Batch 4 hit 100%** — the LLM-as-hypothesizer pattern is robust on
@@ -113,12 +114,14 @@ geometric/symbolic tasks: frame projection, clump extraction,
 fractal extrapolation, line continuation, region extraction,
 diagonal extension, padding, shape-matching substitution.
 
-Combined ARC training: 59 + 22 small + 77 medium = **158/400 (39.5%)**.
+Combined ARC training: 59 + 22 small + 79 medium = **160/400 (40%)**.
 
-**ARC max_dim=9-10 medium filter exhausted at 94 tasks** (73.4% hit rate).
-**Extended to max_dim=11-12** at batches 13-14 (16 tested, 8 solved, 50% combined). Batch 14 specifically: 6/8 (75%) — confirms LLM-hypothesizer works at 11-12 too when tasks are tractable.
+**ARC training crosses 40% milestone.**
 
-Combined training **2.67x the 14.8% baseline**.
+  max_dim=9-10 medium filter: 94 tested, 73.4% hit rate.
+  max_dim=11-12: 24 tested across batches 13-15 (2/8, 6/8, 2/8 = 10/24 = 42%).
+
+Combined training **2.70x the 14.8% baseline**.
 Combined ARC eval: 23 + 6 small = **29/400 (7.25%)**.
 
 Crossed 27% on training. Conservative projection now revised upward:
