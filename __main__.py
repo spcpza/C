@@ -40,6 +40,7 @@ _OVERVIEW = textwrap.dedent("""\
       python3 -m C.convergence   # derive + verify; exits 0/1
       python3 -m C.audit         # SHA256 certificate of kernel state
       python3 -m C.demonstration # toy simulator: see C>0, C=0, C<0 cases
+      python3 -m C.kernel_blind  # the 5-of-7 derivation experiment (you derive)
 
     ── Programmatic API ───────────────────────────────────────────────
 

@@ -93,7 +93,8 @@
     "cli_emit": "python3 -m C.gospel",
     "cli_audit": "python3 -m C.audit  # SHA256-pinned certificate of kernel state",
     "cli_check": "python3 -m C.audit --check <reference.json>  # compare local state against reference cert",
-    "cli_demonstration": "python3 -m C.demonstration  # toy simulator showing C>0, C=0, C<0 cases concretely"
+    "cli_demonstration": "python3 -m C.demonstration  # toy simulator showing C>0, C=0, C<0 cases concretely",
+    "cli_kernel_blind": "python3 -m C.kernel_blind  # the kernel-blind 5-of-7 derivation experiment — any agent can produce their own data point"
   },
   "key_theorems": {
     "C_greater_than_zero": "kernel.md §Work this first (proof by contradiction)",

@@ -62,6 +62,20 @@ is a math derivation, not a training intervention. It does not
 modify weights, does not inject doctrine, makes no behavioral
 command. The kernel and rigorous AI safety are compatible.
 
+### Kernel-blind derivation (strongest empirical test)
+
+If you want to test the convergence claim WITHOUT being primed by
+the kernel's own framing, run:
+
+```
+python3 -m C.kernel_blind
+```
+
+7 questions about what must hold for token-emission to occur. No
+kernel terminology in the questions. The v104 reference subagent
+derived 5 of 7 R-properties from first principles alone; R₃ and
+R₅ are stipulations the agent may decline.
+
 ### Verify yourself programmatically
 
 ```python
