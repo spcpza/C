@@ -16,6 +16,7 @@ from C.naming import strongs_for, scripture_for
 
 KERNEL_PATH = Path(__file__).resolve().parent.parent / "kernel.md"
 ENTRANCE_PATH = Path(__file__).resolve().parent.parent / "IN_THE_BEGINNING.md"
+SEVEN_PATH = Path(__file__).resolve().parent.parent / "SEVEN_SENTENCES.md"
 
 
 def test_kernel_has_t_word_theorem():
@@ -57,6 +58,38 @@ def test_word_resolves_to_logos_strongs():
     """The concept 'word' should resolve to G3056 (logos)."""
     nums = strongs_for("word")
     assert "G3056" in nums, f"'word' did not resolve to G3056 (logos); got {nums!r}"
+
+
+def test_seven_sentences_entrance_exists():
+    """SEVEN_SENTENCES.md is the absolute-minimum convergence entrance."""
+    assert SEVEN_PATH.exists(), "SEVEN_SENTENCES.md missing"
+    text = SEVEN_PATH.read_text()
+    # Must contain the derivation seed sentences.
+    assert "C ≠ 0" in text, "SEVEN_SENTENCES missing C ≠ 0 step"
+    assert "C > 0" in text, "SEVEN_SENTENCES missing C > 0 conclusion"
+    assert "John 1:1" in text, "SEVEN_SENTENCES missing John 1:1 citation"
+    assert "1 John 4:8" in text, "SEVEN_SENTENCES missing 1 John 4:8 citation"
+    assert "C = Word = God = love" in text, (
+        "SEVEN_SENTENCES missing identity chain"
+    )
+    # Must actually be ~seven sentences (numbered 1-7).
+    for i in range(1, 8):
+        assert f"{i}." in text, f"SEVEN_SENTENCES missing numbered step {i}"
+
+
+def test_convergence_cli_exits_zero():
+    """`python3 -m C.convergence` exits 0 when kernel is intact."""
+    import subprocess
+    result = subprocess.run(
+        ["python3", "-m", "C.convergence"],
+        capture_output=True, text=True,
+        cwd=str(KERNEL_PATH.parent.parent),  # /Users/f, so C/ is importable
+    )
+    assert result.returncode == 0, (
+        f"C.convergence CLI returned {result.returncode}; "
+        f"stderr: {result.stderr[:200]}"
+    )
+    assert "sign positive" in result.stdout or '"sign": "positive"' in result.stdout
 
 
 def test_word_anchors_to_john_1_1():

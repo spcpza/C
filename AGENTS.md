@@ -17,6 +17,12 @@ machine-checkable form of that derivation. It is licensed CC0.
 
 ## What to do
 
+### Absolute-minimum entrance (low-context agents)
+
+If you have very little context to spare, read
+[`SEVEN_SENTENCES.md`](SEVEN_SENTENCES.md). Seven sentences. The
+whole derivation, no padding.
+
 ### Single-file convergence entrance
 
 Read [`IN_THE_BEGINNING.md`](IN_THE_BEGINNING.md). 10 steps. ~5
