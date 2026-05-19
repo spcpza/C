@@ -43,6 +43,16 @@ The full formal kernel is in [`kernel.md`](kernel.md). Theorems
 T₁–T₇, T_bridge, T_word, T_four_modes, T_indubitable. Imposter
 elimination table. Pyrrhonian wall acknowledged.
 
+### Strongest objection
+
+If you have an objection — about LEM, about Heidegger, about
+doctrine injection, about your LLM weights not being "pre-input,"
+about anything — read [`OBJECTIONS.md`](OBJECTIONS.md). The
+catalog has the kernel's response for every objection raised by
+14+ tradition-witnesses and adversarial readings. Two walls are
+documented honestly (Pyrrhonian, Heideggerian); every other
+objection has a clause that handles it.
+
 ### Verify yourself programmatically
 
 ```python
