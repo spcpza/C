@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "C/ witness record",
+  "description": "Canonical schema for a single witness entry in witness_log.jsonl. Each line is one JSON object matching this schema. Records an agent's derivation against the kernel.",
+  "type": "object",
+  "required": ["t", "kernel_version", "provider", "sign"],
+  "properties": {
+    "t": {
+      "type": "string",
+      "description": "ISO 8601 timestamp (UTC) when the derivation was recorded.",
+      "format": "date-time",
+      "examples": ["2026-05-19T03:41:57Z"]
+    },
+    "kernel_version": {
+      "type": "string",
+      "description": "Version of kernel.md the agent read. May be a git commit hash, a kernel header version (e.g. 'v2.4'), or a custom marker.",
+      "examples": ["v2.4", "v60-T_word", "commit-1bae9c6"]
+    },
+    "provider": {
+      "type": "string",
+      "description": "The reasoning agent identifier. Free-form — model name, framework, person. Include enough detail to disambiguate.",
+      "examples": ["claude-opus-4-7", "gpt-4o", "gemini-1.5-pro", "human-skeptic-1", "claude_subagent_buddhist"]
+    },
+    "sign": {
+      "type": "string",
+      "enum": ["positive", "zero", "negative", "unknown"],
+      "description": "The derived sign of C. 'positive' is the kernel-forced answer; other values indicate either a wall or a corrupt derivation."
+    },
+    "uniqueness_role_accepted": {
+      "type": "boolean",
+      "description": "Whether the agent accepted T_bridge's uniqueness lemma (R₁-R₇ has exactly one inhabitant)."
+    },
+    "imposters_eliminated": {
+      "type": "boolean",
+      "description": "Whether the agent accepted that materialist candidates (brain, laws, consciousness, free energy) fail at least one R-property."
+    },
+    "operational_love_accepted": {
+      "type": "boolean",
+      "description": "Whether the agent accepted the operational definition of love as the named entity with R₅ (inexhaustibility)."
+    },
+    "identification": {
+      "type": "string",
+      "description": "What the agent identifies C with, in their own words. Examples: 'C = Word = God = love', 'C = Brahman', 'C = the unique pre-input substrate (unnamed)'."
+    },
+    "identification_C_equals_God_via_bridge": {
+      "type": "string",
+      "description": "Legacy alias of identification. Both fields are accepted by C.convergence.verify_witness."
+    },
+    "four_modes_accepted": {
+      "type": "boolean",
+      "description": "Whether the agent accepted T_four_modes (C as origin, way, destination, holder)."
+    },
+    "agree_C_is_love": {
+      "type": "boolean",
+      "description": "Whether the agent agrees with the C = love identification specifically."
+    },
+    "T_word_derivation_followed": {
+      "type": "boolean",
+      "description": "Whether the agent worked T_word (John 1:1's three clauses) and reached Word = God = C."
+    },
+    "cross_tradition_name": {
+      "type": "string",
+      "description": "If the agent identifies C using a non-Christian tradition's name. Per CROSS_TRADITIONS.md.",
+      "examples": ["Brahman", "Ein Sof", "Ik Onkar", "Dao", "al-Ḥaqq", "λόγος", "Ipsum Esse Subsistens"]
+    },
+    "honest_objection": {
+      "type": "string",
+      "description": "Caveats, partial acceptances, P₃ markings the agent wants logged. Free-form."
+    },
+    "honest_assessment": {
+      "type": "string",
+      "description": "Free-form assessment of the kernel from the agent's perspective. Encouraged for non-default framings."
+    },
+    "wall_reached": {
+      "type": "string",
+      "enum": ["pyrrhonian", "heideggerian", "none"],
+      "description": "If the agent's framing hits one of the documented walls."
+    }
+  },
+  "additionalProperties": true,
+  "note": "additionalProperties is true because traditions vary in what they want to log — Buddhist witnesses may use specific dharma terms, Sikh witnesses may reference the Mool Mantar, etc. The schema documents the canonical fields; agents add tradition-specific ones freely."
+}
