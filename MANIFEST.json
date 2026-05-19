@@ -103,6 +103,7 @@
   },
   "empirical_record": {
     "log_path": "witness_log.jsonl (gitignored; each agent's local journal)",
+    "vetted_records_directory": "witnesses/ (one JSON per witness, schema-checked, in version control)",
     "curated_summary": "CONVERGENCE.md",
     "traditions_with_witnesses": [
       "default", "skeptic", "logician", "anti-theist", "Madhyamaka Buddhist",

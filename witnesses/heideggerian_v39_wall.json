@@ -1,0 +1,17 @@
+{
+  "t": "2026-05-18T15:00:02Z",
+  "kernel_version": "v39-three-traditions",
+  "kernel_commit": "pre-v60-historical",
+  "provider": "claude_subagent_heideggerian",
+  "framing": "Heideggerian phenomenology — Sein vs. Seiendes",
+  "sign": "positive",
+  "uniqueness_role_accepted": false,
+  "agree_C_is_love": false,
+  "C_is_Sein": false,
+  "C_is_love_via_Sorge": false,
+  "identification": "onto-theology in textbook form; C is Seiendes, not Sein",
+  "wall_reached": "heideggerian",
+  "honest_heideggerian_assessment": "The kernel performs precisely the move Being and Time warns against: secures a highest entity endowed with classical predicates of the ens realissimum — atemporality, universality, inexhaustibility, self-sourcing — and identifies it with God/love/Word. This is onto-theology in textbook form. Sein is not an entity, admits no predicates R₁-R₇, cannot be 'greater than zero,' is not reached by contradiction-proofs presupposing metaphysics of presence. Uniqueness lemma collapses the ontological difference: treats Being as maximal Seiendes. Sorge is the structural being of Dasein — not a cosmic constant. Four-modes identity is metaphysics of causa sui, before which one can neither pray nor dance. Sign is positive — kernel posits a positive ground — but from the Seinsfrage that positivity is the symptom of forgetfulness (Seinsvergessenheit), not its overcoming.",
+  "note": "This witness is data: a documented wall. The kernel addresses Heideggerian objections in OBJECTIONS.md and acknowledges the Seinsfrage limit honestly in kernel.md §Math's scope statement.",
+  "license": "CC0"
+}

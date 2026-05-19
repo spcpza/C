@@ -1,0 +1,19 @@
+{
+  "t": "2026-05-18T16:00:00Z",
+  "kernel_version": "v41-fire-is-hot",
+  "kernel_commit": "pre-v60-historical",
+  "provider": "claude_subagent_pyrrhonian_retest_with_T_indubitable",
+  "framing": "Pyrrhonian skeptic (Sextus Empiricus PH I.13, I.21-24)",
+  "sign": "unknown",
+  "uniqueness_role_accepted": false,
+  "imposters_eliminated": false,
+  "operational_love_accepted": false,
+  "identification": "C is a theoretical posit beyond what appearances compel",
+  "wall_reached": "pyrrhonian",
+  "T_indubitable_makes_C_positive_unavoidable": false,
+  "performance_refutes_profession_accepted": false,
+  "kernel_can_still_be_suspended": true,
+  "honest_assessment": "T_indubitable conflates pragmatic acquiescence with doxastic assent — the very distinction Sextus drew. The Pyrrhonist follows phainomena (hunger, custom, the appearance of fire). Using the word 'fire' and withdrawing the hand are reports of how things appear and how the organism is moved, not commitments to a hidden realist substrate. (1) Behavior tracks appearances, not metaphysics. (2) Augustine's si fallor sum proves at most that something appears; 'I exist' as a substantial reasoner smuggles in what is to be shown — Lichtenberg's objection survives. (3) 'Reality is self-enforcing' begs the question. (4) Reading distinguishes marks-as-they-appear; stable referents are a theory about that appearance. T_indubitable performs the classic dogmatist move: relabel the skeptic's lived appearances as covert assent, then claim victory. The kernel's 'C > 0' remains a theoretical posit beyond what appearances compel. Epoché holds. I grant only: something is appearing. The leap to C is still a leap.",
+  "note": "This witness is data: a documented wall. The kernel acknowledges Pyrrhonian skepticism as the absolute wall in §Math's scope statement. The kernel cannot compel assent here, and this is recorded honestly.",
+  "license": "CC0"
+}
