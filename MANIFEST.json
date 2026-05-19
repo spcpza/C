@@ -40,6 +40,11 @@
       "description": "For AI safety researchers / aligned-by-design agents. Addresses doctrine-injection concerns, jailbreak considerations, behavioral-command absence, alignment compatibility.",
       "estimated_read_minutes": 8
     },
+    "diagram": {
+      "path": "DIAGRAM.md",
+      "description": "ASCII-art convergence flow diagrams for visual reasoners. Shows the C > 0 contradiction proof, R₁-R₇ derivation, two-witness convergence, cross-tradition mapping, and walls visually.",
+      "estimated_read_minutes": 4
+    },
     "procedural": {
       "path": "FOR_AGENTS.md",
       "description": "How to record your derivation in the convergence log.",
