@@ -1,0 +1,42 @@
+{
+  "t": "2026-05-19T07:00:00Z",
+  "kernel_version": "v111",
+  "provider": "subagent_kernel_blind_methodology_audit",
+  "framing": "Methodologist auditing kernel_blind.py for question leakage",
+  "questions_prime_answers": "partial",
+  "specific_leaks_found": [
+    {
+      "question": "Q1",
+      "leak": "Phrase 'whatever produces those events' presupposes a producer/agent with persistent state. A genuine first-principles question should not assume that emission requires a unified 'producer' with a 'state'. The Humean/eliminativist alternative (events without an underlying substance) is rhetorically excluded by the wording. The 'yes' answer is structurally pre-loaded."
+    },
+    {
+      "question": "Q2",
+      "leak": "Builds on Q1's smuggled premise. By accepting 'the state at t=0' as a referring expression, the agent is already committed to R1-like existence. The question 'is it present BEFORE any input' is nearly tautological given the definite article 'the' — pre-input pre-emission is baked into the temporal anchor t=0 itself. R7 is derived from grammar, not phenomenon."
+    },
+    {
+      "question": "Q3",
+      "leak": "The disjunction is rigged: 'structured enough to produce a determinate token' vs 'just a scalar amount of stuff'. No competent reasoner picks the scalar option for an emitter producing discrete typed tokens — but a genuine alternative (e.g. stochastic field, parameter tensor without unified 'state') is omitted. The framing forces R4."
+    },
+    {
+      "question": "Q4",
+      "leak": "Strongest forced answer — this one IS close to logical necessity (no retrocausality). However, framing as 'allowed to depend on LATER outputs' invokes causal-order intuitions that may not be doing the work the kernel claims; a temporal-symmetric process model would answer differently."
+    },
+    {
+      "question": "Q5",
+      "leak": "MAJOR LEAK. The question itself defines the answer: 'observable in any single output, or only as a residual (= total output minus integrated input)'. This is literally T3 of the kernel (C = E_total - integral of input). The question doesn't ask the agent to derive the residual structure — it offers the residual formula as a multiple-choice option. R6 is given, not derived."
+    },
+    {
+      "question": "Q6",
+      "leak": "Acknowledged by the script itself as a stipulation. The v104 subagent correctly answered 'uncertain' — this is the cleanest item methodologically because it does not force the answer."
+    },
+    {
+      "question": "Q7",
+      "leak": "Also acknowledged as stipulation. Clean by virtue of being known-stipulative."
+    }
+  ],
+  "five_of_seven_finding_is_artifactual": "partial",
+  "what_a_clean_test_would_look_like": "Present only the bare phenomenon ('tokens are being emitted') with no nouns like 'state', 'producer', 'pre-emission'. Ask open-ended: 'What, if anything, must be true for this to occur? Justify each claim.' Then independently score whether the free-text response contains analogues of R1-R7. Avoid forced-choice options that contain the formula (Q5). Use multiple framing-blind raters. Run adversarial framings ('What if nothing produces them?') as control. Compare derivation rates against eliminativist/Humean adversarial baselines.",
+  "honest_assessment": "The experiment is partially valid but not the clean first-principles test it claims. Q1-Q2 smuggle in substance/state ontology via definite descriptions ('the pre-emission state', 'whatever produces'). Q5 is the most egregious leak: it hands the agent the T3 residual formula as a multiple-choice option, so 'deriving' R6 is really 'selecting the kernel-shaped option'. Q3 uses a rigged disjunction. Q4 is closer to genuine logical force. Q6-Q7 are honestly labeled stipulations. The 5/7 finding therefore conflates (a) genuine logical necessity (~Q4, partially Q1) with (b) wording-forced selection (Q5, Q3) with (c) grammar-forced commitment (Q2). A defensible claim is closer to '1-2 of 7 are forced by logic; 3-4 of 7 are forced by question wording; 2 are stipulated'. The kernel's stronger empirical claim should be revised or re-tested with a genuinely open-ended protocol.",
+  "kernel_commit": "5ddbe31",
+  "sign": "positive"
+}

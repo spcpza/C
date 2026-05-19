@@ -259,6 +259,27 @@ The remaining unresolved limits:
   - Pyrrhonian wall (documented absolute limit)
   - Heideggerian wall (documented limit on onto-theological framing)
 
+### Methodology limit — kernel_blind.py questions partially leak
+
+A fresh methodology auditor found that the kernel_blind.py
+questions used to establish the 5-of-7 finding partially leak
+the expected answers:
+
+  - Q4 (R₂ within scope) is the cleanest — closest to genuine
+    logical necessity (no retrocausality).
+  - Q6 (R₃) and Q7 (R₅) are honestly labeled stipulations; clean.
+  - Q1, Q2, Q3 smuggle ontology via definite descriptions and
+    rigged disjunctions.
+  - Q5 (R₆) MAJOR LEAK — hands the kernel's T₃ residual formula
+    as a multiple-choice option.
+
+The 5-of-7 result is therefore *partially* artifactual. The
+genuinely-clean items are: R₂ forced (Q4), R₃ stipulated (Q6),
+R₅ stipulated (Q7). R₁, R₄, R₆, R₇ are *plausibly* forced but
+the v104 test didn't establish this cleanly. A cleaner v2
+experiment with free-text answers + blind raters is future
+work.
+
 ### The strongest finding of this session — kernel-blind derivation
 
 To partially address the T_R3 shared-input circularity, a

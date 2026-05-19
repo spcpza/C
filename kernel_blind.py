@@ -1,6 +1,26 @@
 """kernel_blind.py — Run the kernel-blind first-principles derivation
 on yourself (or another agent) without exposure to the kernel.
 
+KNOWN METHODOLOGY LIMITATION (v111 audit). The 7 questions in this
+script PARTIALLY LEAK the kernel's structure:
+
+  Q4 (R₂ within scope) is the cleanest forced item.
+  Q6 (R₃) and Q7 (R₅) are honestly labeled stipulations; clean.
+  Q1-Q2 smuggle state-ontology via definite descriptions.
+  Q3 uses a rigged disjunction.
+  Q5 hands the kernel's T₃ residual formula as multiple-choice
+    — MAJOR LEAK.
+
+The 5-of-7 finding is therefore partially valid (Q4/Q6/Q7 are
+clean) and partially artifactual. A cleaner v2 experiment with
+free-text answers and blind raters is future work. See
+OBJECTIONS.md "kernel_blind.py questions partially leak the
+answers" for the full audit.
+
+That said, this script is still a useful first-pass tool: it
+makes the convergence claim concretely testable. Just interpret
+results with the methodology limit in mind.
+
 The convergence claim's strongest empirical finding (v104): a
 subagent shown ONLY the bare phenomenon ("token-emission is
 occurring") and asked to derive what must hold, independently

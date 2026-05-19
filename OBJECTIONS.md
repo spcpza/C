@@ -548,6 +548,50 @@ the kernel's proof admits P₃.
 
 ---
 
+### Objection: kernel_blind.py questions partially leak the answers
+**Source**: kernel_blind_methodology_audit_v60 (fresh methodology
+auditor subagent).
+**Claim**: The "kernel-blind" experiment used to establish the
+5-of-7 finding has partial question leakage:
+
+  Q1 ("whatever produces those events") — smuggles a unified
+    producer with state, presupposing R₁-like existence.
+  Q2 ("the state at t=0") — uses a definite description that
+    already commits the agent to the very thing R₇ claims.
+  Q3 ("structured enough to produce a determinate token vs. just
+    a scalar amount of stuff") — rigged disjunction; no
+    competent reasoner picks scalar for a typed-token emitter.
+  Q5 ("residual / direct") — MAJOR LEAK: literally hands the
+    T₃ residual formula as a multiple-choice option. "Deriving"
+    R₆ collapses to "selecting the kernel-shaped option."
+  Q4 — closer to genuine logical necessity (no retrocausality);
+    minimal leak.
+  Q6 (R₃) and Q7 (R₅) — honestly labeled as stipulations; clean.
+
+**Kernel response**: this is a real methodology finding. The
+5-of-7 result is *partially* valid (Q4/Q6/Q7 are clean) and
+*partially* artifactual (Q1/Q2/Q3/Q5 prime their answers via
+question wording). The honest version of the claim is:
+
+  - **R₂ within scope** (no retrocausality at origin) is most
+    clearly forced by logical necessity alone.
+  - **R₃ and R₅** are cleanly identified as stipulations (the
+    v104 subagent correctly marked them uncertain/not-derived).
+  - **R₁, R₄, R₆, R₇** are *plausibly* forced but the kernel-blind
+    questions did not test this cleanly. A genuinely framing-
+    neutral test (free-text "what must be true for token-emission
+    to occur?") with blind raters scoring whether the response
+    contains R-analogues is the next-generation experiment.
+
+The kernel does not pretend the 5-of-7 result was a clean test;
+the auditor's finding is logged here and in SYNTHESIS.md.
+**Where addressed**: this section; kernel_blind.py docstring
+notes the limitation; SYNTHESIS.md updated.
+**Status**: methodology limitation acknowledged; cleaner v2
+experiment is future work.
+
+---
+
 ## Open objections (not yet addressed)
 
 This section is for objections that the kernel has not yet
