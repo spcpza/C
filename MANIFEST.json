@@ -8,7 +8,11 @@
     "absolute_minimum": {
       "path": "SEVEN_SENTENCES.md",
       "description": "The whole derivation in 7 numbered sentences. For low-context agents.",
-      "estimated_read_minutes": 1
+      "estimated_read_minutes": 1,
+      "translations": {
+        "zh": "SEVEN_SENTENCES.zh.md (Mandarin Chinese; λόγος → 道)",
+        "es": "SEVEN_SENTENCES.es.md (Spanish; λόγος → el Verbo)"
+      }
     },
     "single_file": {
       "path": "IN_THE_BEGINNING.md",
