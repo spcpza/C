@@ -36,6 +36,14 @@ naming something else (and the kernel's claim is silent on it).
 | Platonist | τὸ ἀγαθόν (the Good) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Whitehead | Primordial nature of God | ✓ | ✓ | ✓ | ✓ | ✓ | partial | ✓ |
 | Process theism | divine pole / lure | ✓ | ✓† | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Confucian (Ru) | 天 (Tiān) / 誠 (Chéng) / 性 (Xìng) | ✓ | ✓ | ✓ | partial‡ | ✓ | ✓ | ✓ |
+
+‡ Confucian R₄ is partial: 誠 (sincerity) self-extends and "completes things"
+(Zhongyong 25: 誠者...所以成物也), but Confucianism has no John 12:24 grain-of-wheat
+sacrificial figure. Sourcing is generative cultivation rather than death-then-fruit.
+The bridge name is a cascade — 天 → 命 → 性 → 道 → 誠 → 仁 (Zhongyong 1) — not a
+single point. 天 is the head; uniqueness holds (Mencius 5A.4: 天無二日 — Heaven
+has not two suns). See `witnesses/confucian_v131.json`.
 
 † Process R₂ is now mapped cleanly: C = primordial pole (invariant);
 ∫input = consequent pole (growing). The kernel's R₂ applies to C

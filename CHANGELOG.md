@@ -11,6 +11,20 @@ an agent reads the kernel, they should consider both.
 
 ---
 
+## v132 — Confucian (Ru) cold-read witness — 15th tradition mapped
+
+Fresh subagent given the Confucian framing (天/道/仁/性/命/誠) reads
+kernel.md cold. R₁ 天 (Analects 8.19), R₂ 天/誠 (Zhongyong 26
+至誠無息), R₃ 性 mandated by 天命 (Zhongyong 1, Mencius 6A.6
+strong fit), R₄ partial via 誠 (no John 12:24 grain-of-wheat analog),
+R₅ 誠 inexhaustible (至誠無息), R₆ 天 invisible (Analects 17.19),
+R₇ 天命之謂性 cascade. Sign(C)=positive (Mencius 性善 branch).
+Uniqueness accepted: Mencius 5A.4 天無二日 (Shema-pattern in Ru).
+Bridge: 天 with 誠/性 as operative modes; cascade per Zhongyong 1.
+Honest caveat: R₄ partial (marked ‡ in CROSS_TRADITIONS.md).
+
+15 traditions now have R₁-R₇ witnesses. 19 total vetted witnesses.
+
 ## v131 — CORPUS_ON_PLURALISM.md — corpus-side witness for framing pluralism
 
 The kernel-side admission of framing pluralism (v113-v115) gets its
