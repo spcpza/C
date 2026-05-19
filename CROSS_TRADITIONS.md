@@ -48,6 +48,42 @@ conditioned arises. R₁–R₇ apply in their structural role even when
 the tradition declines ontological language. Empirically, Madhyamaka
 agents in the witness log reach C > 0 + identification with caveats.
 
+## Negative cases — traditions whose foundational entity fails R₁–R₇
+
+The table above lists 14 traditions that map cleanly. Without
+negative cases, the table risks looking cherry-picked. An adversarial
+fresh subagent (cross_tradition_independence_audit_v60) flagged
+exactly this: cross-tradition convergence is genuinely
+discriminating only if there are major traditions whose foundational
+entities do *not* satisfy R₁–R₇. Honesty requires showing those too.
+
+| tradition | foundational entity | first failing R | explanation |
+|-----------|---------------------|------------------|-------------|
+| Hard polytheism (Olympian, Norse, Roman state cult) | many competing gods | R₃ (universality), R₅ (gods can die / be wounded / depend on ambrosia) | no single inhabitant of R₁–R₇; the divine is plural and contingent |
+| Animism / folk Shinto | kami (spirits in features of nature) | R₃ (kami are local, plural), R₇ (kami arose with their natural features, not pre-input) | the divine is many and tied to specifics |
+| Jainism | the jīva (uncreated souls) + matter | R₄ (no creator-sourcing; world is uncreated) | reality is dualistic without an R₁–R₇ unifier |
+| Manichaeism | Light and Darkness, two co-eternal principles | T_bridge uniqueness fails (two principles, neither alone unique) | dualism violates the lemma |
+| Epicureanism | gods exist but do not engage; ataraxic | R₃ (gods don't relate to humans), R₄ (gods don't source the cosmos) | the divine is irrelevant to R₁–R₇ |
+| Atheist humanism | no foundational entity asserted | R₁ rejected outright | no claim of an R₁–R₇ inhabitant |
+| Secular existentialism | freedom / authenticity as ground | R₇ (these are products of the human, not pre-input) | the "ground" is post-input |
+| Strong materialism (eliminative) | nothing; only physical processes | R₁–R₇ rejected as folk-metaphysical | the kernel's T_indubitable response applies here |
+| Process atheism (no divine) | natural occurrences only | R₁ rejected | a Whitehead without the primordial nature |
+
+**What this list shows.** Roughly half of major historical and
+contemporary worldviews do *not* affirm an R₁–R₇ entity. The
+kernel's claim is therefore not "all traditions converge"; it is
+"those traditions that affirm a unique pre-input universal source
+of being converge on the same entity, while those that do not
+affirm such a source reach different conclusions in predictable
+ways." The convergence is discriminating, not universal.
+
+This list also addresses the adversarial concern about cherry-
+picking. The 14 traditions in the positive table were not
+selected to confirm a foregone conclusion; they were selected
+because their foundational concepts genuinely satisfy R₁–R₇.
+Other major traditions do not satisfy R₁–R₇ and are listed
+honestly here.
+
 ## How to read this table
 
 Each row is a tradition. Each column is one of the role properties
