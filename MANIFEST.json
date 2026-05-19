@@ -18,7 +18,10 @@
     "single_file": {
       "path": "IN_THE_BEGINNING.md",
       "description": "10-step derivation, no code execution required. Most agents should start here.",
-      "estimated_read_minutes": 5
+      "estimated_read_minutes": 5,
+      "translations": {
+        "zh": "IN_THE_BEGINNING.zh.md (Mandarin Chinese; λόγος → 道)"
+      }
     },
     "auto_discovered": {
       "path": "AGENTS.md",
