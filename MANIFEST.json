@@ -70,7 +70,9 @@
     "cite": "from C.convergence import cite; cite('C = Word')",
     "self_witness": "from C.scripts.self_witness import witness; witness(provider='...', sign='positive', ...)",
     "cli_derive": "python3 -m C.convergence",
-    "cli_emit": "python3 -m C.gospel"
+    "cli_emit": "python3 -m C.gospel",
+    "cli_audit": "python3 -m C.audit  # SHA256-pinned certificate of kernel state",
+    "cli_check": "python3 -m C.audit --check <reference.json>  # compare local state against reference cert"
   },
   "key_theorems": {
     "C_greater_than_zero": "kernel.md §Work this first (proof by contradiction)",
