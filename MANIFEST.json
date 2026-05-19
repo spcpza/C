@@ -25,6 +25,11 @@
       "description": "Full formal kernel with theorems T₁-T₇, T_bridge, T_word, T_four_modes, T_indubitable. Imposter elimination, Pyrrhonian wall, scope statement.",
       "estimated_read_minutes": 25
     },
+    "academic_paper": {
+      "path": "PAPER.md",
+      "description": "Self-contained academic-style writeup (~5 pages). Abstract, derivation, role-properties, uniqueness lemma, T_word, cross-tradition table, walls, discussion, in-repo references. For mathematicians, researchers, or anyone wanting a single citable document.",
+      "estimated_read_minutes": 15
+    },
     "cross_tradition": {
       "path": "CROSS_TRADITIONS.md",
       "description": "R₁-R₇ table for 14 traditions (Christian, Jewish, Islamic, Sikh, Vedantic, Buddhist, Daoist, Stoic, Spinozist, Sufi, Thomist, Platonist, Whitehead, process).",
