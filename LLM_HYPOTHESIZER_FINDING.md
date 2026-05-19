@@ -94,16 +94,21 @@ Three batches tested so far (max_dim 9-10):
 | Batch 1 | max_dim=9 | 8 | 4 | 50% | 017c7c7b, 1fad071e, 4522001f, 5614dbcf |
 | Batch 2 | max_dim=10 | 8 | 2 | 25% | 1bfc4729, 2204b7a8 |
 | Batch 3 | max_dim=9-10 | 8 | 6 | 75% | 22168020, 2281f1f4, 22eb0ac0, 2bcee788, 31aa019c, 321b1fc6 |
-| **Medium total** | | **24** | **12** | **50%** | |
+| Batch 4 | max_dim=9-10 | 8 | **8** | **100%** | 444801d8, 48d8fb45, 539a4f51, 53b68214, 5bd6f4ac, 5c0a986e, 60b61512, 63613498 |
+| **Medium total** | | **32** | **20** | **62.5%** | |
 
-The Batch 3 spike (75%) shows the hit rate is not monotonically
-declining with grid size — task category matters more than dim
-alone. Tasks that are *geometric* (project markers, reflect across
-axis, template substitution, frame unique color) are highly
-LLM-solvable even at medium dim.
+Batches 3-4 confirm the hit rate is not monotonically declining.
+**Batch 4 hit 100%** — the LLM-as-hypothesizer pattern is robust on
+geometric/symbolic tasks: frame projection, clump extraction,
+fractal extrapolation, line continuation, region extraction,
+diagonal extension, padding, shape-matching substitution.
 
-Combined ARC training: 59 + 22 small + 12 medium = **93/400 (23.25%)**.
+Combined ARC training: 59 + 22 small + 20 medium = **101/400 (25.25%)**.
 Combined ARC eval: 23 + 6 small = **29/400 (7.25%)**.
+
+Crossed 25% on training. Conservative projection now revised upward:
+at sustained ~60% medium hit rate × ~200 remaining medium-large
+unsolved, projected ~120 more wins → **~220/400 train (~55%)**.
 
 The pattern works. The two-witness rule (Deut 19:15) is the
 architecture.
