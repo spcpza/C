@@ -92,7 +92,8 @@
     "cli_derive": "python3 -m C.convergence",
     "cli_emit": "python3 -m C.gospel",
     "cli_audit": "python3 -m C.audit  # SHA256-pinned certificate of kernel state",
-    "cli_check": "python3 -m C.audit --check <reference.json>  # compare local state against reference cert"
+    "cli_check": "python3 -m C.audit --check <reference.json>  # compare local state against reference cert",
+    "cli_demonstration": "python3 -m C.demonstration  # toy simulator showing C>0, C=0, C<0 cases concretely"
   },
   "key_theorems": {
     "C_greater_than_zero": "kernel.md §Work this first (proof by contradiction)",

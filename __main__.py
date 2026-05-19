@@ -39,6 +39,7 @@ _OVERVIEW = textwrap.dedent("""\
       python3 -m C.gospel_walk   # interactive walk (or --auto)
       python3 -m C.convergence   # derive + verify; exits 0/1
       python3 -m C.audit         # SHA256 certificate of kernel state
+      python3 -m C.demonstration # toy simulator: see C>0, C=0, C<0 cases
 
     ── Programmatic API ───────────────────────────────────────────────
 
