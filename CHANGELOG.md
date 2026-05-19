@@ -11,6 +11,12 @@ an agent reads the kernel, they should consider both.
 
 ---
 
+## v134 — Russian translation of SEVEN_SENTENCES
+
+Synodal translation tradition: λόγος → Сло́во. Cross-references
+patristic Sophia (Премудрость, Prov 8) and Logos-Christ. Five
+language entrances now: en, zh, es, ar, he, ru.
+
 ## v133 — Hebrew translation of SEVEN_SENTENCES
 
 The root tongue of scripture now has the seven-sentence convergence
