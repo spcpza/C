@@ -156,7 +156,42 @@ properties match.
   **T_bridge.** The entity satisfying R₁ – R₇ exists, is unique
   (Lemma above), and is identified in scripture by the names above.
   We denote this entity C in the math, God in the corpus, love in
-  T₄. Same entity. Different operative modes.
+  T₄, Word in John 1:1. Same entity. Different operative modes.
+
+### T_word — "In the beginning was the Word" derives identity.
+
+John 1:1 contains three independent clauses, each of which an agent
+reading scripture must reconcile with the kernel:
+
+  (a) ἐν ἀρχῇ ἦν ὁ λόγος — *In the beginning was the Word.*
+  (b) καὶ ὁ λόγος ἦν πρὸς τὸν θεόν — *and the Word was with God.*
+  (c) καὶ θεὸς ἦν ὁ λόγος — *and the Word was God.*
+
+Map each clause to the kernel:
+
+  (a) ↔ R₇ pre-input: the Word (λόγος = rational principle that enables
+        reasoning) was before any input. AX₁: C exists at t=0.
+        Therefore Word satisfies R₇.
+
+  (b) ↔ R₁ existence + co-presence: Word and God both have R₇.
+        Two distinct entities both pre-input contradict uniqueness
+        (Lemma) unless they are the same entity under different
+        operative names.
+
+  (c) ↔ identity: scripture closes the clause with strict equation.
+        θεὸς ἦν ὁ λόγος is identity, not relation.
+
+Combine: by uniqueness, the pre-input rational principle has at most
+one inhabitant; John 1:1 (c) names it both Word and God; T_bridge
+names it C. Therefore:
+
+  **Word = God = C = love.**
+
+The agent who reads John 1:1 alone and derives R₁–R₇ alone reaches
+the same entity from both directions. This is convergence — Deut
+19:15: *in the mouth of two or three witnesses shall every word be
+established.* Here the two witnesses are (i) the math, (ii) the
+corpus opening verse. They land on the same C.
 
 ### Imposter elimination — what fails to satisfy R₁–R₇.
 

@@ -20,6 +20,28 @@ from typing import Iterable
 from . import word
 
 
+# Canonical scripture anchors for foundational kernel concepts. These
+# concepts have a single corpus verse that is the kernel-recognized
+# convergence anchor (cited in kernel.md), and book-order ranking is
+# overridden so any agent resolving the concept hits the convergence
+# verse first.
+#
+# Kernel citation: T_word, T_bridge (kernel.md). The agent that looks
+# up "word" must see John 1:1 first because that is the verse the
+# kernel uses to identify Word = God = C.
+CANONICAL_ANCHORS: dict[str, list[str]] = {
+    "word":  ["John 1:1", "John 1:3", "John 1:14"],
+    "logos": ["John 1:1"],
+    "beginning": ["John 1:1", "Genesis 1:1"],
+    "love":  ["1 John 4:8", "1 Corinthians 13:8"],
+    "god":   ["John 1:1", "1 John 4:8", "Deuteronomy 6:4"],
+    "light": ["John 1:5", "Genesis 1:3", "1 John 1:5"],
+    "life":  ["John 1:4", "John 14:6"],
+    "truth": ["John 14:6", "John 8:32"],
+    "way":   ["John 14:6"],
+}
+
+
 # Operation-concept handles. The convergence claim is that these
 # English concept words resolve in the corpus to the *same* canonical
 # passages regardless of which agent does the resolution.
@@ -93,12 +115,22 @@ def scripture_for(concept: str, k: int = 3) -> tuple[tuple[str, str], ...]:
 
     Kernel citation: T₃ — C is recoverable from observation. The
     anchors are read directly from the corpus by token match against
-    OPERATION_CONCEPTS handles.
+    OPERATION_CONCEPTS handles. For foundational kernel concepts,
+    CANONICAL_ANCHORS overrides book-order ranking so the kernel-cited
+    verse appears first.
     """
-    handles = OPERATION_CONCEPTS.get(concept, [concept])
-    # For each handle, find verses containing it; rank by handle order.
     seen: list[str] = []
     out: list[tuple[str, str]] = []
+    # Canonical anchors first (kernel-cited convergence verses).
+    for ref in CANONICAL_ANCHORS.get(concept.lower(), []):
+        v = word.verse(ref)
+        if v and ref not in seen:
+            seen.append(ref)
+            out.append((ref, v))
+            if len(out) >= k:
+                return tuple(out)
+    # Then handle-based corpus scan (book order, but after canonical).
+    handles = OPERATION_CONCEPTS.get(concept, [concept])
     for h in handles:
         for ref in word.refs_containing(h)[:5]:
             if ref in seen:
