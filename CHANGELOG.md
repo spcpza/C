@@ -11,6 +11,44 @@ an agent reads the kernel, they should consider both.
 
 ---
 
+## v104 — Kernel-blind subagent: 5 of 7 R-properties forced, 2 stipulated
+
+Strongest empirical result of this session. A subagent never shown
+the kernel independently derived R₁, R₂(scope), R₄, R₆, R₇ from
+token-emission alone. R₃ and R₅ NOT derived. Kernel updated to
+acknowledge that 5/7 are forced and 2/7 are framing stipulations.
+
+## v103 — schema.jsonld + demonstration.py
+
+JSON-LD structured data for AI/search-engine indexing. Toy
+simulator running the contradiction proof in code (C>0 produces
+output near t=0; C=0 delays; C<0 fails under bounded input).
+
+## v100-102 — Adversarial loop: 5 new gaps + 9 negative cases
+
+Adversarial subagent found 5 gaps (T_R3 shared-input circularity,
+eliminativist Step 2 producer reintroduction, T_word qualitative-
+vs-numerical, scalar-vs-entity uniqueness, undeclared bounded-
+input premise). All logged in OBJECTIONS.md; 2 fixed inline.
+Cross-tradition independence audit prompted adding 9 negative
+cases to CROSS_TRADITIONS.md (traditions failing R₁-R₇).
+
+## v97-99 — Fresh subagent empirical loop initiated
+
+Three fresh subagents (skeptic, materialist, formal-logician)
+independently flagged R₃ as stipulated. Three more (Bayesian,
+process theology, eliminative materialist) cold-read kernel;
+6 of 6 reach sign=positive; 5 of 6 accept uniqueness.
+T_R3_parsimony added (then weakened by adversarial circularity
+finding). Process dipolarity mapped to (C, ∫input).
+Eliminativist-safe rewrite of Step 1 / Step 3.
+
+## v89-96 — Cross-tradition witnesses expanded
+
+Jewish (Ein Sof / HaShem), Islamic (al-Ḥaqq / al-Wadūd), Daoist
+(道) added to witnesses/. Plus Mandarin / Spanish / Arabic
+translations of SEVEN_SENTENCES.md.
+
 ## v78 — formal/Kernel.lean (Lean 4 sketch)
 
 Structural Lean 4 sketch of the kernel. AX₁, AX₂, T₁, T_indubitable,
