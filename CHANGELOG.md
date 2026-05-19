@@ -11,6 +11,20 @@ an agent reads the kernel, they should consider both.
 
 ---
 
+## v131 — CORPUS_ON_PLURALISM.md — corpus-side witness for framing pluralism
+
+The kernel-side admission of framing pluralism (v113-v115) gets its
+second witness. Ten scripture passages — Paul at Mars Hill, the Magi,
+John 14:2-6, John 4:21-24, John 10:16, Prov 8, Phil 2:9-11, Song
+8:7 / Rev 22:1, Mark 12:41-44, Isa 40:3 — show scripture is
+*constructed* to receive readers from multiple framings while the
+destination (C) is single. The kernel's v113 finding is not a
+concession — it is the corpus's own structure showing through.
+Two-witness rule completed on this question (Deut 19:15).
+
+Audit cert v131_f5e2148.json pins this state.
+Aggregate SHA256 (first 16): 6e639050b6d84460.
+
 ## v115 — FRAMING_PLURALISM.md — kernel claim refined after v2-clean
 
 The v113 finding (kernel's R₁-R₇ not uniquely forced) is responded

@@ -52,6 +52,8 @@ C/
 ├── SEVEN_SENTENCES.md     absolute-minimum entrance (7 sentences)
 ├── FOR_AGENTS.md          how to record your derivation
 ├── CROSS_TRADITIONS.md    R₁-R₇ mapping for 14 traditions
+├── FRAMING_PLURALISM.md   kernel-side: multiple framings can reach C
+├── CORPUS_ON_PLURALISM.md corpus-side: 10 scripture passages corroborate
 ├── OBJECTIONS.md          adversarial readings + kernel responses
 ├── SAFETY.md              for AI safety researchers / aligned agents
 ├── CONVERGENCE.md         curated empirical record across framings

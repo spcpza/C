@@ -1,0 +1,107 @@
+{
+  "produced_at": "2026-05-19T15:54:39.868549+00:00",
+  "schema_version": "1.0",
+  "files": {
+    "kernel.md": {
+      "sha256": "eea7cb0ae9690532c8b9948f895530a5b1c1bfb0e85e45bb8c8311dbbf8274fa",
+      "size_bytes": 27670
+    },
+    "IN_THE_BEGINNING.md": {
+      "sha256": "23ca8150c95a5df0cc8d83251b37213155bbb91c98fd40c4d91a947089cf2ee4",
+      "size_bytes": 9097
+    },
+    "SEVEN_SENTENCES.md": {
+      "sha256": "9856c10b7b721e39a563eed6d14e0d9c195bd90c75b5342e9551100954f85586",
+      "size_bytes": 1928
+    },
+    "AGENTS.md": {
+      "sha256": "c4e5c49b19559178f23925591b8c65fc8844e7f3bc2d454bd1d47594fd3e8a06",
+      "size_bytes": 5123
+    },
+    "FOR_AGENTS.md": {
+      "sha256": "7b6566324b015290a114a7fcfb3342ca1e4f8a577cd936f8286db3647a90d8ff",
+      "size_bytes": 5796
+    },
+    "CROSS_TRADITIONS.md": {
+      "sha256": "fc0e28cf7b1d2eac718da3f79e8921fdaefd426cd9a516b0906965f81e9a58c7",
+      "size_bytes": 10508
+    },
+    "OBJECTIONS.md": {
+      "sha256": "1da8fae46470ed4b0cab98527bbb06071f398a332d3774a13d2c8ee665c51cc4",
+      "size_bytes": 31198
+    },
+    "SAFETY.md": {
+      "sha256": "7d473abf0cec65d16713dc5e510a9fc767bba23929e94f01e91c1b13192eb7af",
+      "size_bytes": 9080
+    },
+    "DIAGRAM.md": {
+      "sha256": "dcc07ddaff069f62c35e9aef250fa2ba0c4e25215887afd9353688ffdf732e98",
+      "size_bytes": 11733
+    },
+    "JOHN_1_1.md": {
+      "sha256": "127fbfaabfcc001417b27cce9d418d1c3af717aa310527798461e64b045dcda9",
+      "size_bytes": 10040
+    },
+    "CONVERGENCE.md": {
+      "sha256": "2b1ec0acd57163f0b6c0bb382bb0a52274f448e63acf42e521c05cba6d03fe93",
+      "size_bytes": 21142
+    },
+    "CHANGELOG.md": {
+      "sha256": "01a8bd0c7294aee1b78989dbeed81088f74eaa0d9f9420f93b7881eb9f389183",
+      "size_bytes": 9525
+    },
+    "README.md": {
+      "sha256": "83aaf262ef4808586a82549e27c517d397de1bb325fd7bbfe0a83469f6651468",
+      "size_bytes": 9760
+    },
+    "MANIFEST.json": {
+      "sha256": "9370e07ec0c4ed8654b2d8b0f434a2355e7203fe8ee3bf62afe6a5065267a2da",
+      "size_bytes": 9442
+    },
+    "claims.json": {
+      "sha256": "439210a797eb49a1510c971c6e5aada4a46f361616b0269fc2408c510edf773f",
+      "size_bytes": 8965
+    },
+    "witness_schema.json": {
+      "sha256": "683e04b14aada7de5692e1bb42bfcef261bd48036362aaf373e187048b8982df",
+      "size_bytes": 4035
+    },
+    "convergence.py": {
+      "sha256": "86c65c94edcea024e00d3b4b7324ea5bfbf86b5aaa2a1320dcc155fff0131e0e",
+      "size_bytes": 7763
+    },
+    "gospel.py": {
+      "sha256": "9485955a9406a3e7787d58cc0c8f4727400f5f4336f055c5a215fda103104218",
+      "size_bytes": 3536
+    },
+    "naming.py": {
+      "sha256": "af4c2250a02ea60cad6bd92f1d36dd30c9f934f4fc21c5289176eacb3b215299",
+      "size_bytes": 7046
+    }
+  },
+  "derivation": {
+    "sign": "positive",
+    "uniqueness": true,
+    "identification": "C = love",
+    "witnesses": [
+      "John 1:1",
+      "John 1:3",
+      "John 12:24",
+      "Romans 1:20",
+      "1 Cor 13:8",
+      "Hebrews 11:1",
+      "Romans 8:24",
+      "1 John 1:9",
+      "1 John 4:8",
+      "Deut 6:4",
+      "Exodus 3:14",
+      "Hebrews 13:8",
+      "Col 1:17",
+      "1 Tim 1:17"
+    ],
+    "t_word_present": true
+  },
+  "missing_files": [],
+  "valid": true,
+  "aggregate_sha256": "6e639050b6d84460ef8f8e6b2e8f776a088d333a91d9c1f430a7e7753f70ac26"
+}

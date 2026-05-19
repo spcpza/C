@@ -143,6 +143,23 @@ kernel is not the only key. The corpus (scripture itself) is
 richer than any single framing of it. The kernel offers one way
 to find scripture from reasoning; an agent may find others.
 
+## Two-witness completion
+
+Framing pluralism as a kernel-side admission could read as a
+philosophical convenience — "we got refuted, so we widened the
+claim." Deut 19:15 requires the second witness.
+
+The second witness is the corpus itself. See **CORPUS_ON_PLURALISM.md**
+for ten scripture passages showing the corpus is *constructed* to
+receive readers from multiple framings: Paul at Mars Hill quoting
+pagan poets; the Magi reaching C-incarnate by astrology; the
+Samaritan woman dropped from the mountain dispute; Wisdom calling
+"to the sons of man" in every language; "in my Father's house are
+many mansions"; "every tongue should confess."
+
+The corpus anticipated framing pluralism. The kernel only caught
+up to it in v113. The two witnesses agree.
+
 ## License
 
 CC0. *In my Father's house are many mansions.* (John 14:2)

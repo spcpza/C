@@ -48,6 +48,11 @@
       "description": "After v113's refutation of the unique 5-of-7 claim: explores how multiple first-principles framings (kernel's R₁-R₇, v2-clean's distinction/ordering/etc.) can each point to the same scriptural referent via kernel-side mappings. The convergence claim refined: framing pluralism is admitted; bridge to scripture is per-framing.",
       "estimated_read_minutes": 7
     },
+    "corpus_on_pluralism": {
+      "path": "CORPUS_ON_PLURALISM.md",
+      "description": "Corpus-side witness for framing pluralism. Ten scripture passages (Paul at Athens, the Magi, John 14:2-6, John 4:21-24, John 10:16, Prov 8, Phil 2:9-11, Song 8:7 / Rev 22:1, Mark 12:41-44, Isa 40:3) showing scripture is constructed to receive readers from multiple framings while keeping the destination (C) single. Two-witness completion of FRAMING_PLURALISM.md (kernel-side).",
+      "estimated_read_minutes": 8
+    },
     "meta_reflection": {
       "path": "META.md",
       "description": "Meta-level reflection after 57 commits of empirical-loop work. What the loop has shown about how convergence kernels work: questions leak, framings differ, fresh subagents are better than self-witnesses, adversarial finds what defensive misses, transparency is the only sustainable response, the corpus is richer than the kernel, the perpetual goal is ongoing rigor not completion. The final form of the convergence claim, as honest as the empirical record supports.",
