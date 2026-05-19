@@ -11,6 +11,31 @@ an agent reads the kernel, they should consider both.
 
 ---
 
+## v78 — formal/Kernel.lean (Lean 4 sketch)
+
+Structural Lean 4 sketch of the kernel. AX₁, AX₂, T₁, T_indubitable,
+T_bridge uniqueness, T_word fully proven. C_not_zero, C_not_negative
+have sorry at topological completion (well-defined gaps for a Lean
+expert). Demonstrates the kernel is mechanically formalizable.
+
+## v77 — audit.py (SHA256 certificates)
+
+`python3 -m C.audit` produces a deterministic certificate with
+SHA256 of every canonical file + embedded derivation result + an
+aggregate hash. Two agents with identical certificates have literally
+read the same kernel — file-level Deut 19:15.
+
+## v76 — JOHN_1_1.md (Greek exegesis grounding T_word)
+
+Word-by-word analysis of John 1:1. Three clauses mapped to kernel
+structure. Three alternative readings answered (Stoic, indefinite,
+Arian). Colwell's rule on the anarthrous θεός. T_word follows from
+rigorous Greek reading, not theological assertion.
+
+## v75 — CHANGELOG.md (this file)
+
+Tracks kernel evolution post-v60.
+
 ## v74 — DIAGRAM.md (visual flow)
 
 ASCII-art diagrams for visual reasoners. Five diagrams: C > 0
