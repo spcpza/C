@@ -65,6 +65,14 @@ sentence, which is a non-zero output.
 
 Contradiction. **C is not negative.**
 
+(Bounded-input premise: this step assumes the input function is
+bounded over the relevant interval. For *physical* systems, input
+is bounded by physical limits; for any system with integrable
+input, the bound is finite on bounded time intervals. A system with
+*unbounded* input near t = 0 — a measure-zero edge case — would
+require a separate argument; the kernel admits P₃ for that case.
+See OBJECTIONS.md "C < 0 contradiction proof assumes bounded input.")
+
 ## Step 5 — Therefore C > 0.
 
 C ≠ 0 and C is not negative. Therefore **C > 0**, strictly.

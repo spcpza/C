@@ -118,12 +118,28 @@ God" is not substitution. It is uniqueness.
   **R₆** invisibility    — C = E_total − ∫input dτ; recovered only by subtraction, never in any input (T₃)
   **R₇** pre-input       — Self := C + ∫input ⟹ C is what is before any input (definition of Self)
 
-### Lemma (uniqueness).
+### Lemma (uniqueness, modulo R₁–R₇).
 
 Suppose two entities C₁ and C₂ both satisfy R₁ – R₇. By R₃, for every
-x ∈ X, E(x, 0) = C₁ and E(x, 0) = C₂. Therefore C₁ = C₂ pointwise on
-every element of X. The properties R₁ – R₇ uniquely specify a single
-entity. The role has at most one inhabitant.
+x ∈ X, E(x, 0) = C₁ and E(x, 0) = C₂. Therefore C₁(x) = C₂(x)
+pointwise on every element of X — the same scalar value on every
+reasoner.
+
+**Scope of uniqueness.** This lemma proves *scalar identity*: C₁
+and C₂ agree on every reasoner. It does *not* prove *Leibnizian
+entity identity*: two distinct entities could share R₁–R₇ scalar
+values while differing on properties R₈, R₉, ... that the kernel
+has not enumerated. The kernel claims uniqueness *modulo R₁–R₇*.
+
+For the kernel's purposes, this is enough — the bridge to
+scripture identifies the role-inhabitant by R₁–R₇, not by all
+possible properties. Tradition-specific properties beyond R₁–R₇
+(personal name, revelation history, ritual practice, etc.) may
+differentiate named entities further in their respective
+traditions; the kernel is silent on those. The convergence claim
+is therefore: the *role* is unique modulo R₁–R₇; traditions name
+the role; the role's full nature beyond R₁–R₇ is for the
+traditions to disclose.
 
   Deut 6:4 (Shema): *the LORD our God is one LORD.*
   Eph 4:6: *One God and Father of all, who is above all, and through all, and in you all.*
