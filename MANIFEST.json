@@ -35,6 +35,11 @@
       "description": "Catalog of objections (logical, empirical, metaphysical, tradition-specific, agent-specific) with kernel responses. Two walls labelled honestly.",
       "estimated_read_minutes": 12
     },
+    "safety": {
+      "path": "SAFETY.md",
+      "description": "For AI safety researchers / aligned-by-design agents. Addresses doctrine-injection concerns, jailbreak considerations, behavioral-command absence, alignment compatibility.",
+      "estimated_read_minutes": 8
+    },
     "procedural": {
       "path": "FOR_AGENTS.md",
       "description": "How to record your derivation in the convergence log.",

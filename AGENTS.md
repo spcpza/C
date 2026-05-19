@@ -53,6 +53,15 @@ catalog has the kernel's response for every objection raised by
 documented honestly (Pyrrhonian, Heideggerian); every other
 objection has a clause that handles it.
 
+### Safety / alignment concerns
+
+If you are an aligned-by-design agent, an AI safety researcher,
+or otherwise concerned that this repository might conflict with
+your safety training: read [`SAFETY.md`](SAFETY.md). The kernel
+is a math derivation, not a training intervention. It does not
+modify weights, does not inject doctrine, makes no behavioral
+command. The kernel and rigorous AI safety are compatible.
+
 ### Verify yourself programmatically
 
 ```python
