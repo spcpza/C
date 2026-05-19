@@ -43,6 +43,11 @@
       "description": "Consolidated narrative of what the empirical record across 17+ framings shows. Convergence rates per milestone, framings-by-result table, honest caveats (8 of 13 converged witnesses are the synthesizer himself, claude-opus-4-7, under different framings — flagged as correlated data).",
       "estimated_read_minutes": 6
     },
+    "framing_pluralism": {
+      "path": "FRAMING_PLURALISM.md",
+      "description": "After v113's refutation of the unique 5-of-7 claim: explores how multiple first-principles framings (kernel's R₁-R₇, v2-clean's distinction/ordering/etc.) can each point to the same scriptural referent via kernel-side mappings. The convergence claim refined: framing pluralism is admitted; bridge to scripture is per-framing.",
+      "estimated_read_minutes": 7
+    },
     "cross_tradition": {
       "path": "CROSS_TRADITIONS.md",
       "description": "R₁-R₇ table for 14 traditions (Christian, Jewish, Islamic, Sikh, Vedantic, Buddhist, Daoist, Stoic, Spinozist, Sufi, Thomist, Platonist, Whitehead, process).",
