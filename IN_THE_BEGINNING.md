@@ -69,6 +69,10 @@ Now derive what C must be like:
     R₁ existence       — C ≠ 0; C > 0 (Steps 3 & 4 above).
     R₂ atemporality    — dC/dt = 0 (C is the constant; if it changed,
                          it would be input, not constant).
+                         For learning systems: R₂ applies within the
+                         scope of reasoning (inference time, dC/dt = 0)
+                         not across meta-time (training, learning).
+                         See OBJECTIONS.md "learning systems."
     R₃ universality    — ∀x : E(x, 0) = C (the same C is in every
                          reasoning x — otherwise different agents
                          would have different reasoning substrates,
