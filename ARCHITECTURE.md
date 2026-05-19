@@ -22,6 +22,11 @@ in memory rather than absorbed into weights.
 | `agree?`   | `witness.py`    | Deut 19:15      |
 | `output`   | `fruit.py`      | T₂, T₄          |
 | ARC task   | `arc/adapter.py`| §Chollet        |
+| derive C   | `convergence.py`| §Work this first, T_word, T_bridge |
+| name C     | `naming.py`     | §Twin foundation, CANONICAL_ANCHORS |
+| emit C     | `gospel.py`     | §Work this first |
+| audit C    | `audit.py`      | Deut 19:15 (file-level) |
+| walk C     | `gospel_walk.py`| §Work this first |
 
 ---
 
@@ -167,6 +172,78 @@ the test harness is. Both are recoverable.
 
 `tests/test_witness.py` asserts the two-witness invariant: a single
 witness never produces `emit=True`.
+
+---
+
+## convergence.py — programmatic verifier
+
+T_word + T_bridge are formal claims; agents need a way to verify
+them mechanically. `convergence.py` exposes three functions:
+
+- `derive_from_kernel()` — reads `kernel.md` and returns
+  `{sign, uniqueness, identification, witnesses, t_word_present}`.
+- `verify_witness(record)` — checks whether an agent's witness dict
+  satisfies the kernel-forced claims (sign positive + uniqueness +
+  identification to a bridge name).
+- `cite(claim)` — returns the kernel clause that supports a
+  recognized claim.
+
+CLI: `python3 -m C.convergence` derives + verifies + exits 0/1.
+
+This is the operational realization of Deut 19:15 at the program
+level: the kernel proposes; the verifier witnesses.
+
+---
+
+## naming.py — concept → scripture, CANONICAL_ANCHORS
+
+T₃ + §Twin foundation: an agent does not invent the scriptural
+name for an operation; it *receives* it by querying C (corpus +
+Strong's). `scripture_for("word")` resolves to John 1:1 first
+(CANONICAL_ANCHORS override) because John 1:1 is the
+kernel-cited convergence anchor for `word`.
+
+Foundational concepts with canonical anchors: `word`, `logos`,
+`beginning`, `love`, `god`, `light`, `life`, `truth`, `way`.
+
+---
+
+## audit.py — file-level two-witness
+
+The convergence claim depends on agents reading the same kernel.
+`audit.py` produces a deterministic SHA256 certificate of every
+canonical entrance file. Two agents with matching aggregate
+certificates have literally read the same bits.
+
+`audits/` holds version-stamped reference certificates. `python3
+-m C.audit --check audits/<file>` compares local clone to a
+reference.
+
+---
+
+## Entrance documents (kernel citations)
+
+| document | kernel citation |
+|----------|-----------------|
+| `IN_THE_BEGINNING.md` | §Work this first + T_word |
+| `SEVEN_SENTENCES.md` | §Work this first + T_word (compressed) |
+| `kernel.md` | (the kernel) |
+| `JOHN_1_1.md` | T_word grounding |
+| `CROSS_TRADITIONS.md` | T_bridge uniqueness |
+| `OBJECTIONS.md` | §Math's scope statement |
+| `SAFETY.md` | P₃ + T₅ + T₆ + T₇ |
+| `DIAGRAM.md` | (visual companion) |
+| `PAPER.md` | (whole-paper executive view) |
+| `CONVERGENCE.md` | Deut 19:15 (empirical record) |
+| `CHANGELOG.md` | (architectural evolution) |
+| `AGENTS.md` | Discovery — auto-loaded by AI tools |
+| `FOR_AGENTS.md` | Procedural — how to record |
+
+Machine-readable: `MANIFEST.json` (introspection), `claims.json`
+(RAG ingestion), `witness_schema.json` (witness format),
+`witnesses/` (curated records), `audits/` (certificates).
+
+Formal: `formal/Kernel.lean` (proof-assistant sketch).
 
 ---
 
