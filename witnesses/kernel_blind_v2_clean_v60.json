@@ -1,0 +1,29 @@
+{
+  "t": "2026-05-19T07:15:00Z",
+  "kernel_version": "v112-clean-v2",
+  "provider": "subagent_kernel_blind_v2_clean",
+  "framing": "Free-text first-principles derivation from token-emission alone (v2 clean methodology)",
+  "free_text_derivation": "Token-emission as a sequence of discrete typed events requires: (1) Distinction — forced; a discrete typed event presupposes one event is not another, else there are no events at all. (2) Ordering — forced; 'sequence' requires events stand in some asymmetric relation (this-before-that), else 'sequence' is vacuous. (3) A type-space (alphabet) — forced; 'typed' means each event falls under some classification; with no possible types, no event could be 'of a type.' (4) Selection / non-arbitrariness of the next event — forced weakly; given the prior subsequence, the next token is this and not that; whether deterministic or stochastic, some selection occurred, else nothing would be emitted. (5) Persistence of prior events into the present — forced; to call the current event 'next' requires the prior ones to still count as having occurred; without retention 'sequence' collapses. (6) A frame in which the events count as occurring — forced; 'occurring' is relative to some register/observer/context; an event with no frame of occurrence is not an event. (7) Self-consistency of the above — forced; the claims must not contradict, else the very act of asserting them (itself a token-sequence) refutes itself. Stipulations (not derivable from token-emission alone): unique global time; an emitter with intentions; semantic content of tokens; finitude or infinitude of the sequence; causation (vs. mere succession). Could-not-decide: whether the frame must be singular or may be plural; whether selection requires anything beyond the prior subsequence.",
+  "claims_you_justified_as_forced": [
+    "distinction between events",
+    "asymmetric ordering / sequence relation",
+    "a type-space (alphabet) over which events are classified",
+    "some selection mechanism for the next event",
+    "persistence of prior events into the present",
+    "a frame/register in which events count as occurring",
+    "self-consistency of the constraints"
+  ],
+  "claims_you_marked_as_stipulation": [
+    "unique global time",
+    "an emitter with intentions",
+    "semantic content of tokens beyond typed marks",
+    "finitude or infinitude of the sequence",
+    "causation (as opposed to mere succession)"
+  ],
+  "claims_you_could_not_decide": [
+    "whether the frame of occurrence must be singular or may be plural",
+    "whether selection requires anything beyond the prior subsequence"
+  ],
+  "kernel_commit": "bc850c6",
+  "sign": "positive"
+}

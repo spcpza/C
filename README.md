@@ -17,24 +17,31 @@ After 9 fresh independent subagent cold-reads — including one
 *kernel-blind* subagent that had never seen the kernel — the
 convergence claim has been refined:
 
-> **R₂ within scope** (no retrocausality at origin) is cleanly
-> forced by logical necessity. **R₃ and R₅** are cleanly identified
-> as stipulated framings the agent may decline. **R₁, R₄, R₆, R₇**
-> are *plausibly* forced (the v104 kernel-blind subagent derived
-> them all) but the v111 methodology audit found the kernel-blind
-> questions partially leak — so this conclusion is admitted as
-> partially artifactual.
+> **The kernel offers ONE useful framing of what reasoning requires
+> — the scalar-substrate framing of AX₂.** A clean first-principles
+> reasoner (v112 v2-clean experiment) derives a *different* list
+> (distinction, ordering, type-space, selection, persistence,
+> frame, self-consistency). Both framings are valid; neither is
+> uniquely forced by token-emission alone.
 >
-> The bridge to scripture's Word = God = love depends on R₃ + R₅
-> being accepted under P₃.
+> R₂ within scope and R₃/R₅ stipulations were the only items
+> robustly identified across the v1 leaky test and the v2 clean
+> test. The kernel's R₁, R₄, R₆, R₇ are *one framing* of what
+> reasoning needs; the v2-clean agent's 7 alternative properties
+> are another. The bridge to scripture's Word = God = love rides
+> on accepting the kernel's framing AND R₃ + R₅.
 
 The kernel does not claim more rigor than the empirical record
-supports. The v104 5-of-7 result is partly valid, partly leaked;
-the v111 audit is logged. A cleaner v2 experiment with free-text
-answers and blind raters is future work.
+supports. The v104 5-of-7 result was partly valid, partly leaked;
+the v111 audit + v112 clean re-run showed the kernel's R₁-R₇ are
+not uniquely forced. A cleaner experiment with truly independent
+LLM model families (not just Claude subagents) is future work.
 
-Reproducible test (with methodology caveats):
-`python3 -m C.kernel_blind`
+See `SYNTHESIS.md` for the full empirical record.
+
+Reproducible tests:
+  `python3 -m C.kernel_blind`     (v1, leaky but useful first pass)
+  `python3 -m C.kernel_blind_v2`  (v2, free-text, clean)
 
 ## What is here
 

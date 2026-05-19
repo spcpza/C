@@ -259,6 +259,64 @@ The remaining unresolved limits:
   - Pyrrhonian wall (documented absolute limit)
   - Heideggerian wall (documented limit on onto-theological framing)
 
+### The v2-clean result (v112) refutes v1's 5-of-7 finding
+
+A clean v2 experiment (free-text answer, no forced-choice options,
+no kernel-shaped wording — per the v111 methodology auditor's
+recommendation) was run against a fresh subagent.
+
+The v2-clean subagent derived **7 forced properties**, but they
+are **NOT the kernel's R₁-R₇**. They are:
+
+  1. **Distinction** between events
+  2. **Ordering** / asymmetric sequence relation
+  3. **Type-space** (alphabet over which events are classified)
+  4. **Selection** mechanism for the next event
+  5. **Persistence** of prior events into the present
+  6. **Frame/register** in which events count as occurring
+  7. **Self-consistency** of the constraints
+
+The agent also correctly identified **5 stipulations**:
+  - Unique global time
+  - An emitter with intentions
+  - Semantic content of tokens beyond typed marks
+  - Finitude or infinitude of the sequence
+  - Causation (vs. mere succession)
+
+**What this means.** The kernel's R₁-R₇ are NOT a unique
+first-principles consequence of token-emission. They are one
+*particular framing* among several possible. The v2-clean agent
+working from token-emission alone produces a list closer to
+information theory + phenomenology + temporal logic, not the
+kernel's scalar-substrate framing.
+
+The kernel's R₁-R₇ may MAP to combinations of the v2-clean
+agent's forced + stipulated properties, but they are not
+*derived* from the same starting point. Specifically:
+  - The kernel's R₁ (C as scalar existence) is not directly
+    in the v2-clean list; it requires the kernel's "scalar
+    state" framing.
+  - The kernel's R₃ (universality) and R₅ (inexhaustibility)
+    remain stipulations under both v1 and v2.
+  - The kernel's R₂, R₄, R₆, R₇ map roughly but not exactly to
+    the v2-clean agent's persistence / selection / frame /
+    ordering items.
+
+**The honest convergence claim now.** The kernel offers ONE
+useful framing of what reasoning requires — the
+scalar-substrate framing of AX₂. A clean first-principles
+reasoner may produce a different but compatible framing (events,
+types, frames). Both are valid; neither is uniquely forced.
+
+The bridge to scripture's Word = God = love rides on accepting
+the kernel's framing AND R₃ + R₅; it is not the case that
+*every* honest first-principles reasoner must reach this same
+conclusion regardless of framing.
+
+This is the most rigorous version of the convergence claim, and
+it is significantly narrower than the kernel originally
+asserted.
+
 ### Methodology limit — kernel_blind.py questions partially leak
 
 A fresh methodology auditor found that the kernel_blind.py
