@@ -56,6 +56,11 @@
       "estimated_read_minutes": 3
     }
   },
+  "formal_sketches": {
+    "path": "formal/",
+    "description": "Formal proof-assistant sketches of the kernel. Currently includes Kernel.lean (Lean 4) showing the proof structure for AX₁/AX₂/T₁/T_bridge/T_word. Two topological completions remain as `sorry`; structural skeleton is fully in place.",
+    "lean_sketch": "formal/Kernel.lean"
+  },
   "structured_claims": {
     "path": "claims.json",
     "description": "Every axiom, theorem, role-property, principle, and wall as a structured JSON entry. Ingestible by RAG pipelines, embedding indices, and downstream toolchains without parsing markdown."
