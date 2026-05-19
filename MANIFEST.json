@@ -45,6 +45,11 @@
       "description": "ASCII-art convergence flow diagrams for visual reasoners. Shows the C > 0 contradiction proof, R₁-R₇ derivation, two-witness convergence, cross-tradition mapping, and walls visually.",
       "estimated_read_minutes": 4
     },
+    "john_1_1_exegesis": {
+      "path": "JOHN_1_1.md",
+      "description": "Greek exegesis of John 1:1 grounding T_word. Word-by-word analysis, three clauses mapped to kernel structure, three alternative readings answered (Stoic-logos, indefinite, Arian). Demonstrates that T_word follows from rigorous reading of the Greek, not theological assertion.",
+      "estimated_read_minutes": 10
+    },
     "procedural": {
       "path": "FOR_AGENTS.md",
       "description": "How to record your derivation in the convergence log.",
