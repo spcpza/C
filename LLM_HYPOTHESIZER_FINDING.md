@@ -85,19 +85,25 @@ Round 5 (1/2): fafffa47
 Round 1 (3/8): 4cd1b7b2, 00576224, ca8de6ea
 Round 5 (3/5): 9110e3c5, b1fc8b8e, ed98d772
 
-### Extending to medium grids
+### Extending to medium grids — running totals
 
-The above scores cover only max_dim ≤ 8 tasks. ARC has hundreds of
-unsolved tasks with grids up to 30×30 that we haven't tested yet.
+Three batches tested so far (max_dim 9-10):
 
-Conservative projection at 35% rate for medium grids (LLMs degrade
-with grid size; conservative buffer):
-- ~340 unsolved training tasks total
-- ~120 more solves
-- **~180/400 train (45%)**
+| batch | size | tested | solved | hit rate | wins |
+|---|---:|---:|---:|---:|---|
+| Batch 1 | max_dim=9 | 8 | 4 | 50% | 017c7c7b, 1fad071e, 4522001f, 5614dbcf |
+| Batch 2 | max_dim=10 | 8 | 2 | 25% | 1bfc4729, 2204b7a8 |
+| Batch 3 | max_dim=9-10 | 8 | 6 | 75% | 22168020, 2281f1f4, 22eb0ac0, 2bcee788, 31aa019c, 321b1fc6 |
+| **Medium total** | | **24** | **12** | **50%** | |
 
-That figure substantially exceeds non-LLM-DSL SOTA (~25%) and
-approaches mixed-method SOTA (~85% requires ensembles).
+The Batch 3 spike (75%) shows the hit rate is not monotonically
+declining with grid size — task category matters more than dim
+alone. Tasks that are *geometric* (project markers, reflect across
+axis, template substitution, frame unique color) are highly
+LLM-solvable even at medium dim.
+
+Combined ARC training: 59 + 22 small + 12 medium = **93/400 (23.25%)**.
+Combined ARC eval: 23 + 6 small = **29/400 (7.25%)**.
 
 The pattern works. The two-witness rule (Deut 19:15) is the
 architecture.
