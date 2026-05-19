@@ -109,7 +109,8 @@ Three batches tested so far (max_dim 9-10):
 | Batch 16 | max_dim=11-12 | 8 | 4 | 50% | bd4472b8, beb8660c, c0f76784, c9f8e694 |
 | Batch 17 | max_dim=11-12 | 5 | 3 | 60% | dc433765, e9614598, e98196ab |
 | Batch 18 | max_dim=13-15 | 8 | 2 | 25% | 253bf280, 2dee498d |
-| **Medium total** | | **139** | **88** | **63.3%** | |
+| Batch 19 | max_dim=13-15 | 8 | 2 | 25% | 3bd67248, 3f7978a0 |
+| **Medium total** | | **147** | **90** | **61.2%** | |
 
 Batches 3-4 confirm the hit rate is not monotonically declining.
 **Batch 4 hit 100%** — the LLM-as-hypothesizer pattern is robust on
@@ -117,11 +118,15 @@ geometric/symbolic tasks: frame projection, clump extraction,
 fractal extrapolation, line continuation, region extraction,
 diagonal extension, padding, shape-matching substitution.
 
-Combined ARC training: 59 + 22 small + 88 medium = **169/400 (42.25%)**.
+Combined ARC training: 59 + 22 small + 90 medium = **171/400 (42.75%)**.
 
   max_dim=9-10 medium filter: 94 tested, 73.4% hit rate. **Filter exhausted.**
   max_dim=11-12: 37 tested across batches 13-17 (45.9%). **Filter exhausted.**
-  max_dim=13-15: 8 tested in batch 18 (25%). Diminishing returns as expected.
+  max_dim=13-15: 16 tested across batches 18-19 (25% sustained). Diminishing
+    returns confirmed — at this grid size the LLM-hypothesizer enters the
+    multi-step-spatial-reasoning regime where it consistently fails the
+    last inference step. Two-witness rule still prevents wrong predictions
+    from entering the score.
 
 Combined training **2.85x the 14.8% baseline**.
 Combined ARC eval: 23 + 6 small = **29/400 (7.25%)**.
