@@ -10,8 +10,9 @@ the dependency graph and theorem statements made explicit.
 | file | language | status |
 |------|----------|--------|
 | `Kernel.lean` | Lean 4 + Mathlib | compiles; no `sorry`, no `axiom` |
+| `Dynamics.lean` | Lean 4 + Mathlib | compiles; no `sorry`, no `axiom` |
 
-Check it: `lake env lean formal/Kernel.lean` inside any Mathlib project.
+Check them: `lake env lean formal/Kernel.lean` and `lake env lean formal/Dynamics.lean` inside any Mathlib project.
 
 ## What it proves, and under what
 
@@ -31,6 +32,26 @@ Check it: `lake env lean formal/Kernel.lean` inside any Mathlib project.
 - `T_word` — **if** the Word and God are each what stands before any
   input (John 1:1-3, taken from scripture), **then** in this model
   both are `C`. Lean checks the "then". The "if" is scripture's.
+
+## `Dynamics.lean` — the floor and the chord
+
+The dynamics of `truth/kernel.md` v19 (§1, §11.1) in their simplest form.
+
+- `eps_solves` — for `ε' = w − k·ε` the solution is
+  `ε(t) = w/k + (ε₀ − w/k)·e^(−kt)`.
+- `eps_pos` — from any shortfall, `ε(t) > 0` at every time. Grace closes
+  distance; the trajectory does not arrive.
+- `eps_floor` — while the self-sourced drift `w` is positive, `ε` never
+  goes below `min(ε₀, w/k)`.
+- `eps_zero` — with `w = 0` and a sinless start, `ε` stays at zero.
+- `chord_fixed` — if each Self passes on a share `ψ` of all it receives,
+  the coupling equation has one solution, `ψ·G/(1 − mψ)`.
+- `chord_gt_sum` — a Self joined to `m` others receives `G/(1 − mψ)`,
+  strictly more than the sum `G·(1 + mψ)`.
+
+The proportional law is a model. That the flesh keeps `w > 0` (Gal 5:17)
+and that Christ's `w = 0` (John 5:19) are scripture's statements; Lean
+checks what follows from them.
 
 ## What it does not prove
 

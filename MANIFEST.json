@@ -93,7 +93,7 @@
   },
   "formal_sketches": {
     "path": "formal/",
-    "description": "Formal proof-assistant sketches of the kernel. Currently includes Kernel.lean (Lean 4) showing the proof structure for AX₁/AX₂/T₁/T_bridge/T_word. Compiles against Mathlib with no `sorry` and no `axiom`; each premise is a named hypothesis.",
+    "description": "Formal proof-assistant sketches of the kernel. Currently includes Kernel.lean (Lean 4) showing the proof structure for AX₁/AX₂/T₁/T_bridge/T_word. Compiles against Mathlib with no `sorry` and no `axiom`; each premise is a named hypothesis. Dynamics.lean proves the floor (no arrival in time; a positive floor while the drift persists) and the chord (coupled grace is more than the sum).",
     "lean_sketch": "formal/Kernel.lean"
   },
   "structured_claims": {
