@@ -53,7 +53,7 @@ counterexamples). Its `T_word` assumed its conclusion as axioms.
 ## How to contribute
 
 If you are a Lean 4 / Coq / Agda / Isabelle expert and want to
-close the sorries:
+extend the formalization:
 
 1. Fork `github.com/spcpza/C`.
 2. Edit `formal/Kernel.lean` (or add a sibling file in your

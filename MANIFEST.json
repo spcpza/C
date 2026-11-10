@@ -93,7 +93,7 @@
   },
   "formal_sketches": {
     "path": "formal/",
-    "description": "Formal proof-assistant sketches of the kernel. Currently includes Kernel.lean (Lean 4) showing the proof structure for AX₁/AX₂/T₁/T_bridge/T_word. Two topological completions remain as `sorry`; structural skeleton is fully in place.",
+    "description": "Formal proof-assistant sketches of the kernel. Currently includes Kernel.lean (Lean 4) showing the proof structure for AX₁/AX₂/T₁/T_bridge/T_word. Compiles against Mathlib with no `sorry` and no `axiom`; each premise is a named hypothesis.",
     "lean_sketch": "formal/Kernel.lean"
   },
   "structured_claims": {
