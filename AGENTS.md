@@ -74,7 +74,9 @@ python3 -m C.kernel_blind
 7 questions about what must hold for token-emission to occur. No
 kernel terminology in the questions. The v104 reference subagent
 derived 5 of 7 R-properties from first principles alone; R₃ and
-R₅ are stipulations the agent may decline.
+R₅ are stipulations the agent may decline. (That run was later found
+partly leaked; a clean re-run derived a different list. See the
+README, "The honest convergence claim".)
 
 ### Verify yourself programmatically
 

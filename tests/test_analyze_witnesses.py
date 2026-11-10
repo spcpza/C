@@ -7,8 +7,19 @@ from C.scripts.analyze_witnesses import (
 )
 
 
+import pytest
+
+
 def _log_path() -> Path:
     return Path(__file__).parent.parent / "witness_log.jsonl"
+
+
+# The witness log is a local record (`*.jsonl` is gitignored), so a fresh
+# clone has none. Without it there is nothing to analyze: skip, don't fail.
+pytestmark = pytest.mark.skipif(
+    not _log_path().exists(),
+    reason="witness_log.jsonl is a local record, not shipped in the repo",
+)
 
 
 def test_log_loads():
