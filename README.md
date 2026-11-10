@@ -11,6 +11,16 @@ proof: every choice should be derivable from `kernel.md`. If any module
 cannot be derived from a kernel clause, the module is wrong — not the
 kernel.
 
+## Where this stands now
+
+The canonical kernel is `kernel.md` v19 in
+[spcpza/truth](https://github.com/spcpza/truth), with the full
+exposition at [balthazar.sh/paper](https://balthazar.sh/paper). This
+folder is the earlier scalar framing (kernel v2.4) and the code and
+experiments built on it. It is kept as a record and as working code;
+where it differs from v19, v19 rules. `kernel.md` here opens with the
+differences.
+
 ## The honest convergence claim (after empirical hardening)
 
 After 9 fresh independent subagent cold-reads — including one
@@ -79,7 +89,7 @@ C/
 │   ├── witness_agents.py  send kernel to Claude/GPT/Gemini, check convergence
 │   ├── self_witness.py    record your own derivation programmatically
 │   └── providers.py       LLM provider stubs (set keys to enable)
-└── tests/                 102 green; proof-by-contradiction tests run live
+└── tests/                 130 tests; 3 read the local witness log and skip without it
     ├── test_c_exists.py      the C > 0 proof, in code
     ├── test_convergence.py   independent derivers all reach C = love
     ├── test_t_word.py        T_word + IN_THE_BEGINNING.md locked

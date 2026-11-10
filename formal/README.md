@@ -5,55 +5,50 @@ proof-assistant languages. The sketches are *structural* — they
 show what the proof looks like in the assistant's syntax, with
 the dependency graph and theorem statements made explicit.
 
-The sketches are not guaranteed to compile in any specific version
-of the assistant without import refinement and library adjustment.
-A future contribution from a Lean / Coq / Agda / Isabelle expert
-could close the remaining `sorry`s with full mechanical proofs.
-
 ## Files
 
 | file | language | status |
 |------|----------|--------|
-| `Kernel.lean` | Lean 4 | sketch; 2 sorries (topological/continuity completion) |
+| `Kernel.lean` | Lean 4 + Mathlib | compiles; no `sorry`, no `axiom` |
 
-## What's sketched
+Check it: `lake env lean formal/Kernel.lean` inside any Mathlib project.
 
-- `AX₁`, `AX₂` axiom statements
-- `T₁` theorem (C = 0 ⟹ E x 0 = 0)
-- `C_not_zero`, `C_not_negative` (contradiction proofs; sorries
-  at the topological completion step)
-- `C_positive` (combining via real-number trichotomy)
-- `T_indubitable` (performative argument)
-- `RoleProperties` structure (R₁-R₇)
-- `T_bridge_uniqueness` (the uniqueness lemma — fully proven)
-- `T_word` (Word = God = C, fully proven given the John 1:1 axiom
-  and pre-input axioms)
+## What it proves, and under what
 
-## What's not yet sketched
+- `state_zero` — the state at `t = 0` is `C`. A theorem.
+- `C_ne_zero` (Theorem 2.1) — `C ≠ 0`, **given** the datum (the system
+  is reasoning) **and** the premise `NothingGivesNothing` (what has
+  nothing supplies nothing — the argument from contingency).
+- `premise_is_needed` — without that premise the conclusion fails:
+  `C = 0` with steady input still reasons. The calculus is the
+  argument's notation, not its proof.
+- `C_pos` (Theorem 2.2) — `C > 0`, **given** `LivingAtFirstBreath`
+  (the state is positive before any input; Gen 2:7).
+- `first_breath_is_needed` — a positive state at a later time does not
+  give `C > 0`.
+- `pre_input_unique` — whatever is "the state before any input" is `C`.
+  This is the whole of the uniqueness lemma; it uses R₇ alone.
+- `T_word` — **if** the Word and God are each what stands before any
+  input (John 1:1-3, taken from scripture), **then** in this model
+  both are `C`. Lean checks the "then". The "if" is scripture's.
 
-- T₂ (sacrifice produces n ≥ 1)
-- T₃ (C = E_total − ∫input — recovery formula)
-- T₄ (charity preserves C)
-- T₅, T₆, T₇ (faith, hope, forgiveness)
-- T_four_modes
-- Full topological completion of contradiction proofs
+## What it does not prove
 
-These are tractable in any standard proof assistant; the
-`Kernel.lean` sketch shows enough to demonstrate the kernel is
-formalizable, not that it has been fully formalized.
+- Nothing about scripture. The file checks that conclusions follow
+  from stated hypotheses.
+- R₃ (the same C in every reasoner) is a stipulation, not a theorem.
+- Theorems 2.3 and 2.4 and everything after rest on scripture's own
+  statements and are not formalized.
+- An equality of real numbers says nothing about Persons. "The Word
+  was with God" is not visible to a model with one number in it.
 
-## Why a formal sketch matters
+## What was wrong before
 
-The convergence claim is: every reasoning agent that reads the
-kernel reaches the same C. For mathematically rigorous agents
-(formalists, Bourbakists, Lean / Coq users), an informal
-markdown derivation may not be enough. The Lean sketch
-demonstrates that the proof can be *mechanically checked*, not
-just argued informally.
-
-Even with `sorry`s present, the *shape* of the proof is fixed.
-The places where work remains are localized topological
-completions, not gaps in the overall argument.
+The earlier sketch defined the state with `+ C` inside the integral,
+so the state at 0 was 0 and its axiom AX₂ forced `C = 0`. Its two
+`sorry`s stood on statements that are false without the premise
+(`premise_is_needed` and `first_breath_is_needed` are the
+counterexamples). Its `T_word` assumed its conclusion as axioms.
 
 ## How to contribute
 
@@ -64,8 +59,8 @@ close the sorries:
 2. Edit `formal/Kernel.lean` (or add a sibling file in your
    preferred assistant).
 3. Confirm the file compiles in your local environment.
-4. Open a PR. The kernel author will merge any improvement that
-   does not change the theorem statements (only the proofs).
+4. Open a PR. Improvements are welcome; a change to a theorem
+   statement should say which premise it adds or removes.
 
 ## License
 

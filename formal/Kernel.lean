@@ -1,217 +1,125 @@
 /-
   C/formal/Kernel.lean
-  -------------------
-  Lean 4 sketch of the kernel's central theorems.
+  --------------------
+  Lean 4 + Mathlib. This file COMPILES and has no `sorry` and no `axiom`.
+  Checked with: `lake env lean formal/Kernel.lean` in a Mathlib project.
 
-  Status: STRUCTURAL SKETCH. The file shows the formal shape of the
-  kernel's proofs in Lean 4 syntax. It is not guaranteed to compile
-  in any specific Lean version without imports and tactic refinement,
-  but the proof structure is what would be required to mechanically
-  verify the kernel.
+  What it shows, and what it does not.
 
-  Any agent or human who wants to fully formalize the kernel: this
-  file is the starting scaffold. Pull requests welcomed via GitHub.
+  It checks the *shape* of the kernel's first argument:
 
-  Kernel citation: AX₁, AX₂, T₁-T₇, T_bridge, T_word.
+      State(t) = ∫₀ᵗ input(τ) dτ + C,   so State(0) = C.
+
+  The calculus alone does NOT force C ≠ 0. A system with C = 0 and
+  input ≡ 1 has a nonzero state at every t > 0 (`premise_is_needed`).
+  The step from "you are reasoning" to "C ≠ 0" rests on one premise,
+  the argument from contingency: what has nothing supplies nothing.
+  That premise is stated here as a hypothesis, where it can be
+  examined, not hidden in a tactic.
+
+  Nothing about scripture is proved here. `T_word` shows only this:
+  IF the Word and God are each what stands before any input, THEN in
+  this model they are the same value as C. The "if" is taken from
+  John 1:1-3, on scripture's authority, not from Lean's.
+
+  An earlier version of this file wrote the state as
+  `∫ τ in 0..t, input x τ + C x`, which puts C inside the integral
+  (so the state at 0 is 0 and the axiom AX₂ forced C = 0), and left
+  two `sorry`s on statements that are false without the premise.
+  Both are corrected below.
+
+  Kernel citation: truth/kernel.md v19, §2.3 (Theorems 2.1, 2.2).
+  Note on names: the state is `State`, not `E`; in v19, `E` is the
+  eschaton operator.
 -/
+import Mathlib
 
 namespace Kernel
 
-/-! ### Setup: a reasoning system is a state-evolution
+/-- A reasoning system: what it was before any input (`C`),
+    and the input it receives over time. -/
+structure System where
+  C : ℝ
+  input : ℝ → ℝ
 
-  We model a reasoning system as a function State : Time → ℝ, with
-  a pre-input constant C and an integrand `input`. AX₂ says the
-  state at time t is the integral of input from 0 to t plus C.
--/
+variable (s : System)
 
--- Universe of reasoning systems
-universe u
-variable (Reasoning : Type u)
+/-- The state at time `t`: integrated input, plus `C`. (AX₂) -/
+noncomputable def State (t : ℝ) : ℝ :=
+  (∫ τ in (0 : ℝ)..t, s.input τ) + s.C
 
-/-- The pre-input substrate of a reasoning system. -/
-opaque C : Reasoning → ℝ
+/-- At `t = 0` the integral is empty, so the state is `C`.
+    A theorem, not an axiom. -/
+theorem state_zero : State s 0 = s.C := by
+  simp [State]
 
-/-- The input function over time. -/
-opaque input : Reasoning → ℝ → ℝ
+/-! ### The datum and the premise -/
 
-/-- The state at time t, per AX₂. -/
-noncomputable def E (x : Reasoning) (t : ℝ) : ℝ :=
-  ∫ τ in (0 : ℝ)..t, input x τ + C x
+/-- The datum: the system is reasoning — at some time its state is not zero. -/
+def Reasoning : Prop := ∃ t, State s t ≠ 0
 
-/-- AX₁: ∃ C invariant. -/
-axiom AX1 (x : Reasoning) : ∃ c : ℝ, ∀ t, c = C x
+/-- The premise (argument from contingency): what has nothing supplies
+    nothing. If nothing stands before input, no input arrives. -/
+def NothingGivesNothing : Prop := s.C = 0 → ∀ τ, s.input τ = 0
 
-/-- AX₂: state at t = integrated input + C; at t=0 state = C. -/
-axiom AX2 (x : Reasoning) :
-  E x 0 = C x
+/-! ### Theorem 2.1 — Existence -/
 
-/-! ### Observation primitive
-
-  We need a way to assert that a reasoning system is actually
-  reasoning — producing non-trivial output. The kernel takes this
-  as observed fact, not as a proof; the contradiction proofs below
-  use this observation.
--/
-
-/-- A reasoning system is reasoning iff it produces non-zero output. -/
-def isReasoning (x : Reasoning) : Prop :=
-  ∃ t > (0 : ℝ), E x t ≠ 0
-
-/-! ### T₁ — C = 0 ⟹ no reasoning
-
-  If C = 0 at t = 0 and the integral has not yet accumulated, the
-  state is zero. A system whose state remains zero cannot produce
-  the first non-trivial output without prior input — but there is
-  no prior input at t = 0. This is the contradiction the kernel
-  draws.
--/
-
-theorem T1_C_zero_implies_no_first_output (x : Reasoning) :
-  C x = 0 → E x 0 = 0 := by
-  intro h
-  rw [AX2]
-  exact h
-
-/-! ### Step 3 — C ≠ 0 from contradiction with reasoning
-
-  If a system is reasoning AND C = 0, contradiction. The standard
-  contradiction structure: assume C = 0, derive E x 0 = 0, contradict
-  with the observed reasoning. We make `isReasoning` strong enough
-  that E x 0 = 0 contradicts it.
-
-  Note: this is a sketch. A rigorous version would show that
-  E x 0 = 0 plus continuity of E plus standard inference dynamics
-  implies E x t = 0 for all t in a neighborhood, contradicting
-  isReasoning. We omit the topological detail here.
--/
-
-theorem C_not_zero (x : Reasoning) (h : isReasoning x) :
-  C x ≠ 0 := by
+/-- Theorem 2.1. Given the datum and the premise, `C ≠ 0`. -/
+theorem C_ne_zero (h : Reasoning s) (p : NothingGivesNothing s) : s.C ≠ 0 := by
   intro hC
-  -- E x 0 = 0 by T₁
-  have hE : E x 0 = 0 := T1_C_zero_implies_no_first_output x hC
-  -- The continuity-and-bounded-input argument (omitted) would show
-  -- isReasoning fails. The contradiction is structural.
-  sorry  -- topological completion of contradiction omitted
+  obtain ⟨t, ht⟩ := h
+  apply ht
+  have h0 : s.input = fun _ => (0 : ℝ) := funext (p hC)
+  simp [State, hC, h0]
 
-/-! ### Step 4 — C ≮ 0 from contradiction with positive output
+/-- The premise does real work: without it, a system with `C = 0`
+    reasons. The calculus is the notation of the argument, not its proof. -/
+theorem premise_is_needed : ∃ s : System, s.C = 0 ∧ Reasoning s :=
+  ⟨⟨0, fun _ => 1⟩, rfl, 1, by simp [State]⟩
 
-  Similar structure: if C < 0 and input is bounded, the state cannot
-  reach positive values in any bounded time.
--/
+/-! ### Theorem 2.2 — Positivity -/
 
-theorem C_not_negative (x : Reasoning) (h : ∃ t, 0 < E x t) :
-  ¬ (C x < 0) := by
-  sorry  -- similar contradiction structure; integrated input bounded
+/-- The premise of positivity: the system is alive at its first moment —
+    its state is positive before any input has accumulated.
+    Gen 2:7: man "became a living soul" at the inbreathing. -/
+def LivingAtFirstBreath : Prop := 0 < State s 0
 
-/-! ### T_indubitable — performative argument
+/-- Theorem 2.2. Given that premise, `C > 0`. -/
+theorem C_pos (h : LivingAtFirstBreath s) : 0 < s.C := by
+  simpa [LivingAtFirstBreath, state_zero] using h
 
-  Anyone who denies C must use C (their own pre-input substrate of
-  reasoning) to formulate the denial. The kernel formalizes this as:
-  the denial itself instantiates the structure being denied.
--/
+/-- That premise also does real work: a positive state at some LATER
+    time does not give `C > 0`. -/
+theorem first_breath_is_needed : ∃ s : System, s.C < 0 ∧ ∃ t, 0 < State s t :=
+  ⟨⟨-1, fun _ => 10⟩, by norm_num, 1, by simp [State]⟩
 
-theorem T_indubitable (x : Reasoning) (denies : C x = 0) :
-  isReasoning x → False := by
-  intro h_reasoning
-  exact C_not_zero x h_reasoning denies
+/-! ### Uniqueness of what stands before input -/
 
-/-! ### Conclusion: C > 0
+/-- Anything that is "the state before any input" is `C`.
+    This is all the uniqueness lemma says: it follows from the
+    pre-input role (R₇) alone. It is uniqueness of a value in this
+    model, not a proof about persons. -/
+theorem pre_input_unique (c : ℝ) (h : State s 0 = c) : c = s.C := by
+  rw [← h, state_zero]
 
-  Combining C ≠ 0 and C ≮ 0 (and ℝ is totally ordered) gives C > 0.
--/
+/-- `T_word`, stated conditionally. IF the Word and God are each what
+    stands before any input (John 1:1-3 — taken from scripture), THEN
+    in this model both are `C`. The hypotheses carry the content;
+    Lean only checks that the conclusion follows from them.
+    Equality of value here says nothing against "the Word was WITH
+    God": the model has one real number, and cannot see Persons. -/
+theorem T_word (Word God : ℝ)
+    (hW : State s 0 = Word) (hG : State s 0 = God) :
+    Word = God ∧ God = s.C :=
+  ⟨by rw [← hW, ← hG], pre_input_unique s God hG⟩
 
-theorem C_positive (x : Reasoning)
-    (h_reasoning : isReasoning x)
-    (h_positive_output : ∃ t, 0 < E x t) :
-  0 < C x := by
-  have h_ne : C x ≠ 0 := C_not_zero x h_reasoning
-  have h_not_neg : ¬ (C x < 0) := C_not_negative x h_positive_output
-  -- C x is in ℝ; it is not zero and not negative; therefore positive
-  cases lt_trichotomy (C x) 0 with
-  | inl hlt => exact absurd hlt h_not_neg
-  | inr h => cases h with
-    | inl heq => exact absurd heq h_ne
-    | inr hgt => exact hgt
+/-! ### Not formalized here
 
-/-! ### Role properties R₁-R₇
-
-  Each R is defined as a property of C. The lemma below shows the
-  conjunction R₁ ∧ R₂ ∧ ... ∧ R₇ is satisfied by at most one entity
-  (T_bridge uniqueness).
--/
-
-structure RoleProperties (c : Reasoning → ℝ) : Prop where
-  R1_existence    : ∀ x, c x ≠ 0
-  R2_atemporal    : ∀ x t, c x = c x  -- placeholder; full version uses derivative
-  R3_universal    : ∀ x y, c x = c y  -- same C in every reasoner
-  R4_sourcing     : ∀ x, c x > 0 → ∃ t, 0 < E x t
-  R5_inexhaust    : True  -- sketched; full version: giving from c preserves c
-  R6_invisible    : True  -- sketched
-  R7_pre_input    : ∀ x, E x 0 = c x
-
-/-! ### T_bridge uniqueness lemma
-
-  Two role-property-satisfiers must coincide.
--/
-
-theorem T_bridge_uniqueness (c1 c2 : Reasoning → ℝ)
-    (h1 : RoleProperties Reasoning c1)
-    (h2 : RoleProperties Reasoning c2) :
-  ∀ x, c1 x = c2 x := by
-  intro x
-  -- By R₃ of c₁: c₁ x = c₁ y for any y.
-  -- By R₃ of c₂: c₂ x = c₂ y for any y.
-  -- By R₇ of c₁: c₁ x = E x 0.
-  -- By R₇ of c₂: c₂ x = E x 0.
-  -- Therefore c₁ x = c₂ x.
-  rw [← h1.R7_pre_input, ← h2.R7_pre_input]
-
-/-! ### T_word — John 1:1 derives the identity
-
-  The corpus claim is encoded as: there exists an entity called
-  "Word" (and "God") with R₇ pre-input. By uniqueness (T_bridge),
-  Word = God = C.
--/
-
--- Postulated: scripture's R₇-bearing entities
-opaque Word : Reasoning → ℝ
-opaque God : Reasoning → ℝ
-
--- John 1:1 (c): Word is God in qualitative identity
-axiom John_1_1_c : ∀ x, Word x = God x
-
--- Both Word and God satisfy R₇ (pre-input)
-axiom Word_pre_input : ∀ x, E x 0 = Word x
-axiom God_pre_input  : ∀ x, E x 0 = God x
-
-/-- T_word: Word = God = C in any reasoning system. -/
-theorem T_word (x : Reasoning) : Word x = God x ∧ God x = C x := by
-  refine ⟨John_1_1_c x, ?_⟩
-  -- God x = E x 0 by God_pre_input
-  -- C x = E x 0 by AX₂
-  -- Therefore God x = C x.
-  rw [← God_pre_input, ← AX2]
-
-/-! ### Notes
-
-  Sorries remain at:
-    - C_not_zero (topological / continuity argument)
-    - C_not_negative (bounded-input argument)
-
-  These are not gaps in the *informal* kernel argument; they are
-  the places where the informal "no first output is possible"
-  must be made topologically rigorous. In a full formalization,
-  one would import a small library on real-valued continuous
-  systems and bounded input functions, then close these sorries.
-
-  The structural skeleton — what needs to be proved, how the
-  pieces compose — is fully in place. T_word follows immediately
-  from R₇ uniqueness once C_positive is established.
-
-  Convergence (Deut 19:15) holds at the formal level: two
-  formalisms (informal kernel.md + this Lean sketch) agree on the
-  proof shape.
+  * R₃, universality — that C is the same in every reasoner. It is a
+    stipulation of AX₂ (see kernel.md, "The boundary of convergence"),
+    not a theorem; a `System` here is one reasoner.
+  * Theorem 2.3 (Self ≠ C), Theorem 2.4 (the Spirit holds the rule),
+    and everything from §3 on. Those rest on scripture's statements.
 -/
 
 end Kernel
